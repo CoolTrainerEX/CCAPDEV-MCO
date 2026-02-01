@@ -2,6 +2,29 @@
   "name": "ccapdev-mco",
   "version": "0.1.0",
   "private": true,
+  "description": "CCAPDEV MCO",
+  "keywords": [
+    "CCAPDEV"
+  ],
+  "homepage": "https://github.com/CoolTrainerEX/CCAPDEV-MCO#readme",
+  "bugs": {
+    "url": "https://github.com/CoolTrainerEX/CCAPDEV-MCO/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoolTrainerEX/CCAPDEV-MCO.git"
+  },
+  "license": "ISC",
+  "contributors": [
+    "Justin Ryan Uy <justin_ryan_uy@dlsu.edu.ph> (https://CoolTrainerEX.github.io)",
+    "Anie Guo <anie_guo@dlsu.edu.ph> (https://www.facebook.com/anie.guo)",
+    "Andrea Jadyn Tan <andrea_jadyn_tan@dlsu.edu.ph> (https://www.facebook.com/andreajadyn.tan.3)"
+  ],
+  "type": "module",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
