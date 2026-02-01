@@ -12,6 +12,7 @@ export default defineConfig({
       target: "src/api/endpoints",
       schemas: { path: "src/api/models", type: "zod" },
       mock: true,
+      baseUrl: "/api",
       override: {
         fetch: {
           runtimeValidation: true,
