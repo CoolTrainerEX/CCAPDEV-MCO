@@ -18,7 +18,7 @@ export default function Nav() {
   const userID = useUser((state) => state.userID);
 
   return (
-    <NavigationMenu className="sticky p-4 max-w-full [&>div]:w-full">
+    <NavigationMenu className="sticky top-0 p-4 max-w-full [&>div]:w-full bg-secondary text-secondary-foreground">
       <NavigationMenuList className="justify-between">
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
