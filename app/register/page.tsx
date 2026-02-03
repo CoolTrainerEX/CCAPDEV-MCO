@@ -1,19 +1,19 @@
 import Link from "next/link";
-import { Button } from "../../components/ui/button.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card.tsx";
+} from "@/components/ui/card.tsx";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "../../components/ui/field.tsx";
-import { Input } from "../../components/ui/input.tsx";
+} from "@/components/ui/field.tsx";
+import { Input } from "@/components/ui/input.tsx";
 
 export default function Register() {
   return (
