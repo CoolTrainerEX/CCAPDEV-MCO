@@ -1,0 +1,12 @@
+openapi: '3.1.1'
+info:
+  title: ArchersLab API
+  version: '1.0'
+servers:
+  - url: /api
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK
