@@ -8,7 +8,7 @@
 import { z as zod } from 'zod';
 
 export const LoginBody = zod.object({
-  "email": zod.string().email(),
+  "email": zod.email(),
   "password": zod.string()
 })
 

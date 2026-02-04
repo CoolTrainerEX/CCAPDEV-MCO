@@ -15,7 +15,7 @@ import {
 import { useLogin } from "@/src/api/endpoints/default/default.ts";
 
 export default function Nav() {
-  const { data } = useLogin({
+  const { data, isLoading } = useLogin({
     email: "juan_dela_cruz@dlsu.edu.ph",
     password: "password",
   });
@@ -41,17 +41,22 @@ export default function Nav() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
-            <Link href={`/user/${data?.data }`} className="flex-row gap-4">
-              <p className="leading-7 not-first:mt-6">
-                Hello, {useUser((state) => state.username)}!
-              </p>
-              <Avatar>
-                <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/1/16/Official_Presidential_Portrait_of_President_Donald_J._Trump_%282025%29.jpg" />
-                <AvatarFallback>
-                  {userID.toString()[0]}
-                </AvatarFallback>
-              </Avatar>
-            </Link>
+            {isLoading ? <>Loading</> : (
+              <Link
+                href={`/user/${data?.data?.id}`}
+                className="flex-row gap-4"
+              >
+                <p className="leading-7 not-first:mt-6">
+                  Hello, {data?.data?.name.first} {data?.data?.name.last}!
+                </p>
+                <Avatar>
+                  <AvatarImage src="" />
+                  <AvatarFallback>
+                    {data?.data?.name.first[0]}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            )}
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

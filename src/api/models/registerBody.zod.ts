@@ -8,7 +8,7 @@
 import { z as zod } from 'zod';
 
 export const RegisterBody = zod.object({
-  "email": zod.string().email(),
+  "email": zod.email(),
   "password": zod.string()
 }).and(zod.object({
   "id": zod.number(),
