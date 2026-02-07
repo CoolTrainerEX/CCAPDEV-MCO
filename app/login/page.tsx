@@ -45,7 +45,7 @@ export default function Login() {
                 <Field>
                   <Button type="submit">Login</Button>
                   <FieldDescription className="text-center">
-                    Don&apos;t have an account?{" "}
+                    Don't have an account?{" "}
                     <Link href="/register">Register</Link>
                   </FieldDescription>
                 </Field>

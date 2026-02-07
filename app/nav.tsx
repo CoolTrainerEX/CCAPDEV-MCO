@@ -12,15 +12,11 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar.tsx";
+import { getUser } from "@/src/sample.ts";
+import useLogin from "@/src/store/login.ts";
 
 export default function Nav() {
-  const data = {
-    id: 1,
-    name: {
-      first: "Juan",
-      last: "Dela Cruz",
-    },
-  };
+  const user = getUser(useLogin().id);
 
   return (
     <NavigationMenu className="sticky top-0 p-4 max-w-full [&>div]:w-full bg-secondary text-secondary-foreground">
@@ -44,16 +40,16 @@ export default function Nav() {
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
             <Link
-              href={`/user/${data.id}`}
+              href={`/user/${user?.id}`}
               className="flex-row gap-4 align-middle"
             >
               <p className="leading-7 not-first:mt-6">
-                Hello, {data.name.first} {data.name.last}!
+                Hello, {user?.name.first} {user?.name.last}!
               </p>
               <Avatar>
                 <AvatarImage src="" />
                 <AvatarFallback>
-                  {data.name.first[0]}
+                  {user?.name.first[0]}
                 </AvatarFallback>
               </Avatar>
             </Link>

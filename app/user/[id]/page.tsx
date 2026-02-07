@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
+import { getUser } from "../../../src/sample.ts";
 
 export default async function User(
   { params }: Readonly<{ params: Promise<{ id: string }> }>,
 ) {
-  const id = Number.parseInt((await params).id);
+  const user = getUser(Number.parseInt((await params).id));
 
-  if (Number.isNaN(id)) notFound();
+  if (!user) notFound();
 
-  return <p>{id}</p>;
+  return <p>{user.id}</p>;
 }
