@@ -34,7 +34,7 @@ export default function Login() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@dlsu.edu.ph"
+                    placeholder="juan_dela_cruz@dlsu.edu.ph"
                     required
                   />
                 </Field>

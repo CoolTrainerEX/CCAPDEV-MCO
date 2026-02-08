@@ -16,14 +16,14 @@ import { getUser } from "@/src/sample.ts";
 import useLogin from "@/src/store/login.ts";
 
 export default function Nav() {
-  const user = getUser(useLogin().id);
+  const user = getUser(useLogin(({ id }) => id));
 
   return (
-    <NavigationMenu className="sticky top-0 p-4 max-w-full [&>div]:w-full bg-secondary text-secondary-foreground">
+    <NavigationMenu className="sticky top-0 p-4 max-w-full [&>div]:w-full bg-card text-card-foreground">
       <NavigationMenuList className="justify-between">
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
-            <Link href="/" className="flex-row gap-4">
+            <Link href="/" className="flex-row gap-6">
               <div className="relative w-10">
                 <Image
                   src="/icon.svg"
@@ -39,20 +39,31 @@ export default function Nav() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
-            <Link
-              href={`/user/${user?.id}`}
-              className="flex-row gap-4 align-middle"
-            >
-              <p className="leading-7 not-first:mt-6">
-                Hello, {user?.name.first} {user?.name.last}!
-              </p>
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback>
-                  {user?.name.first[0]}
-                </AvatarFallback>
-              </Avatar>
-            </Link>
+            {user
+              ? (
+                <Link
+                  href={`/user/${user.id}`}
+                  className="flex-row gap-4 align-middle"
+                >
+                  <p className="leading-7 not-first:mt-6">
+                    Hello, {user.name.first} {user.name.last}!
+                  </p>
+                  <Avatar>
+                    <AvatarImage src="" />
+                    <AvatarFallback>
+                      {user.name.first[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              )
+              : (
+                <Link
+                  href="/login"
+                  className="bg-primary text-primary-foreground"
+                >
+                  Login
+                </Link>
+              )}
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

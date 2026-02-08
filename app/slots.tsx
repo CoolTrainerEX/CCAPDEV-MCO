@@ -1,20 +1,20 @@
 import { cn } from "@/lib/utils.ts";
 import { ReactNode } from "react";
-import { getLab } from "../src/sample.ts";
+import { getLab } from "@/src/sample.ts";
 
-export default function Slots<T>(
-    { className, children, slots, ...props }:
+export default function Slots(
+    { className, style, children, slots, ...props }:
         & Omit<React.ComponentProps<"div">, "children">
         & {
             children: (slot: typeof slots[number]) => ReactNode;
-            slots:
-                (NonNullable<ReturnType<typeof getLab>>["slots"][number] & {
-                    reserved?: true;
-                })[];
+            slots: (
+                & NonNullable<ReturnType<typeof getLab>>["slots"][number]
+                & Partial<Record<"reserved", true>>
+            )[];
         },
 ) {
     // deno-lint-ignore no-unused-vars
-    const dim = slots.map(({ id, ...value }) => value).reduce(
+    const { x, y } = slots.map(({ id, ...value }) => value).reduce(
         (previousValue, currentValue) => ({
             x: Math.max(previousValue.x, currentValue.x),
             y: Math.max(previousValue.y, currentValue.y),
@@ -25,8 +25,9 @@ export default function Slots<T>(
         <div
             className={cn("grid gap-2", className)}
             style={{
-                gridTemplateColumns: `repeat(${dim.x + 1}, 1fr)`,
-                gridTemplateRows: `repeat(${dim.y + 1}, 1fr)`,
+                gridTemplateColumns: `repeat(${x + 1}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${y + 1}, minmax(0, 1fr))`,
+                ...style,
             }}
             {...props}
         >
