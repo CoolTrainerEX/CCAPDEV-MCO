@@ -115,13 +115,13 @@ const reservations: Reservation[] = [
             start: (() => {
                 const date = startOfDay(new Date());
 
-                date.setHours(1);
+                date.setHours(23);
                 return date;
             })(),
             end: (() => {
                 const date = startOfDay(new Date());
 
-                date.setHours(19);
+                date.setHours(24);
                 return date;
             })(),
         },

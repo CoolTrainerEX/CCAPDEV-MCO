@@ -85,8 +85,8 @@ export default function Lab() {
             ...value,
             reserved: getReservationsFromLab(id)?.filter(
               ({ schedule: { start, end } }) =>
-                compareDesc(start, new Date()) !== -1 &&
-                compareAsc(end, new Date()) !== -1,
+                compareDesc(start, timeDate) !== -1 &&
+                compareAsc(end, timeDate) !== -1,
             ).flatMap(({ slotIds }) => slotIds)
               .includes(value.id) ||
               undefined,
