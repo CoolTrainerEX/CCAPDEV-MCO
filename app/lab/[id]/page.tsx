@@ -34,34 +34,37 @@ export default function Lab() {
 
   timeDate.setHours(time[0], time[0] % 1 * 60);
 
-  let schedule = weeklySched[
-    ([
-      "sunday",
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-    ] as (keyof typeof weeklySched)[])[
-      startOfDay(date).getDay()
-    ]
-  ];
+  let schedule = structuredClone(
+    weeklySched[
+      ([
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ] as (keyof typeof weeklySched)[])[
+        startOfDay(date).getDay()
+      ]
+    ],
+  );
 
   if (schedule) {
-    const date = new Date(0);
+    const start = new Date(date), end = new Date(date);
 
-    date.setHours(new Date().getHours(), new Date().getMinutes());
+    start.setHours(schedule.start.getHours(), schedule.start.getMinutes());
+    end.setHours(schedule.end.getHours(), schedule.end.getMinutes());
 
     schedule.start = max([
-      schedule.start,
-      roundToNearestMinutes(date, {
+      start,
+      roundToNearestMinutes(new Date(), {
         nearestTo: 30,
         roundingMethod: "ceil",
       }),
     ]);
 
-    if (differenceInMinutes(schedule.start, schedule.end) >= 0) {
+    if (differenceInMinutes(schedule.start, end) >= 0) {
       schedule = undefined;
     }
   }
