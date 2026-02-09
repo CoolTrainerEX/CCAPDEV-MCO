@@ -14,6 +14,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import Form from "next/form";
 
 export default function Login() {
   return (
@@ -27,7 +28,7 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
+            <Form action="/login">
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -50,7 +51,7 @@ export default function Login() {
                   </FieldDescription>
                 </Field>
               </FieldGroup>
-            </form>
+            </Form>
           </CardContent>
         </Card>
       </div>

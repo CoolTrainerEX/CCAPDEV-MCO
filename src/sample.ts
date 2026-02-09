@@ -1,7 +1,6 @@
-import { startOfDay } from "date-fns/startOfDay";
-import { compareAsc } from "date-fns/compareAsc";
-
-type Schedule = { start: Date; end: Date };
+import { Interval } from "date-fns";
+import { setHours } from "date-fns/setHours";
+import { isAfter } from "date-fns/isAfter";
 
 type User = {
   id: number;
@@ -14,7 +13,7 @@ type User = {
 type Lab = {
   id: number;
   name: string;
-  weeklySched: Partial<
+  weeklySchedule: Partial<
     Record<
       | "sunday"
       | "monday"
@@ -23,7 +22,7 @@ type Lab = {
       | "thursday"
       | "friday"
       | "saturday",
-      Schedule
+      Interval
     >
   >;
   slots: { id: number; x: number; y: number }[];
@@ -34,7 +33,7 @@ type Reservation = {
   userId: number;
   labId: number;
   anonymous?: true;
-  schedule: Schedule;
+  schedule: Interval;
   slotIds: number[];
 };
 
@@ -61,20 +60,10 @@ const labs: Lab[] = [
   {
     id: 1,
     name: "GK203",
-    weeklySched: {
+    weeklySchedule: {
       monday: {
-        start: (() => {
-          const date = new Date(0);
-
-          date.setHours(8);
-          return date;
-        })(),
-        end: (() => {
-          const date = new Date(0);
-
-          date.setHours(23);
-          return date;
-        })(),
+        start: setHours(new Date(0), 8),
+        end: setHours(new Date(0), 23),
       },
     },
     slots: [{ id: 1, x: 0, y: 0 }, { id: 2, x: 1, y: 0 }, {
@@ -86,20 +75,10 @@ const labs: Lab[] = [
   {
     id: 2,
     name: "GK204",
-    weeklySched: {
+    weeklySchedule: {
       monday: {
-        start: (() => {
-          const date = new Date(0);
-
-          date.setHours(8);
-          return date;
-        })(),
-        end: (() => {
-          const date = new Date(0);
-
-          date.setHours(16);
-          return date;
-        })(),
+        start: setHours(new Date(0), 8),
+        end: setHours(new Date(0), 16),
       },
     },
     slots: [{ id: 1, x: 0, y: 1 }, { id: 2, x: 1, y: 0 }],
@@ -112,18 +91,8 @@ const reservations: Reservation[] = [
     userId: 1,
     labId: 1,
     schedule: {
-      start: (() => {
-        const date = startOfDay(new Date());
-
-        date.setHours(12);
-        return date;
-      })(),
-      end: (() => {
-        const date = startOfDay(new Date());
-
-        date.setHours(15);
-        return date;
-      })(),
+      start: setHours(new Date(), 12),
+      end: setHours(new Date(), 17),
     },
     slotIds: [1],
   },
@@ -133,18 +102,8 @@ const reservations: Reservation[] = [
     labId: 2,
     anonymous: true,
     schedule: {
-      start: (() => {
-        const date = startOfDay(new Date());
-
-        date.setHours(11);
-        return date;
-      })(),
-      end: (() => {
-        const date = startOfDay(new Date());
-
-        date.setHours(15);
-        return date;
-      })(),
+      start: setHours(new Date(), 11),
+      end: setHours(new Date(), 20),
     },
     slotIds: [1, 2],
   },
@@ -186,7 +145,7 @@ export function getReservationsFromLab(
 
   return reservations.filter((value) =>
     value.labId === labId &&
-    compareAsc(value.schedule.end, new Date()) !== -1
+    isAfter(value.schedule.end, new Date())
   ).map((
     value,
   ) => ({
@@ -205,7 +164,7 @@ export function getReservationsFromUser(
   return reservations.filter((value) =>
     value.userId === userId &&
     (!value.anonymous || value.userId === loginId || isAdmin) &&
-    compareAsc(value.schedule.end, new Date()) !== -1
+    isAfter(value.schedule.end, new Date())
   ).map((
     value,
   ) => ({

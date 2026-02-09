@@ -24,7 +24,7 @@ export default function Nav() {
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
             <Link href="/" className="flex-row gap-6">
-              <div className="relative w-10">
+              <div className="relative w-10 hidden sm:block">
                 <Image
                   src="/icon.svg"
                   alt="ArchersLab logo"
@@ -45,7 +45,7 @@ export default function Nav() {
                   href={`/user/${user.id}`}
                   className="flex-row gap-4 align-middle"
                 >
-                  <p className="leading-7 not-first:mt-6">
+                  <p className="leading-7 not-first:mt-6 hidden sm:block">
                     Hello, {user.name.first} {user.name.last}!
                   </p>
                   <Avatar>

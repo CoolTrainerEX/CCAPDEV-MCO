@@ -18,11 +18,10 @@ import Form from "next/form";
 import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator.tsx";
 import { startOfDay } from "date-fns/startOfDay";
-import { compareAsc } from "date-fns/compareAsc";
-import { compareDesc } from "date-fns/compareDesc";
 import { useEffect, useState } from "react";
-import useNow from "@/src/store/now.ts";
 import { cn } from "../lib/utils.ts";
+import { isWithinInterval } from "date-fns/isWithinInterval";
+import { toDate } from "date-fns/toDate";
 
 export default function Home() {
   const labs = getLabs(useSearchParams().get("q") ?? "");
@@ -30,16 +29,7 @@ export default function Home() {
     undefined,
   );
 
-  const now = useNow(({ now }) => now);
-
-  useEffect(
-    () => {
-      setInterval(() => {
-        useNow.getState().tick();
-      }, 1000 * 60);
-    },
-    [],
-  );
+  const now = new Date();
 
   useEffect(() => {
     setFormat(Intl.DateTimeFormat(undefined, {
@@ -60,11 +50,9 @@ export default function Home() {
       <Separator className="my-6" />
       <div className="flex flex-wrap gap-6 justify-around container m-auto">
         {labs.map(
-          ({ id, name, weeklySched, slots }) => {
+          ({ id, name, weeklySchedule: weeklySched, slots }) => {
             const reserved = getReservationsFromLab(id)?.filter(
-              ({ schedule: { start, end } }) =>
-                compareDesc(start, now) !== -1 &&
-                compareAsc(end, now) !== -1,
+              ({ schedule }) => isWithinInterval(now, schedule),
             ).flatMap((
               { slotIds },
             ) => slotIds);
@@ -112,8 +100,8 @@ export default function Home() {
                   {schedule
                     ? (
                       format?.formatRange(
-                        schedule.start,
-                        schedule.end,
+                        toDate(schedule.start),
+                        toDate(schedule.end),
                       )
                     )
                     : (

@@ -14,34 +14,35 @@ import {
   FieldLabel,
 } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import Form from "next/form";
 
 export default function Register() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm flex flex-col gap-6">
+      <div className="w-full max-w-sm">
         <Card>
           <CardHeader>
-            <CardTitle>Register to your account</CardTitle>
+            <CardTitle>Create an account</CardTitle>
             <CardDescription>
-              Enter your details below to register your account
+              Enter your information below to create your account
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
+            <Form action="/register">
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="fname">First Name</FieldLabel>
+                  <FieldLabel htmlFor="firstname">First Name</FieldLabel>
                   <Input
-                    id="fname"
+                    id="firstname"
                     type="text"
                     placeholder="Juan"
                     required
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="lname">Last Name</FieldLabel>
+                  <FieldLabel htmlFor="lastname">Last Name</FieldLabel>
                   <Input
-                    id="lname"
+                    id="lastname"
                     type="text"
                     placeholder="Dela Cruz"
                     required
@@ -55,25 +56,38 @@ export default function Register() {
                     placeholder="juan_dela_cruz@dlsu.edu.ph"
                     required
                   />
+                  <FieldDescription>
+                    We&apos;ll use this to contact you. We will not share your
+                    email with anyone else.
+                  </FieldDescription>
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input id="password" type="password" required />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="password-confirm">
-                    Confirm Password
-                  </FieldLabel>
-                  <Input id="password-confirm" type="password" required />
-                </Field>
-                <Field>
-                  <Button type="submit">Register</Button>
-                  <FieldDescription className="text-center">
-                    Already have an account? <Link href="/login">Login</Link>
+                  <Input id="password" type="password" minLength={8} required />
+                  <FieldDescription>
+                    Must be at least 8 characters long.
                   </FieldDescription>
                 </Field>
+                <Field>
+                  <FieldLabel htmlFor="confirm-password">
+                    Confirm Password
+                  </FieldLabel>
+                  <Input id="confirm-password" type="password" required />
+                  <FieldDescription>
+                    Please confirm your password.
+                  </FieldDescription>
+                </Field>
+                <FieldGroup>
+                  <Field>
+                    <Button type="submit">Create Account</Button>
+                    <FieldDescription className="px-6 text-center">
+                      Already have an account?{" "}
+                      <Link href="/login">Sign in</Link>
+                    </FieldDescription>
+                  </Field>
+                </FieldGroup>
               </FieldGroup>
-            </form>
+            </Form>
           </CardContent>
         </Card>
       </div>
