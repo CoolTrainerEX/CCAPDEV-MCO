@@ -21,11 +21,23 @@ import { startOfDay } from "date-fns/startOfDay";
 import { compareAsc } from "date-fns/compareAsc";
 import { compareDesc } from "date-fns/compareDesc";
 import { useEffect, useState } from "react";
+import useNow from "@/src/store/now.ts";
 
 export default function Home() {
   const labs = getLabs(useSearchParams().get("q") ?? "");
   const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
     undefined,
+  );
+
+  const now = useNow(({ now }) => now);
+
+  useEffect(
+    () => {
+      setInterval(() => {
+        useNow.getState().tick();
+      }, 1000 * 60);
+    },
+    [],
   );
 
   useEffect(() => {
@@ -50,8 +62,8 @@ export default function Home() {
           ({ id, name, weeklySched, slots }) => {
             const reserved = getReservationsFromLab(id)?.filter(
               ({ schedule: { start, end } }) =>
-                compareDesc(start, new Date()) !== -1 &&
-                compareAsc(end, new Date()) !== -1,
+                compareDesc(start, now) !== -1 &&
+                compareAsc(end, now) !== -1,
             ).flatMap((
               { slotIds },
             ) => slotIds);
@@ -66,7 +78,7 @@ export default function Home() {
                 "friday",
                 "saturday",
               ] as (keyof typeof weeklySched)[])[
-                startOfDay(new Date()).getDay()
+                startOfDay(now).getDay()
               ]
             ];
 

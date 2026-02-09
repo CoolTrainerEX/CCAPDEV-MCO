@@ -12,7 +12,7 @@ import Reservations from "@/app/reservations.tsx";
 import useLogin from "../../../src/store/login.ts";
 
 export default function User() {
-  const { id: loginId } = useLogin();
+  const loginId = useLogin(({ id }) => id);
   const { id, name, admin } =
     getUser(Number.parseInt(useParams<{ id: string }>().id)) ??
       notFound();

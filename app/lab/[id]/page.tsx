@@ -21,12 +21,14 @@ import { format } from "date-fns/format";
 import { compareDesc } from "date-fns/compareDesc";
 import { compareAsc } from "date-fns/compareAsc";
 import { max } from "date-fns/max";
-import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
+import useNow from "@/src/store/now.ts";
 
 export default function Lab() {
   const { id, name, slots, weeklySched } =
     getLab(Number.parseInt(useParams<{ id: string }>().id)) ??
       notFound();
+
+  const now = useNow(({ now }) => now);
 
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState([0]);
@@ -68,13 +70,7 @@ export default function Lab() {
     start.setHours(schedule.start.getHours(), schedule.start.getMinutes());
     end.setHours(schedule.end.getHours(), schedule.end.getMinutes());
 
-    schedule.start = max([
-      start,
-      roundToNearestMinutes(new Date(), {
-        nearestTo: 30,
-        roundingMethod: "ceil",
-      }),
-    ]);
+    schedule.start = max([start, now]);
 
     if (differenceInMinutes(schedule.start, end) >= 0) {
       schedule = undefined;
@@ -121,8 +117,8 @@ export default function Lab() {
               onSelect={setDate}
               className="p-0"
               disabled={{
-                before: startOfDay(new Date()),
-                after: addDays(startOfDay(new Date()), 7),
+                before: startOfDay(now),
+                after: addDays(startOfDay(now), 7),
               }}
               timeZone={timeZone}
               required
