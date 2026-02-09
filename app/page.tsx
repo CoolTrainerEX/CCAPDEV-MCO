@@ -59,69 +59,75 @@ export default function Home() {
       </Form>
       <Separator className="my-6" />
       <div className="flex flex-wrap gap-6 justify-around container m-auto">
-        {labs.map(
-          ({ id, name, weeklySchedule: weeklySched, slots }) => {
-            const reserved = getReservationsFromLab(id)?.filter(
-              ({ schedule }) => isWithinInterval(now, schedule),
-            ).flatMap((
-              { slotIds },
-            ) => slotIds);
+        {labs.length
+          ? labs.map(
+            ({ id, name, weeklySchedule: weeklySched, slots }) => {
+              const reserved = getReservationsFromLab(id)?.filter(
+                ({ schedule }) => isWithinInterval(now, schedule),
+              ).flatMap((
+                { slotIds },
+              ) => slotIds);
 
-            const schedule = weeklySched[
-              ([
-                "sunday",
-                "monday",
-                "tuesday",
-                "wednesday",
-                "thursday",
-                "friday",
-                "saturday",
-              ] as (keyof typeof weeklySched)[])[
-                startOfDay(now).getDay()
-              ]
-            ];
+              const schedule = weeklySched[
+                ([
+                  "sunday",
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                ] as (keyof typeof weeklySched)[])[
+                  startOfDay(now).getDay()
+                ]
+              ];
 
-            return (
-              <Card key={id} className="w-full max-w-sm">
-                <CardHeader>
-                  <CardTitle>{name}</CardTitle>
-                  <CardAction>
-                    <Button variant="link" asChild>
-                      <Link href={`/lab/${id}`}>Reserve</Link>
-                    </Button>
-                  </CardAction>
-                </CardHeader>
-                <CardContent>
-                  <Slots
-                    className="aspect-video"
-                    slots={slots}
-                  >
-                    {({ id }) => (
-                      <div
-                        className={cn(
-                          "w-full h-full",
-                          reserved?.includes(id) ? "bg-primary" : "bg-muted",
-                        )}
-                      />
-                    )}
-                  </Slots>
-                </CardContent>
-                <CardFooter>
-                  {schedule
-                    ? (
-                      format?.formatRange(
-                        toDate(schedule.start),
-                        toDate(schedule.end),
+              return (
+                <Card key={id} className="w-full max-w-sm">
+                  <CardHeader>
+                    <CardTitle>{name}</CardTitle>
+                    <CardAction>
+                      <Button variant="link" asChild>
+                        <Link href={`/lab/${id}`}>Reserve</Link>
+                      </Button>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <Slots
+                      className="aspect-video"
+                      slots={slots}
+                    >
+                      {({ id }) => (
+                        <div
+                          className={cn(
+                            "w-full h-full",
+                            reserved?.includes(id) ? "bg-primary" : "bg-muted",
+                          )}
+                        />
+                      )}
+                    </Slots>
+                  </CardContent>
+                  <CardFooter>
+                    {schedule
+                      ? (
+                        format?.formatRange(
+                          toDate(schedule.start),
+                          toDate(schedule.end),
+                        )
                       )
-                    )
-                    : (
-                      "Closed today"
-                    )}
-                </CardFooter>
-              </Card>
-            );
-          },
-        )}
+                      : (
+                        "Closed today"
+                      )}
+                  </CardFooter>
+                </Card>
+              );
+            },
+          )
+          : (
+            <p className="text-center leading-7 not-first:mt-6">
+              No labs.
+            </p>
+          )}
       </div>
     </>
   );

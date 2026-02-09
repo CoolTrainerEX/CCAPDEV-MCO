@@ -39,12 +39,18 @@ export default function User() {
         </div>
       </div>
       <Separator className="my-6" />
-      <div className="flex gap-6">
-        {reservations?.map((value) => (
-          <Reservation key={value.id} reservation={value}>
-            <ReservationContent reservation={value} />
-          </Reservation>
-        ))}
+      <div className="flex gap-6 justify-around">
+        {reservations?.length
+          ? reservations.map((value) => (
+            <Reservation key={value.id} reservation={value}>
+              <ReservationContent reservation={value} />
+            </Reservation>
+          ))
+          : (
+            <p className="text-center leading-7 not-first:mt-6">
+              No reservations.
+            </p>
+          )}
       </div>
     </>
   );
