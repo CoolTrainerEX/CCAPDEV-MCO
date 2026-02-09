@@ -22,6 +22,7 @@ import { compareAsc } from "date-fns/compareAsc";
 import { compareDesc } from "date-fns/compareDesc";
 import { useEffect, useState } from "react";
 import useNow from "@/src/store/now.ts";
+import { cn } from "../lib/utils.ts";
 
 export default function Home() {
   const labs = getLabs(useSearchParams().get("q") ?? "");
@@ -99,9 +100,10 @@ export default function Home() {
                   >
                     {({ id }) => (
                       <div
-                        className={`w-full h-full ${
-                          reserved?.includes(id) ? "bg-primary" : "bg-muted"
-                        }`}
+                        className={cn(
+                          "w-full h-full",
+                          reserved?.includes(id) ? "bg-primary" : "bg-muted",
+                        )}
                       />
                     )}
                   </Slots>

@@ -22,14 +22,22 @@ import { compareDesc } from "date-fns/compareDesc";
 import { compareAsc } from "date-fns/compareAsc";
 import { max } from "date-fns/max";
 import useNow from "@/src/store/now.ts";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
+import Reservation, { ReservationContent } from "@/app/reservation.tsx";
+import useLogin from "@/src/store/login.ts";
+import { cn } from "@/lib/utils.ts";
 
 export default function Lab() {
   const { id, name, slots, weeklySched } =
     getLab(Number.parseInt(useParams<{ id: string }>().id)) ??
       notFound();
 
+  const reservations = getReservationsFromLab(id, useLogin(({ id }) => id));
   const now = useNow(({ now }) => now);
-
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState([0]);
   const timeDate = new Date(date);
@@ -52,11 +60,11 @@ export default function Lab() {
     ],
   );
 
-  const reserved = getReservationsFromLab(id)?.filter(
+  const reservedSelected = reservations?.filter(
     ({ schedule: { start, end } }) =>
       compareDesc(start, timeDate) !== -1 &&
       compareAsc(end, timeDate) !== -1,
-  ).flatMap(({ slotIds }) => slotIds);
+  );
 
   const [timeZone, setTimeZone] = useState<string | undefined>(undefined);
 
@@ -91,23 +99,41 @@ export default function Lab() {
           className="w-full"
           slots={slots}
         >
-          {({ id }) => (
-            <div
-              className={`w-full h-full flex justify-center items-center ${
-                reserved?.includes(id) ? "bg-destructive" : "bg-muted"
-              }`}
-            >
-              <p
-                className={`scroll-m-20 text-xl font-semibold tracking-tight ${
-                  reserved?.includes(id)
-                    ? "text-destructive-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {id}
-              </p>
-            </div>
-          )}
+          {({ id }) => {
+            const reservation = reservedSelected?.find(({ slotIds }) =>
+              slotIds.includes(id)
+            );
+
+            return (
+              <Reservation reservation={reservation}>
+                <Tooltip>
+                  <TooltipTrigger
+                    className={cn(
+                      "w-full h-full flex justify-center items-center",
+                      !reservation && "bg-muted text-muted-foreground",
+                      reservation?.editable &&
+                        "bg-primary text-primary-foreground",
+                      reservation && !reservation.editable &&
+                        "bg-destructive text-destructive-foreground",
+                    )}
+                    asChild
+                  >
+                    <p className="scroll-m-20 text-xl font-semibold tracking-tight">
+                      {id}
+                    </p>
+                  </TooltipTrigger>
+                  {reservation &&
+                    (
+                      <TooltipContent className="p-0 bg-transparent">
+                        <ReservationContent
+                          reservation={reservation}
+                        />
+                      </TooltipContent>
+                    )}
+                </Tooltip>
+              </Reservation>
+            );
+          }}
         </Slots>
         <Card className="mx-auto w-fit">
           <CardContent>

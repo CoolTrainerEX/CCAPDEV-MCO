@@ -8,12 +8,12 @@ import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
  * @author Justin Ryan Uy
  */
 export default create<{ now: Date; tick: () => void }>((set) => ({
-    now: startOfDay(new Date()),
-    tick: () =>
-        set({
-            now: roundToNearestMinutes(new Date(), {
-                nearestTo: 30,
-                roundingMethod: "ceil",
-            }),
-        }),
+  now: startOfDay(new Date()),
+  tick: () =>
+    set({
+      now: roundToNearestMinutes(new Date(), {
+        nearestTo: 30,
+        roundingMethod: "ceil",
+      }),
+    }),
 }));

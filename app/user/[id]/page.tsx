@@ -8,7 +8,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import Reservations from "@/app/reservations.tsx";
+import Reservation, { ReservationContent } from "@/app/reservation.tsx";
 import useLogin from "../../../src/store/login.ts";
 
 export default function User() {
@@ -39,7 +39,13 @@ export default function User() {
         </div>
       </div>
       <Separator className="my-6" />
-      <Reservations reservations={reservations} />
+      <div className="flex gap-6">
+        {reservations?.map((value) => (
+          <Reservation key={value.id} reservation={value}>
+            <ReservationContent reservation={value} />
+          </Reservation>
+        ))}
+      </div>
     </>
   );
 }

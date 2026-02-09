@@ -7,7 +7,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { HomeIcon, FlaskConicalOffIcon } from "lucide-react";
+import { FlaskConicalOffIcon, HomeIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
