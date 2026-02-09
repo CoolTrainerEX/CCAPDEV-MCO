@@ -55,6 +55,31 @@ const users: User[] = [{
   },
   password: "password",
   admin: true,
+}, {
+  id: 3,
+  email: "paityn_orr@dlsu.edu.ph",
+  name: {
+    first: "Paityn",
+    last: "Orr",
+  },
+  password: "123456",
+}, {
+  id: 4,
+  email: "benicio_mclean@dlsu.edu.ph",
+  name: {
+    first: "Benicio",
+    last: "McLean",
+  },
+  password: "000000",
+  admin: true,
+}, {
+  id: 5,
+  email: "amirah_colon@dlsu.edu.ph",
+  name: {
+    first: "Amirah",
+    last: "Colon",
+  },
+  password: "654321",
 }];
 
 const labs: Lab[] = [
@@ -84,6 +109,44 @@ const labs: Lab[] = [
     },
     slots: [{ id: 1, x: 0, y: 1 }, { id: 2, x: 1, y: 0 }],
   },
+  {
+    id: 3,
+    name: "GK302A",
+    weeklySchedule: {
+      tuesday: {
+        start: parse("13:00", "HH:mm", new Date(0)),
+        end: parse("17:00", "HH:mm", new Date(0)),
+      },
+      wednesday: {
+        start: parse("7:30", "HH:mm", new Date(0)),
+        end: parse("18:00", "HH:mm", new Date(0)), 
+      },
+    },
+    slots: [{ id: 4, x: 0, y: 1}],
+  },
+  {
+    id: 4,
+    name: "GK302B",
+    weeklySchedule: {
+      thursday: {
+        start: parse("12:00", "HH:mm", new Date(0)),
+        end: parse("16:30", "HH:mm", new Date(0)),
+      },
+    },
+    slots: [{ id: 5, x: 0, y: 1}, {id: 4, x: 2, y:1],
+  },
+  {
+    id: 5,
+    name: "GK304A",
+    weeklySchedule: {
+      friday: {
+        start: parse("7:30", "HH:mm", new Date(0)),
+        end: parse("12:00", "HH:mm", new Date(0)), 
+      },
+    },
+    slots: [{ id: 5, x: 0, y: 1}],
+
+  },
 ];
 
 const reservations: Reservation[] = [
@@ -107,6 +170,37 @@ const reservations: Reservation[] = [
       end: parse("20:00", "HH:mm", new Date()),
     },
     slotIds: [1, 2],
+  },
+  {
+    id: 3,
+    userId: 3,
+    labId: 2,
+    anonymous: true,
+    schedule: {
+      start: parse("9:00", "HH:mm", new Date()),
+      end: parse("14:00", "HH:mm", new Date()),
+    },
+    slotIds: [1],
+  },
+  {
+    id: 4,
+    userId: 4,
+    labId: 3,
+    schedule: {
+      start: parse("12:30", "HH:mm", new Date()),
+      end: parse("15:00", "HH:mm", new Date()),
+    },
+    slotIds: [4],
+  },
+  {
+    id: 5,
+    userId: 5,
+    labId: 4,
+    schedule: {
+      start: parse("9:30", "HH:mm", new Date()),
+      end: parse("17:30", "HH:mm", new Date()),
+    },
+    slotIds: [3],
   },
 ];
 
