@@ -46,7 +46,7 @@ export default function Nav() {
                   className="flex-row gap-4 align-middle"
                 >
                   <p className="leading-7 not-first:mt-6 hidden sm:block">
-                    Hello, {user.name.first} {user.name.last}!
+                    Hello, {user.name.first}!
                   </p>
                   <Avatar>
                     <AvatarImage src="" />

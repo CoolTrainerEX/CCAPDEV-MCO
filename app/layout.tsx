@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArchersLab",
+  title: {
+    default: "ArchersLab",
+    template: "%s | ArchersLab",
+  },
   description: "DLSU Lab Reservations",
 };
 
