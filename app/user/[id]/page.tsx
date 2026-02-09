@@ -17,6 +17,8 @@ export default function User() {
     getUser(Number.parseInt(useParams<{ id: string }>().id)) ??
       notFound();
 
+  const reservations = getReservationsFromUser(id, loginId);
+
   return (
     <>
       <div className="flex justify-center items-center gap-6 container m-auto">
@@ -37,7 +39,7 @@ export default function User() {
         </div>
       </div>
       <Separator className="my-6" />
-      <Reservations reservations={getReservationsFromUser(id, loginId)} />
+      <Reservations reservations={reservations} />
     </>
   );
 }

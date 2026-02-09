@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { getLab, getReservationsFromLab } from "@/src/sample.ts";
 import Slots from "@/app/slots.tsx";
 import { Calendar } from "@/components/ui/calendar.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { startOfDay } from "date-fns/startOfDay";
 import { Slider } from "@/components/ui/slider.tsx";
 import { differenceInMinutes } from "date-fns/differenceInMinutes";
@@ -50,6 +50,18 @@ export default function Lab() {
     ],
   );
 
+  const reserved = getReservationsFromLab(id)?.filter(
+    ({ schedule: { start, end } }) =>
+      compareDesc(start, timeDate) !== -1 &&
+      compareAsc(end, timeDate) !== -1,
+  ).flatMap(({ slotIds }) => slotIds);
+
+  const [timeZone, setTimeZone] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
   if (schedule) {
     const start = new Date(date), end = new Date(date);
 
@@ -81,26 +93,17 @@ export default function Lab() {
       <div className="flex gap-6 mx-6">
         <Slots
           className="w-full"
-          slots={slots.map((value) => ({
-            ...value,
-            reserved: getReservationsFromLab(id)?.filter(
-              ({ schedule: { start, end } }) =>
-                compareDesc(start, timeDate) !== -1 &&
-                compareAsc(end, timeDate) !== -1,
-            ).flatMap(({ slotIds }) => slotIds)
-              .includes(value.id) ||
-              undefined,
-          }))}
+          slots={slots}
         >
-          {({ id, reserved }) => (
+          {({ id }) => (
             <div
               className={`w-full h-full flex justify-center items-center ${
-                reserved ? "bg-destructive" : "bg-muted"
+                reserved?.includes(id) ? "bg-destructive" : "bg-muted"
               }`}
             >
               <p
                 className={`scroll-m-20 text-xl font-semibold tracking-tight ${
-                  reserved
+                  reserved?.includes(id)
                     ? "text-destructive-foreground"
                     : "text-muted-foreground"
                 }`}
@@ -121,6 +124,7 @@ export default function Lab() {
                 before: startOfDay(new Date()),
                 after: addDays(startOfDay(new Date()), 7),
               }}
+              timeZone={timeZone}
               required
             />
           </CardContent>

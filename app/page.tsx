@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardAction,
@@ -18,12 +20,20 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { startOfDay } from "date-fns/startOfDay";
 import { compareAsc } from "date-fns/compareAsc";
 import { compareDesc } from "date-fns/compareDesc";
+import { useEffect, useState } from "react";
 
-export default async function Home(
-  { searchParams }: Readonly<
-    { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }
-  >,
-) {
+export default function Home() {
+  const labs = getLabs(useSearchParams().get("q") ?? "");
+  const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    setFormat(Intl.DateTimeFormat(undefined, {
+      timeStyle: "short",
+    }));
+  }, []);
+
   return (
     <>
       <Form action="/" className="w-md mx-auto">
@@ -36,7 +46,7 @@ export default async function Home(
       </Form>
       <Separator className="my-6" />
       <div className="flex flex-wrap gap-6 justify-around container m-auto">
-        {getLabs([(await searchParams)["q"]].flat()[0] ?? "").map(
+        {labs.map(
           ({ id, name, weeklySched, slots }) => {
             const reserved = getReservationsFromLab(id)?.filter(
               ({ schedule: { start, end } }) =>
@@ -73,15 +83,12 @@ export default async function Home(
                 <CardContent>
                   <Slots
                     className="aspect-video"
-                    slots={slots.map((value) => ({
-                      ...value,
-                      reserved: reserved?.includes(value.id) || undefined,
-                    }))}
+                    slots={slots}
                   >
-                    {({ reserved }) => (
+                    {({ id }) => (
                       <div
                         className={`w-full h-full ${
-                          reserved ? "bg-primary" : "bg-muted"
+                          reserved?.includes(id) ? "bg-primary" : "bg-muted"
                         }`}
                       />
                     )}
@@ -90,9 +97,7 @@ export default async function Home(
                 <CardFooter>
                   {schedule
                     ? (
-                      Intl.DateTimeFormat(undefined, {
-                        timeStyle: "short",
-                      }).formatRange(
+                      format?.formatRange(
                         schedule.start,
                         schedule.end,
                       )

@@ -7,10 +7,7 @@ export default function Slots(
         & Omit<React.ComponentProps<"div">, "children">
         & {
             children: (slot: typeof slots[number]) => ReactNode;
-            slots: (
-                & NonNullable<ReturnType<typeof getLab>>["slots"][number]
-                & Partial<Record<"reserved", true>>
-            )[];
+            slots: NonNullable<ReturnType<typeof getLab>>["slots"][number][];
         },
 ) {
     // deno-lint-ignore no-unused-vars

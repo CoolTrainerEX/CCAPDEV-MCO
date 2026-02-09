@@ -12,12 +12,24 @@ import {
 import { getLab, getReservationsFromLab, getUser } from "@/src/sample.ts";
 import Slots from "./slots.tsx";
 import { cn } from "@/lib/utils.ts";
+import { useEffect, useState } from "react";
 
 export default function Reservations(
     { className, reservations, ...props }: React.ComponentProps<"div"> & {
         reservations: ReturnType<typeof getReservationsFromLab>;
     },
 ) {
+    const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
+        undefined,
+    );
+
+    useEffect(() => {
+        setFormat(Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }));
+    }, []);
+
     return (
         <div className={cn("flex gap-6", className)} {...props}>
             {reservations?.map(
@@ -66,16 +78,12 @@ export default function Reservations(
                             <CardContent>
                                 <Slots
                                     className="aspect-video"
-                                    slots={lab.slots.map((value) => ({
-                                        ...value,
-                                        reserved: slotIds?.includes(value.id) ||
-                                            undefined,
-                                    }))}
+                                    slots={lab.slots}
                                 >
-                                    {({ reserved }) => (
+                                    {({ id }) => (
                                         <div
                                             className={`h-full ${
-                                                reserved
+                                                slotIds?.includes(id)
                                                     ? "bg-primary"
                                                     : "bg-muted"
                                             }`}
@@ -84,10 +92,7 @@ export default function Reservations(
                                 </Slots>
                             </CardContent>
                             <CardFooter>
-                                {Intl.DateTimeFormat(undefined, {
-                                    dateStyle: "medium",
-                                    timeStyle: "short",
-                                }).formatRange(
+                                {format?.formatRange(
                                     schedule.start,
                                     schedule.end,
                                 )}
