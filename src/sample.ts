@@ -113,7 +113,7 @@ const labs: Lab[] = [
     id: 3,
     name: "GK302A",
     weeklySchedule: {
-      monday: {
+      tuesday: {
         start: parse("13:00", "HH:mm", new Date(0)),
         end: parse("17:00", "HH:mm", new Date(0)),
       },
