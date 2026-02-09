@@ -1,6 +1,7 @@
 import { Interval } from "date-fns";
 import { setHours } from "date-fns/setHours";
 import { isAfter } from "date-fns/isAfter";
+import { parse } from "date-fns/parse";
 
 type User = {
   id: number;
@@ -62,8 +63,8 @@ const labs: Lab[] = [
     name: "GK203",
     weeklySchedule: {
       monday: {
-        start: setHours(new Date(0), 8),
-        end: setHours(new Date(0), 23),
+        start: parse("07:00", "HH:mm", new Date(0)),
+        end: parse("23:00", "HH:mm", new Date(0)),
       },
     },
     slots: [{ id: 1, x: 0, y: 0 }, { id: 2, x: 1, y: 0 }, {
@@ -77,8 +78,8 @@ const labs: Lab[] = [
     name: "GK204",
     weeklySchedule: {
       monday: {
-        start: setHours(new Date(0), 8),
-        end: setHours(new Date(0), 16),
+        start: parse("08:00", "HH:mm", new Date(0)),
+        end: parse("16:00", "HH:mm", new Date(0)),
       },
     },
     slots: [{ id: 1, x: 0, y: 1 }, { id: 2, x: 1, y: 0 }],
@@ -91,19 +92,19 @@ const reservations: Reservation[] = [
     userId: 1,
     labId: 1,
     schedule: {
-      start: setHours(new Date(), 19),
-      end: setHours(new Date(), 20),
+      start: parse("11:00", "HH:mm", new Date()),
+      end: parse("19:00", "HH:mm", new Date()),
     },
     slotIds: [1],
   },
   {
     id: 2,
     userId: 2,
-    labId: 2,
+    labId: 1,
     anonymous: true,
     schedule: {
-      start: setHours(new Date(), 11),
-      end: setHours(new Date(), 20),
+      start: parse("19:00", "HH:mm", new Date()),
+      end: parse("20:00", "HH:mm", new Date()),
     },
     slotIds: [1, 2],
   },

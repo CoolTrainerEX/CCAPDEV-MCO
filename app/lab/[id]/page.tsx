@@ -32,7 +32,7 @@ import { setHours } from "date-fns/setHours";
 import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
 
 export default function Lab() {
-  const { id, name, slots, weeklySchedule: weeklySched } =
+  const { id, name, slots, weeklySchedule } =
     getLab(Number.parseInt(useParams<{ id: string }>().id)) ??
       notFound();
 
@@ -42,7 +42,7 @@ export default function Lab() {
 
   const [date, setDate] = useState(new Date());
 
-  const rawSchedule = weeklySched[
+  const rawSchedule = weeklySchedule[
     ([
       "sunday",
       "monday",
@@ -51,7 +51,7 @@ export default function Lab() {
       "thursday",
       "friday",
       "saturday",
-    ] as (keyof typeof weeklySched)[])[
+    ] as (keyof typeof weeklySchedule)[])[
       startOfDay(date).getDay()
     ]
   ];

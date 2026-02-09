@@ -19,7 +19,18 @@ import {
   getUser,
 } from "@/src/sample.ts";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Interval, toDate } from "date-fns";
+import {
+  getHours,
+  getMinutes,
+  Interval,
+  isAfter,
+  max,
+  roundToNearestMinutes,
+  setHours,
+  setMinutes,
+  startOfDay,
+  toDate,
+} from "date-fns";
 import { areIntervalsOverlapping } from "date-fns/areIntervalsOverlapping";
 import {
   AlertDialog,
@@ -66,14 +77,15 @@ export default function Reservation(
 ) {
   const router = useRouter();
   const loginId = useLogin(({ id }) => id);
+  const now = new Date();
 
-  const [schedule, setSchedule] = useState<Interval>(
+  const [formSchedule, setFormSchedule] = useState<Interval>(
     reservation
       ? {
         start: new Date(reservation.schedule.start),
         end: new Date(reservation.schedule.end),
       }
-      : { start: new Date(), end: new Date() },
+      : { start: new Date(now), end: new Date(now) },
   );
 
   const [selected, setSelected] = useState(
@@ -89,6 +101,39 @@ export default function Reservation(
   const reservations = getReservationsFromLab(lab.id)?.filter(({ id }) =>
     id !== reservation.id
   );
+
+  const rawSchedule = lab.weeklySchedule[
+    ([
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ] as (keyof typeof lab.weeklySchedule)[])[
+      startOfDay(reservation.schedule.start).getDay()
+    ]
+  ];
+
+  let schedule = rawSchedule && {
+    start: max([
+      setMinutes(
+        setHours(
+          new Date(reservation.schedule.start),
+          getHours(rawSchedule.start),
+        ),
+        getMinutes(rawSchedule.start),
+      ),
+      roundToNearestMinutes(now, { nearestTo: 30, roundingMethod: "ceil" }),
+    ]),
+    end: setMinutes(
+      setHours(new Date(reservation.schedule.end), getHours(rawSchedule.end)),
+      getMinutes(rawSchedule.end),
+    ),
+  };
+
+  if (schedule && isAfter(schedule.start, schedule.end)) schedule = undefined;
 
   return (
     <Drawer {...props}>
@@ -108,8 +153,8 @@ export default function Reservation(
                 slots={lab.slots}
               >
                 {({ id }) => {
-                  const reservation = reservations?.filter((value) =>
-                    areIntervalsOverlapping(value.schedule, schedule)
+                  const reservation = reservations?.filter(({ schedule }) =>
+                    areIntervalsOverlapping(schedule, formSchedule)
                   ).find(({ slotIds }) => slotIds.includes(id));
 
                   return (
@@ -131,13 +176,13 @@ export default function Reservation(
                 }}
               </Slots>
               <TimeRangeInput
-                schedule={reservation.schedule}
-                value={schedule}
-                onValueChange={setSchedule}
+                schedule={schedule}
+                value={formSchedule}
+                onValueChange={setFormSchedule}
                 valid={!reservations?.filter(({ slotIds }) =>
                   slotIds.some((value) => selected.includes(value))
                 ).some(({ schedule }) =>
-                  areIntervalsOverlapping(schedule, schedule)
+                  areIntervalsOverlapping(schedule, formSchedule)
                 )}
               />
             </div>
