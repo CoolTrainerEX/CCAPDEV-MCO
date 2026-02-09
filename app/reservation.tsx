@@ -134,7 +134,7 @@ export default function Reservation(
                 schedule={reservation.schedule}
                 value={schedule}
                 onValueChange={setSchedule}
-                valid={!reservations?.filter(({ id, slotIds }) =>
+                valid={!reservations?.filter(({ slotIds }) =>
                   slotIds.some((value) => selected.includes(value))
                 ).some(({ schedule }) =>
                   areIntervalsOverlapping(schedule, schedule)

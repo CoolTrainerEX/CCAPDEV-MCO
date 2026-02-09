@@ -91,8 +91,8 @@ const reservations: Reservation[] = [
     userId: 1,
     labId: 1,
     schedule: {
-      start: setHours(new Date(), 12),
-      end: setHours(new Date(), 18),
+      start: setHours(new Date(), 19),
+      end: setHours(new Date(), 20),
     },
     slotIds: [1],
   },

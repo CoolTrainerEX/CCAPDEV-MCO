@@ -6,18 +6,8 @@ import Slots from "@/app/slots.tsx";
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { useEffect, useState } from "react";
 import { startOfDay } from "date-fns/startOfDay";
-import { Slider } from "@/components/ui/slider.tsx";
-import { differenceInMinutes } from "date-fns/differenceInMinutes";
-import { Book, BookOpen, Clock2Icon } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group.tsx";
 import { addDays } from "date-fns/addDays";
-import { format } from "date-fns/format";
 import { max } from "date-fns/max";
 import {
   Tooltip,
@@ -31,22 +21,14 @@ import Reservation, {
 import useLogin from "@/src/store/login.ts";
 import { cn } from "@/lib/utils.ts";
 import { Toggle } from "@/components/ui/toggle.tsx";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible.tsx";
-import { Button } from "@/components/ui/button.tsx";
 import Form from "next/form";
 import TimeRangeInput from "@/app/time-range-input.tsx";
-import { isWithinInterval } from "date-fns/isWithinInterval";
 import { getHours } from "date-fns/getHours";
 import { getMinutes } from "date-fns/getMinutes";
 import { Interval, isAfter } from "date-fns";
 import { areIntervalsOverlapping } from "date-fns/areIntervalsOverlapping";
 import { setMinutes } from "date-fns/setMinutes";
 import { setHours } from "date-fns/setHours";
-import { parse } from "date-fns/parse";
 import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
 
 export default function Lab() {
@@ -90,14 +72,7 @@ export default function Lab() {
 
   if (schedule && isAfter(schedule.start, schedule.end)) schedule = undefined;
 
-  const [time, setTime] = useState(new Date(schedule?.start ?? date));
-
-  const reservedSelected = reservations?.filter(
-    ({ schedule }) => isWithinInterval(time, schedule),
-  );
-
   const [selected, setSelected] = useState<number[]>([]);
-  const [formOpen, setFormOpen] = useState(false);
   const [formSchedule, setFormSchedule] = useState<Interval>({
     start: new Date(schedule?.start ?? date),
     end: new Date(schedule?.end ?? date),
@@ -123,15 +98,15 @@ export default function Lab() {
           slots={slots}
         >
           {({ id }) => {
-            const reservation = reservedSelected?.find(({ slotIds }) =>
-              slotIds.includes(id)
-            );
+            const reservation = reservations?.filter((value) =>
+              areIntervalsOverlapping(value.schedule, formSchedule)
+            ).find(({ slotIds }) => slotIds.includes(id));
 
             return (
               <Reservation reservation={reservation}>
                 <Tooltip>
                   <Toggle
-                    disabled={!!reservation || !formOpen}
+                    disabled={!!reservation}
                     className={cn(
                       "w-full h-full flex justify-center items-center",
                       !reservation && "bg-muted text-muted-foreground",
@@ -180,88 +155,17 @@ export default function Lab() {
             />
           </CardContent>
           <CardFooter className="bg-card border-t flex-col gap-6">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="time">
-                  {schedule ? "Time" : "Closed"}
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id="time"
-                    type="time"
-                    step={30 * 60}
-                    disabled={!schedule}
-                    min={schedule && format(schedule.start, "HH:mm")}
-                    max={schedule && format(schedule.end, "HH:mm")}
-                    value={format(time, "HH:mm")}
-                    onChange={(event) =>
-                      schedule &&
-                      setTime(parse(
-                        event.target.value,
-                        "HH:mm",
-                        schedule.start,
-                      ))}
-                    className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  />
-                  <InputGroupAddon>
-                    <Clock2Icon className="text-muted-foreground" />
-                  </InputGroupAddon>
-                </InputGroup>
-              </Field>
-              <Slider
-                value={[time.getHours() + time.getMinutes() / 60]}
-                onValueChange={(value) =>
-                  schedule && setTime(setMinutes(
-                    setHours(new Date(schedule?.start), value[0]),
-                    value[0] % 1 * 60,
-                  ))}
-                disabled={!schedule}
-                min={schedule &&
-                  differenceInMinutes(
-                      schedule.start,
-                      startOfDay(schedule.start),
-                    ) / 60}
-                max={schedule &&
-                  differenceInMinutes(
-                      schedule.end,
-                      startOfDay(schedule.end),
-                    ) /
-                    60}
-                step={0.5}
-              />
-            </FieldGroup>
             <Form action="/lab" className="w-full">
-              <Collapsible
-                open={formOpen}
-                onOpenChange={(open) => {
-                  setFormOpen(open);
-                  setSelected([]);
-                }}
-                className="flex items-start gap-2 w-full"
-              >
-                <CollapsibleContent className="col-span-full grid grid-cols-subgrid gap-2 w-full">
-                  <TimeRangeInput
-                    schedule={schedule}
-                    value={formSchedule}
-                    onValueChange={setFormSchedule}
-                    valid={!reservations?.filter(({ slotIds }) =>
-                      slotIds.some((value) => selected.includes(value))
-                    ).some(({ schedule }) =>
-                      areIntervalsOverlapping(schedule, formSchedule)
-                    )}
-                  />
-                </CollapsibleContent>
-                <Tooltip>
-                  <CollapsibleTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" type="reset" size="icon">
-                        {formOpen ? <Book /> : <BookOpen />}
-                      </Button>
-                    </TooltipTrigger>
-                  </CollapsibleTrigger>
-                  <TooltipContent>Reserve</TooltipContent>
-                </Tooltip>
-              </Collapsible>
+              <TimeRangeInput
+                schedule={schedule}
+                value={formSchedule}
+                onValueChange={setFormSchedule}
+                valid={!reservations?.filter(({ slotIds }) =>
+                  slotIds.some((value) => selected.includes(value))
+                ).some(({ schedule }) =>
+                  areIntervalsOverlapping(schedule, formSchedule)
+                )}
+              />
             </Form>
           </CardFooter>
         </Card>
