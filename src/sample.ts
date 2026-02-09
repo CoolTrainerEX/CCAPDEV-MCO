@@ -133,7 +133,7 @@ const labs: Lab[] = [
         end: parse("16:30", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 5, x: 0, y: 1}, {id: 4, x: 2, y:1],
+    slots: [{ id: 5, x: 0, y: 1}, {id: 4, x: 2, y:1}],
   },
   {
     id: 5,
