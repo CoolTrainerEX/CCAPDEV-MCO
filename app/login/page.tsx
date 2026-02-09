@@ -28,7 +28,7 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form action="/login">
+            <Form action="/">
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>

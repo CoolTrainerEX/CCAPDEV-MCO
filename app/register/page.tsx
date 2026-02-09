@@ -28,7 +28,7 @@ export default function Register() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form action="/register">
+            <Form action="/">
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="firstname">First Name</FieldLabel>

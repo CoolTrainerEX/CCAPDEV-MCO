@@ -155,7 +155,7 @@ export default function Lab() {
             />
           </CardContent>
           <CardFooter className="bg-card border-t flex-col gap-6">
-            <Form action="/lab" className="w-full">
+            <Form action="/" className="w-full">
               <TimeRangeInput
                 schedule={schedule}
                 value={formSchedule}

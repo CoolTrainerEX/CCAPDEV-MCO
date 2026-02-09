@@ -139,7 +139,7 @@ export default function Reservation(
     <Drawer {...props}>
       {children}
       <DrawerContent>
-        <div className="mx-auto w-full max-w-sm">
+        <div className="mx-auto w-full">
           <DrawerHeader>
             <DrawerTitle>Edit Reservation</DrawerTitle>
             <DrawerDescription>
@@ -147,9 +147,9 @@ export default function Reservation(
             </DrawerDescription>
           </DrawerHeader>
           <Form action="/" formMethod="post">
-            <div className="flex flex-col gap-6 p-4 pb-0">
+            <div className="flex flex-wrap gap-6 p-4 pb-0">
               <Slots
-                className="min-h-50 max-h-96"
+                className="flex-1"
                 slots={lab.slots}
               >
                 {({ id }) => {
@@ -161,7 +161,7 @@ export default function Reservation(
                     <Toggle
                       disabled={!!reservation}
                       className={cn(
-                        "w-full h-full flex justify-center items-center",
+                        "w-full h-full",
                         reservation
                           ? "bg-destructive text-destructive-foreground"
                           : "bg-muted text-muted-foreground",
@@ -169,9 +169,7 @@ export default function Reservation(
                       pressed={selected.includes(id)}
                       onPressedChange={onPressedChange(setSelected, id)}
                       aria-label="Toggle Slot"
-                      asChild
-                    >
-                    </Toggle>
+                    />
                   );
                 }}
               </Slots>
@@ -184,9 +182,10 @@ export default function Reservation(
                 ).some(({ schedule }) =>
                   areIntervalsOverlapping(schedule, formSchedule)
                 )}
+                className="w-sm"
               />
             </div>
-            <DrawerFooter>
+            <DrawerFooter className="max-w-sm mx-auto">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">Delete</Button>

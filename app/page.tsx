@@ -15,15 +15,17 @@ import Slots from "./slots.tsx";
 import { Field } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import Form from "next/form";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator.tsx";
 import { startOfDay } from "date-fns/startOfDay";
 import { useEffect, useState } from "react";
 import { cn } from "../lib/utils.ts";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 import { toDate } from "date-fns/toDate";
+import useLogin from "@/src/store/login.ts";
 
 export default function Home() {
+  const admin = useLogin(({ admin }) => admin);
   const labs = getLabs(useSearchParams().get("q") ?? "");
   const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
     undefined,
@@ -45,6 +47,14 @@ export default function Home() {
           <Button type="submit">
             <Search />
           </Button>
+          {admin &&
+            (
+              <Button variant="secondary" asChild>
+                <Link href="/lab/create">
+                  <Plus />
+                </Link>
+              </Button>
+            )}
         </Field>
       </Form>
       <Separator className="my-6" />
