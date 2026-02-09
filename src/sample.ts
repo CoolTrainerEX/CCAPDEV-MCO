@@ -1,7 +1,7 @@
 import { Interval } from "date-fns";
-import { setHours } from "date-fns/setHours";
-import { isAfter } from "date-fns/isAfter";
-import { parse } from "date-fns/parse";
+import  setHours  from "date-fns/setHours";
+import  isAfter  from "date-fns/isAfter";
+import  parse  from "date-fns/parse";
 
 type User = {
   id: number;
