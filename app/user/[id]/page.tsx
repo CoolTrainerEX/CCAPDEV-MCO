@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/avatar.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import Reservation, { ReservationContent } from "@/app/reservation.tsx";
-import useLogin from "../../../src/store/login.ts";
+import useLogin from "@/src/store/login.ts";
 
 export default function User() {
   const loginId = useLogin(({ id }) => id);

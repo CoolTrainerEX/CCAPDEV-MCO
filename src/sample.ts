@@ -92,7 +92,7 @@ const reservations: Reservation[] = [
     labId: 1,
     schedule: {
       start: setHours(new Date(), 12),
-      end: setHours(new Date(), 17),
+      end: setHours(new Date(), 18),
     },
     slotIds: [1],
   },
@@ -172,4 +172,18 @@ export function getReservationsFromUser(
     ...value,
     userId: value.anonymous ? 0 : value.userId,
   }));
+}
+
+export function deleteReservation(id: number, loginId: number) {
+  const reservation = reservations.find((value) => value.id === id);
+
+  if (
+    reservation &&
+    (getUser(loginId)?.admin ||
+      getUser(reservation.userId)?.id === loginId)
+  ) {
+    reservations.splice(
+      reservations.findIndex((value) => value.id === reservation.id),
+    );
+  }
 }

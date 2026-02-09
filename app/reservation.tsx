@@ -1,19 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button.tsx";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx";
-import { getLab, getReservationsFromLab, getUser } from "@/src/sample.ts";
-import Slots from "./slots.tsx";
-import { cn } from "@/lib/utils.ts";
-import React, { useEffect, useState } from "react";
-import {
   Drawer,
   DrawerClose,
   DrawerContent,
@@ -24,6 +11,174 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer.tsx";
 import Form from "next/form";
+import TimeRangeInput from "./time-range-input.tsx";
+import {
+  deleteReservation,
+  getLab,
+  getReservationsFromLab,
+  getUser,
+} from "@/src/sample.ts";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Interval, toDate } from "date-fns";
+import { areIntervalsOverlapping } from "date-fns/areIntervalsOverlapping";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.tsx";
+import useLogin from "@/src/store/login.ts";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
+import { cn } from "@/lib/utils.ts";
+import Slots from "./slots.tsx";
+import { useRouter } from "next/navigation";
+import { Toggle } from "@/components/ui/toggle.tsx";
+
+export function onPressedChange(
+  setSelected: Dispatch<SetStateAction<number[]>>,
+  slotId: number,
+) {
+  return (pressed: boolean) =>
+    setSelected((value) =>
+      pressed ? [slotId, ...value] : value.filter((value) => value !== slotId)
+    );
+}
+
+export default function Reservation(
+  { children, reservation, ...props }: Parameters<typeof Drawer>[0] & {
+    reservation?: NonNullable<
+      ReturnType<typeof getReservationsFromLab>
+    >[number];
+  },
+) {
+  const router = useRouter();
+  const loginId = useLogin(({ id }) => id);
+
+  const [schedule, setSchedule] = useState<Interval>(
+    reservation
+      ? {
+        start: new Date(reservation.schedule.start),
+        end: new Date(reservation.schedule.end),
+      }
+      : { start: new Date(), end: new Date() },
+  );
+
+  const [selected, setSelected] = useState(
+    reservation ? reservation.slotIds : [],
+  );
+
+  if (!reservation) return <>{children}</>;
+
+  const lab = getLab(reservation.labId);
+
+  if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
+
+  const reservations = getReservationsFromLab(lab.id)?.filter(({ id }) =>
+    id !== reservation.id
+  );
+
+  return (
+    <Drawer {...props}>
+      {children}
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-sm">
+          <DrawerHeader>
+            <DrawerTitle>Edit Reservation</DrawerTitle>
+            <DrawerDescription>
+              <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
+            </DrawerDescription>
+          </DrawerHeader>
+          <Form action="/" formMethod="post">
+            <div className="flex flex-col gap-6 p-4 pb-0">
+              <Slots
+                className="min-h-50 max-h-96"
+                slots={lab.slots}
+              >
+                {({ id }) => {
+                  const reservation = reservations?.filter((value) =>
+                    areIntervalsOverlapping(value.schedule, schedule)
+                  ).find(({ slotIds }) => slotIds.includes(id));
+
+                  return (
+                    <Toggle
+                      disabled={!!reservation}
+                      className={cn(
+                        "w-full h-full flex justify-center items-center",
+                        reservation
+                          ? "bg-destructive text-destructive-foreground"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                      pressed={selected.includes(id)}
+                      onPressedChange={onPressedChange(setSelected, id)}
+                      aria-label="Toggle Slot"
+                      asChild
+                    >
+                    </Toggle>
+                  );
+                }}
+              </Slots>
+              <TimeRangeInput
+                schedule={reservation.schedule}
+                value={schedule}
+                onValueChange={setSchedule}
+                valid={!reservations?.filter(({ id, slotIds }) =>
+                  slotIds.some((value) => selected.includes(value))
+                ).some(({ schedule }) =>
+                  areIntervalsOverlapping(schedule, schedule)
+                )}
+              />
+            </div>
+            <DrawerFooter>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your reservation from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        deleteReservation(reservation.id, loginId);
+                        router.refresh();
+                      }}
+                    >
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <DrawerClose asChild>
+                <Button variant="outline" type="reset">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </Form>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 export function ReservationContent(
   { className, reservation, ...props }: React.ComponentProps<"div"> & {
@@ -91,50 +246,10 @@ export function ReservationContent(
       </CardContent>
       <CardFooter>
         {format?.formatRange(
-          reservation.schedule.start,
-          reservation.schedule.end,
+          toDate(reservation.schedule.start),
+          toDate(reservation.schedule.end),
         )}
       </CardFooter>
     </Card>
-  );
-}
-
-export default function Reservation(
-  { children, reservation, ...props }: Parameters<typeof Drawer>[0] & {
-    reservation?: NonNullable<
-      ReturnType<typeof getReservationsFromLab>
-    >[number];
-  },
-) {
-  if (!reservation) return <>{children}</>;
-
-  const lab = getLab(reservation.labId);
-
-  if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
-
-  return (
-    <Drawer {...props}>
-      {children}
-      <DrawerContent>
-        <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader>
-            <DrawerTitle>Edit Reservation</DrawerTitle>
-            <DrawerDescription>
-              <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
-            </DrawerDescription>
-          </DrawerHeader>
-          <Form action="/" formMethod="post">
-            <div className="p-4 pb-0">
-            </div>
-            <DrawerFooter>
-              <Button type="submit">Submit</Button>
-              <DrawerClose asChild>
-                <Button variant="outline" type="reset">Cancel</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </Form>
-        </div>
-      </DrawerContent>
-    </Drawer>
   );
 }

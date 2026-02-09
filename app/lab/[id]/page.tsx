@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { getLab, getReservationsFromLab } from "@/src/sample.ts";
 import Slots from "@/app/slots.tsx";
 import { Calendar } from "@/components/ui/calendar.tsx";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { startOfDay } from "date-fns/startOfDay";
 import { Slider } from "@/components/ui/slider.tsx";
 import { differenceInMinutes } from "date-fns/differenceInMinutes";
@@ -24,7 +24,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
-import Reservation, { ReservationContent } from "@/app/reservation.tsx";
+import Reservation, {
+  onPressedChange,
+  ReservationContent,
+} from "@/app/reservation.tsx";
 import useLogin from "@/src/store/login.ts";
 import { cn } from "@/lib/utils.ts";
 import { Toggle } from "@/components/ui/toggle.tsx";
@@ -45,16 +48,6 @@ import { setMinutes } from "date-fns/setMinutes";
 import { setHours } from "date-fns/setHours";
 import { parse } from "date-fns/parse";
 import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
-
-function onPressedChange(
-  setSelected: Dispatch<SetStateAction<number[]>>,
-  slotId: number,
-) {
-  return (pressed: boolean) =>
-    setSelected((value) =>
-      pressed ? [slotId, ...value] : value.filter((value) => value !== slotId)
-    );
-}
 
 export default function Lab() {
   const { id, name, slots, weeklySchedule: weeklySched } =
