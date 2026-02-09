@@ -41,7 +41,7 @@ export default function Home() {
 
   return (
     <>
-      <Form action="/" className="w-md mx-auto">
+      <Form action="/" className="w-md max-w-full mx-auto">
         <Field orientation="horizontal">
           <Input type="search" name="q" placeholder="Search" />
           <Button type="submit">
