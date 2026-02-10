@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import Providers from "./providers.tsx";
-import Nav from "./nav.tsx";
-import { TooltipProvider } from "@/components/ui/tooltip.tsx";
+import Providers from "./providers";
+import Nav from "./nav";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

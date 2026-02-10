@@ -8,126 +8,104 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { getLabs, getReservationsFromLab } from "@/src/sample.ts";
-import Slots from "./slots.tsx";
-import { Field } from "@/components/ui/field.tsx";
-import { Input } from "@/components/ui/input.tsx";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { getLabs, getReservationsFromLab } from "@/src/sample";
+import Slots from "./slots";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { Plus, Search } from "lucide-react";
-import { Separator } from "@/components/ui/separator.tsx";
+import { Separator } from "@/components/ui/separator";
 import { startOfDay } from "date-fns/startOfDay";
-import { useEffect, useState } from "react";
-import { cn } from "../lib/utils.ts";
+import { cn } from "../lib/utils";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 import { toDate } from "date-fns/toDate";
-import useLogin from "@/src/store/login.ts";
+import useLogin from "@/src/store/login";
 
 export default function Home() {
   const admin = useLogin(({ admin }) => admin);
   const labs = getLabs(useSearchParams().get("q") ?? "");
-  const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
-    undefined,
-  );
-
   const now = new Date();
-
-  useEffect(() => {
-    setFormat(Intl.DateTimeFormat(undefined, {
-      timeStyle: "short",
-    }));
-  }, []);
 
   return (
     <>
-      <Form action="/" className="w-md max-w-full mx-auto">
+      <Form action="/" className="mx-auto w-md max-w-full">
         <Field orientation="horizontal">
           <Input type="search" name="q" placeholder="Search" />
           <Button type="submit">
             <Search />
           </Button>
-          {admin &&
-            (
-              <Button variant="secondary" asChild>
-                <Link href="/lab/create">
-                  <Plus />
-                </Link>
-              </Button>
-            )}
+          {admin && (
+            <Button variant="secondary" asChild>
+              <Link href="/lab/create">
+                <Plus />
+              </Link>
+            </Button>
+          )}
         </Field>
       </Form>
       <Separator className="my-6" />
-      <div className="flex flex-wrap gap-6 justify-around container m-auto">
-        {labs.length
-          ? labs.map(
-            ({ id, name, weeklySchedule: weeklySched, slots }) => {
-              const reserved = getReservationsFromLab(id)?.filter(
-                ({ schedule }) => isWithinInterval(now, schedule),
-              ).flatMap((
-                { slotIds },
-              ) => slotIds);
+      <div className="container m-auto flex flex-wrap justify-around gap-6">
+        {labs.length ? (
+          labs.map(({ id, name, weeklySchedule: weeklySched, slots }) => {
+            const reserved = getReservationsFromLab(id)
+              ?.filter(({ schedule }) => isWithinInterval(now, schedule))
+              .flatMap(({ slotIds }) => slotIds);
 
-              const schedule = weeklySched[
-                ([
-                  "sunday",
-                  "monday",
-                  "tuesday",
-                  "wednesday",
-                  "thursday",
-                  "friday",
-                  "saturday",
-                ] as (keyof typeof weeklySched)[])[
-                  startOfDay(now).getDay()
-                ]
+            const schedule =
+              weeklySched[
+                (
+                  [
+                    "sunday",
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                  ] as (keyof typeof weeklySched)[]
+                )[startOfDay(now).getDay()]
               ];
 
-              return (
-                <Card key={id} className="w-full max-w-sm">
-                  <CardHeader>
-                    <CardTitle>{name}</CardTitle>
-                    <CardAction>
-                      <Button variant="link" asChild>
-                        <Link href={`/lab/${id}`}>Reserve</Link>
-                      </Button>
-                    </CardAction>
-                  </CardHeader>
-                  <CardContent>
-                    <Slots
-                      className="aspect-video"
-                      slots={slots}
-                    >
-                      {({ id }) => (
-                        <div
-                          className={cn(
-                            "w-full h-full",
-                            reserved?.includes(id) ? "bg-primary" : "bg-muted",
-                          )}
-                        />
-                      )}
-                    </Slots>
-                  </CardContent>
-                  <CardFooter>
-                    {schedule
-                      ? (
-                        format?.formatRange(
-                          toDate(schedule.start),
-                          toDate(schedule.end),
-                        )
+            return (
+              <Card key={id} className="w-full max-w-sm">
+                <CardHeader>
+                  <CardTitle>{name}</CardTitle>
+                  <CardAction>
+                    <Button variant="link" asChild>
+                      <Link href={`/lab/${id}`}>Reserve</Link>
+                    </Button>
+                  </CardAction>
+                </CardHeader>
+                <CardContent>
+                  <Slots className="aspect-video" slots={slots}>
+                    {({ id }) => (
+                      <div
+                        className={cn(
+                          "h-full w-full",
+                          reserved?.includes(id) ? "bg-primary" : "bg-muted",
+                        )}
+                      />
+                    )}
+                  </Slots>
+                </CardContent>
+                <CardFooter>
+                  {schedule
+                    ? Intl.DateTimeFormat(undefined, {
+                        timeStyle: "short",
+                      })?.formatRange(
+                        toDate(schedule.start),
+                        toDate(schedule.end),
                       )
-                      : (
-                        "Closed today"
-                      )}
-                  </CardFooter>
-                </Card>
-              );
-            },
-          )
-          : (
-            <p className="text-center leading-7 not-first:mt-6">
-              No labs.
-            </p>
-          )}
+                    : "Closed today"}
+                </CardFooter>
+              </Card>
+            );
+          })
+        ) : (
+          <p className="text-center leading-7 not-first:mt-6">No labs.</p>
+        )}
       </div>
     </>
   );

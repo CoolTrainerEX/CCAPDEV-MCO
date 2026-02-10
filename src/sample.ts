@@ -1,5 +1,4 @@
 import { Interval } from "date-fns";
-import { setHours } from "date-fns/setHours";
 import { isAfter } from "date-fns/isAfter";
 import { parse } from "date-fns/parse";
 
@@ -38,49 +37,55 @@ type Reservation = {
   slotIds: number[];
 };
 
-const users: User[] = [{
-  id: 1,
-  email: "juan_dela_cruz@dlsu.edu.ph",
-  name: {
-    first: "Juan",
-    last: "Dela Cruz",
+export const users: User[] = [
+  {
+    id: 1,
+    email: "juan_dela_cruz@dlsu.edu.ph",
+    name: {
+      first: "Juan",
+      last: "Dela Cruz",
+    },
+    password: "password",
   },
-  password: "password",
-}, {
-  id: 2,
-  email: "joe_dela_cruz@dlsu.edu.ph",
-  name: {
-    first: "Joe",
-    last: "Dela Cruz",
+  {
+    id: 2,
+    email: "joe_dela_cruz@dlsu.edu.ph",
+    name: {
+      first: "Joe",
+      last: "Dela Cruz",
+    },
+    password: "password",
+    admin: true,
   },
-  password: "password",
-  admin: true,
-}, {
-  id: 3,
-  email: "paityn_orr@dlsu.edu.ph",
-  name: {
-    first: "Paityn",
-    last: "Orr",
+  {
+    id: 3,
+    email: "paityn_orr@dlsu.edu.ph",
+    name: {
+      first: "Paityn",
+      last: "Orr",
+    },
+    password: "123456",
   },
-  password: "123456",
-}, {
-  id: 4,
-  email: "benicio_mclean@dlsu.edu.ph",
-  name: {
-    first: "Benicio",
-    last: "McLean",
+  {
+    id: 4,
+    email: "benicio_mclean@dlsu.edu.ph",
+    name: {
+      first: "Benicio",
+      last: "McLean",
+    },
+    password: "000000",
+    admin: true,
   },
-  password: "000000",
-  admin: true,
-}, {
-  id: 5,
-  email: "amirah_colon@dlsu.edu.ph",
-  name: {
-    first: "Amirah",
-    last: "Colon",
+  {
+    id: 5,
+    email: "amirah_colon@dlsu.edu.ph",
+    name: {
+      first: "Amirah",
+      last: "Colon",
+    },
+    password: "654321",
   },
-  password: "654321",
-}];
+];
 
 const labs: Lab[] = [
   {
@@ -92,11 +97,15 @@ const labs: Lab[] = [
         end: parse("23:00", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 1, x: 0, y: 0 }, { id: 2, x: 1, y: 0 }, {
-      id: 3,
-      x: 5,
-      y: 1,
-    }],
+    slots: [
+      { id: 1, x: 0, y: 0 },
+      { id: 2, x: 1, y: 0 },
+      {
+        id: 3,
+        x: 5,
+        y: 1,
+      },
+    ],
   },
   {
     id: 2,
@@ -107,7 +116,10 @@ const labs: Lab[] = [
         end: parse("16:00", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 1, x: 0, y: 1 }, { id: 2, x: 1, y: 0 }],
+    slots: [
+      { id: 1, x: 0, y: 1 },
+      { id: 2, x: 1, y: 0 },
+    ],
   },
   {
     id: 3,
@@ -133,7 +145,10 @@ const labs: Lab[] = [
         end: parse("16:30", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 5, x: 0, y: 1 }, { id: 4, x: 2, y: 1 }],
+    slots: [
+      { id: 5, x: 0, y: 1 },
+      { id: 4, x: 2, y: 1 },
+    ],
   },
   {
     id: 5,
@@ -204,7 +219,7 @@ const reservations: Reservation[] = [
 ];
 
 export function login(): Pick<User, "id" | "admin"> {
-  // deno-lint-ignore no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { name, ...user } = getUser(1)!;
   return user;
 }
@@ -216,14 +231,14 @@ export function getUser(
 
   if (!user) return undefined;
 
-  // deno-lint-ignore no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password, ...filtered } = user;
   return filtered;
 }
 
 export function getLabs(name: string) {
   return labs.filter((value) =>
-    value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
+    value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
   );
 }
 
@@ -237,16 +252,16 @@ export function getReservationsFromLab(
 ): (Reservation & Partial<Record<"editable", true>>)[] | undefined {
   const isAdmin = !!(loginId && getUser(loginId)?.admin);
 
-  return reservations.filter((value) =>
-    value.labId === labId &&
-    isAfter(value.schedule.end, new Date())
-  ).map((
-    value,
-  ) => ({
-    editable: value.userId === loginId || isAdmin || undefined,
-    ...value,
-    userId: value.anonymous ? 0 : value.userId,
-  }));
+  return reservations
+    .filter(
+      (value) =>
+        value.labId === labId && isAfter(value.schedule.end, new Date()),
+    )
+    .map((value) => ({
+      editable: value.userId === loginId || isAdmin || undefined,
+      ...value,
+      userId: value.anonymous ? 0 : value.userId,
+    }));
 }
 
 export function getReservationsFromUser(
@@ -255,17 +270,18 @@ export function getReservationsFromUser(
 ): (Reservation & Partial<Record<"editable", true>>)[] | undefined {
   const isAdmin = !!(loginId && getUser(loginId)?.admin);
 
-  return reservations.filter((value) =>
-    value.userId === userId &&
-    (!value.anonymous || value.userId === loginId || isAdmin) &&
-    isAfter(value.schedule.end, new Date())
-  ).map((
-    value,
-  ) => ({
-    editable: value.userId === loginId || isAdmin || undefined,
-    ...value,
-    userId: value.anonymous ? 0 : value.userId,
-  }));
+  return reservations
+    .filter(
+      (value) =>
+        value.userId === userId &&
+        (!value.anonymous || value.userId === loginId || isAdmin) &&
+        isAfter(value.schedule.end, new Date()),
+    )
+    .map((value) => ({
+      editable: value.userId === loginId || isAdmin || undefined,
+      ...value,
+      userId: value.anonymous ? 0 : value.userId,
+    }));
 }
 
 export function deleteReservation(id: number, loginId: number) {
@@ -273,8 +289,7 @@ export function deleteReservation(id: number, loginId: number) {
 
   if (
     reservation &&
-    (getUser(loginId)?.admin ||
-      getUser(reservation.userId)?.id === loginId)
+    (getUser(loginId)?.admin || getUser(reservation.userId)?.id === loginId)
   ) {
     reservations.splice(
       reservations.findIndex((value) => value.id === reservation.id),

@@ -5,8 +5,8 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty.tsx";
-import { Button } from "@/components/ui/button.tsx";
+} from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 import { HomeIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 

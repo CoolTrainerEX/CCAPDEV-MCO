@@ -1,11 +1,11 @@
-import { Spinner } from "@/components/ui/spinner.tsx";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty.tsx";
+} from "@/components/ui/empty";
 export default function Loading() {
   return (
     <Empty>

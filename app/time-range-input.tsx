@@ -1,14 +1,14 @@
 import { differenceInMinutes } from "date-fns/differenceInMinutes";
 import { startOfDay } from "date-fns/startOfDay";
 import { Clock2Icon } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
+import { Button } from "@/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group.tsx";
-import { Slider } from "@/components/ui/slider.tsx";
+} from "@/components/ui/input-group";
+import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns/format";
 import { Dispatch, SetStateAction } from "react";
 import { Interval } from "date-fns";
@@ -17,18 +17,20 @@ import { getHours } from "date-fns/getHours";
 import { setMinutes } from "date-fns/setMinutes";
 import { getMinutes } from "date-fns/getMinutes";
 import { setHours } from "date-fns/setHours";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/lib/utils";
 
-export default function TimeRangeInput(
-  { schedule, valid, value, onValueChange, ...props }:
-    & React.ComponentProps<"div">
-    & {
-      schedule?: Interval;
-      valid?: boolean;
-      value: Interval;
-      onValueChange: Dispatch<SetStateAction<Interval>>;
-    },
-) {
+export default function TimeRangeInput({
+  schedule,
+  valid,
+  value,
+  onValueChange,
+  ...props
+}: React.ComponentProps<"div"> & {
+  schedule?: Interval;
+  valid?: boolean;
+  value: Interval;
+  onValueChange: Dispatch<SetStateAction<Interval>>;
+}) {
   return (
     <FieldGroup {...props}>
       <Field>
@@ -47,12 +49,9 @@ export default function TimeRangeInput(
               schedule &&
               onValueChange((value) => ({
                 ...value,
-                start: parse(
-                  event.target.value,
-                  "HH:mm",
-                  schedule.start,
-                ),
-              }))}
+                start: parse(event.target.value, "HH:mm", schedule.start),
+              }))
+            }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
           <InputGroupAddon>
@@ -76,12 +75,9 @@ export default function TimeRangeInput(
               schedule &&
               onValueChange((value) => ({
                 ...value,
-                start: parse(
-                  event.target.value,
-                  "HH:mm",
-                  schedule.end,
-                ),
-              }))}
+                start: parse(event.target.value, "HH:mm", schedule.end),
+              }))
+            }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
           <InputGroupAddon>
@@ -99,30 +95,25 @@ export default function TimeRangeInput(
           onValueChange({
             start: setMinutes(
               setHours(new Date(schedule.start), value[0]),
-              value[0] % 1 * 60,
+              (value[0] % 1) * 60,
             ),
             end: setMinutes(
               setHours(new Date(schedule.end), value[1]),
-              value[1] % 1 * 60,
+              (value[1] % 1) * 60,
             ),
-          })}
+          })
+        }
         disabled={!schedule}
-        min={schedule &&
-          differenceInMinutes(
-              schedule.start,
-              startOfDay(schedule.start),
-            ) / 60}
-        max={schedule &&
-          differenceInMinutes(
-              schedule.end,
-              startOfDay(schedule.end),
-            ) /
-            60}
+        min={
+          schedule &&
+          differenceInMinutes(schedule.start, startOfDay(schedule.start)) / 60
+        }
+        max={
+          schedule &&
+          differenceInMinutes(schedule.end, startOfDay(schedule.end)) / 60
+        }
         step={0.5}
-        className={cn(
-          !valid &&
-            "**:data-[slot=slider-range]:bg-destructive",
-        )}
+        className={cn(!valid && "**:data-[slot=slider-range]:bg-destructive")}
       />
       <Button type="submit" disabled={!schedule || !valid}>
         Reserve

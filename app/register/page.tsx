@@ -1,19 +1,19 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card.tsx";
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field.tsx";
-import { Input } from "@/components/ui/input.tsx";
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { Metadata } from "next";
 

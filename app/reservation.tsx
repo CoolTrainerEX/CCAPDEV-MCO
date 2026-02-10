@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -9,16 +9,16 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer.tsx";
+} from "@/components/ui/drawer";
 import Form from "next/form";
-import TimeRangeInput from "./time-range-input.tsx";
+import TimeRangeInput from "./time-range-input";
 import {
   deleteReservation,
   getLab,
   getReservationsFromLab,
   getUser,
-} from "@/src/sample.ts";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+} from "@/src/sample";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   getHours,
   getMinutes,
@@ -42,8 +42,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog.tsx";
-import useLogin from "@/src/store/login.ts";
+} from "@/components/ui/alert-dialog";
+import useLogin from "@/src/store/login";
 import {
   Card,
   CardAction,
@@ -52,11 +52,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card.tsx";
-import { cn } from "@/lib/utils.ts";
-import Slots from "./slots.tsx";
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import Slots from "./slots";
 import { useRouter } from "next/navigation";
-import { Toggle } from "@/components/ui/toggle.tsx";
+import { Toggle } from "@/components/ui/toggle";
 
 export function onPressedChange(
   setSelected: Dispatch<SetStateAction<number[]>>,
@@ -64,17 +64,17 @@ export function onPressedChange(
 ) {
   return (pressed: boolean) =>
     setSelected((value) =>
-      pressed ? [slotId, ...value] : value.filter((value) => value !== slotId)
+      pressed ? [slotId, ...value] : value.filter((value) => value !== slotId),
     );
 }
 
-export default function Reservation(
-  { children, reservation, ...props }: Parameters<typeof Drawer>[0] & {
-    reservation?: NonNullable<
-      ReturnType<typeof getReservationsFromLab>
-    >[number];
-  },
-) {
+export default function Reservation({
+  children,
+  reservation,
+  ...props
+}: Parameters<typeof Drawer>[0] & {
+  reservation?: NonNullable<ReturnType<typeof getReservationsFromLab>>[number];
+}) {
   const router = useRouter();
   const loginId = useLogin(({ id }) => id);
   const now = new Date();
@@ -82,9 +82,9 @@ export default function Reservation(
   const [formSchedule, setFormSchedule] = useState<Interval>(
     reservation
       ? {
-        start: new Date(reservation.schedule.start),
-        end: new Date(reservation.schedule.end),
-      }
+          start: new Date(reservation.schedule.start),
+          end: new Date(reservation.schedule.end),
+        }
       : { start: new Date(now), end: new Date(now) },
   );
 
@@ -98,23 +98,24 @@ export default function Reservation(
 
   if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
 
-  const reservations = getReservationsFromLab(lab.id)?.filter(({ id }) =>
-    id !== reservation.id
+  const reservations = getReservationsFromLab(lab.id)?.filter(
+    ({ id }) => id !== reservation.id,
   );
 
-  const rawSchedule = lab.weeklySchedule[
-    ([
-      "sunday",
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-    ] as (keyof typeof lab.weeklySchedule)[])[
-      startOfDay(reservation.schedule.start).getDay()
-    ]
-  ];
+  const rawSchedule =
+    lab.weeklySchedule[
+      (
+        [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ] as (keyof typeof lab.weeklySchedule)[]
+      )[startOfDay(reservation.schedule.start).getDay()]
+    ];
 
   let schedule = rawSchedule && {
     start: max([
@@ -148,20 +149,19 @@ export default function Reservation(
           </DrawerHeader>
           <Form action="/" formMethod="post">
             <div className="flex flex-wrap gap-6 p-4 pb-0">
-              <Slots
-                className="flex-1"
-                slots={lab.slots}
-              >
+              <Slots className="flex-1" slots={lab.slots}>
                 {({ id }) => {
-                  const reservation = reservations?.filter(({ schedule }) =>
-                    areIntervalsOverlapping(schedule, formSchedule)
-                  ).find(({ slotIds }) => slotIds.includes(id));
+                  const reservation = reservations
+                    ?.filter(({ schedule }) =>
+                      areIntervalsOverlapping(schedule, formSchedule),
+                    )
+                    .find(({ slotIds }) => slotIds.includes(id));
 
                   return (
                     <Toggle
                       disabled={!!reservation}
                       className={cn(
-                        "w-full h-full",
+                        "h-full w-full",
                         reservation
                           ? "bg-destructive text-destructive-foreground"
                           : "bg-muted text-muted-foreground",
@@ -177,15 +177,19 @@ export default function Reservation(
                 schedule={schedule}
                 value={formSchedule}
                 onValueChange={setFormSchedule}
-                valid={!reservations?.filter(({ slotIds }) =>
-                  slotIds.some((value) => selected.includes(value))
-                ).some(({ schedule }) =>
-                  areIntervalsOverlapping(schedule, formSchedule)
-                )}
+                valid={
+                  !reservations
+                    ?.filter(({ slotIds }) =>
+                      slotIds.some((value) => selected.includes(value)),
+                    )
+                    .some(({ schedule }) =>
+                      areIntervalsOverlapping(schedule, formSchedule),
+                    )
+                }
                 className="w-sm"
               />
             </div>
-            <DrawerFooter className="max-w-sm mx-auto">
+            <DrawerFooter className="mx-auto max-w-sm">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">Delete</Button>
@@ -214,7 +218,9 @@ export default function Reservation(
                 </AlertDialogContent>
               </AlertDialog>
               <DrawerClose asChild>
-                <Button variant="outline" type="reset">Cancel</Button>
+                <Button variant="outline" type="reset">
+                  Cancel
+                </Button>
               </DrawerClose>
             </DrawerFooter>
           </Form>
@@ -224,13 +230,13 @@ export default function Reservation(
   );
 }
 
-export function ReservationContent(
-  { className, reservation, ...props }: React.ComponentProps<"div"> & {
-    reservation: NonNullable<
-      ReturnType<typeof getReservationsFromLab>
-    >[number];
-  },
-) {
+export function ReservationContent({
+  className,
+  reservation,
+  ...props
+}: React.ComponentProps<"div"> & {
+  reservation: NonNullable<ReturnType<typeof getReservationsFromLab>>[number];
+}) {
   const user = reservation.anonymous
     ? { name: { first: "Anonymous", last: "" } }
     : getUser(reservation.userId);
@@ -240,44 +246,27 @@ export function ReservationContent(
   if (!user) throw new Error(`Invalid user ID ${reservation.userId}.`);
   if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
 
-  const [format, setFormat] = useState<Intl.DateTimeFormat | undefined>(
-    undefined,
-  );
-
-  useEffect(() => {
-    setFormat(Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }));
-  }, []);
-
   return (
     <Card className={cn("w-full max-w-sm", className)} {...props}>
       <CardHeader>
         <CardTitle>
           <Link href={`/user/${reservation.userId}`}>
-            {[user.name.first, user.name.last].join(
-              " ",
-            )}
+            {[user.name.first, user.name.last].join(" ")}
           </Link>
         </CardTitle>
         <CardDescription>
           <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
         </CardDescription>
-        {reservation.editable &&
-          (
-            <CardAction>
-              <DrawerTrigger asChild>
-                <Button variant="link">Edit</Button>
-              </DrawerTrigger>
-            </CardAction>
-          )}
+        {reservation.editable && (
+          <CardAction>
+            <DrawerTrigger asChild>
+              <Button variant="link">Edit</Button>
+            </DrawerTrigger>
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent>
-        <Slots
-          className="aspect-video"
-          slots={lab.slots}
-        >
+        <Slots className="aspect-video" slots={lab.slots}>
           {({ id }) => (
             <div
               className={cn(
@@ -289,7 +278,10 @@ export function ReservationContent(
         </Slots>
       </CardContent>
       <CardFooter>
-        {format?.formatRange(
+        {Intl.DateTimeFormat(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })?.formatRange(
           toDate(reservation.schedule.start),
           toDate(reservation.schedule.end),
         )}

@@ -1,28 +1,28 @@
 "use client";
 import { notFound, useParams } from "next/navigation";
-import { Separator } from "@/components/ui/separator.tsx";
-import { getLab, getReservationsFromLab } from "@/src/sample.ts";
-import Slots from "@/app/slots.tsx";
-import { Calendar } from "@/components/ui/calendar.tsx";
-import { useEffect, useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { getLab, getReservationsFromLab } from "@/src/sample";
+import Slots from "@/app/slots";
+import { Calendar } from "@/components/ui/calendar";
+import { useState } from "react";
 import { startOfDay } from "date-fns/startOfDay";
-import { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { addDays } from "date-fns/addDays";
 import { max } from "date-fns/max";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip.tsx";
+} from "@/components/ui/tooltip";
 import Reservation, {
   onPressedChange,
   ReservationContent,
-} from "@/app/reservation.tsx";
-import useLogin from "@/src/store/login.ts";
-import { cn } from "@/lib/utils.ts";
-import { Toggle } from "@/components/ui/toggle.tsx";
+} from "@/app/reservation";
+import useLogin from "@/src/store/login";
+import { cn } from "@/lib/utils";
+import { Toggle } from "@/components/ui/toggle";
 import Form from "next/form";
-import TimeRangeInput from "@/app/time-range-input.tsx";
+import TimeRangeInput from "@/app/time-range-input";
 import { getHours } from "date-fns/getHours";
 import { getMinutes } from "date-fns/getMinutes";
 import { Interval, isAfter } from "date-fns";
@@ -33,28 +33,31 @@ import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
 
 export default function Lab() {
   const { id, name, slots, weeklySchedule } =
-    getLab(Number.parseInt(useParams<{ id: string }>().id)) ??
-      notFound();
+    getLab(Number.parseInt(useParams<{ id: string }>().id)) ?? notFound();
 
-  const reservations = getReservationsFromLab(id, useLogin(({ id }) => id));
+  const reservations = getReservationsFromLab(
+    id,
+    useLogin(({ id }) => id),
+  );
 
   const now = new Date();
 
   const [date, setDate] = useState(new Date());
 
-  const rawSchedule = weeklySchedule[
-    ([
-      "sunday",
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-    ] as (keyof typeof weeklySchedule)[])[
-      startOfDay(date).getDay()
-    ]
-  ];
+  const rawSchedule =
+    weeklySchedule[
+      (
+        [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ] as (keyof typeof weeklySchedule)[]
+      )[startOfDay(date).getDay()]
+    ];
 
   let schedule = rawSchedule && {
     start: max([
@@ -77,30 +80,24 @@ export default function Lab() {
     start: new Date(schedule?.start ?? date),
     end: new Date(schedule?.end ?? date),
   });
-  const [timeZone, setTimeZone] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  }, []);
 
   return (
     <>
       <div className="container m-auto">
-        <h1 className="scroll-m-20 text-4xl text-center font-extrabold tracking-tight text-balance">
+        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
           {name}
         </h1>
         <p className="text-muted-foreground text-center text-sm">{id}</p>
       </div>
       <Separator className="my-6" />
-      <div className="flex gap-6 mx-6 flex-wrap">
-        <Slots
-          className="flex-1 min-h-50 max-h-96"
-          slots={slots}
-        >
+      <div className="mx-6 flex flex-wrap gap-6">
+        <Slots className="max-h-96 min-h-50 flex-1" slots={slots}>
           {({ id }) => {
-            const reservation = reservations?.filter((value) =>
-              areIntervalsOverlapping(value.schedule, formSchedule)
-            ).find(({ slotIds }) => slotIds.includes(id));
+            const reservation = reservations
+              ?.filter((value) =>
+                areIntervalsOverlapping(value.schedule, formSchedule),
+              )
+              .find(({ slotIds }) => slotIds.includes(id));
 
             return (
               <Reservation reservation={reservation}>
@@ -108,11 +105,12 @@ export default function Lab() {
                   <Toggle
                     disabled={!!reservation}
                     className={cn(
-                      "w-full h-full flex justify-center items-center",
+                      "flex h-full w-full items-center justify-center",
                       !reservation && "bg-muted text-muted-foreground",
                       reservation?.editable &&
                         "bg-primary text-primary-foreground",
-                      reservation && !reservation.editable &&
+                      reservation &&
+                        !reservation.editable &&
                         "bg-destructive text-destructive-foreground",
                     )}
                     pressed={selected.includes(id)}
@@ -126,14 +124,11 @@ export default function Lab() {
                       </p>
                     </TooltipTrigger>
                   </Toggle>
-                  {reservation &&
-                    (
-                      <TooltipContent className="p-0 bg-transparent">
-                        <ReservationContent
-                          reservation={reservation}
-                        />
-                      </TooltipContent>
-                    )}
+                  {reservation && (
+                    <TooltipContent className="bg-transparent p-0">
+                      <ReservationContent reservation={reservation} />
+                    </TooltipContent>
+                  )}
                 </Tooltip>
               </Reservation>
             );
@@ -150,21 +145,24 @@ export default function Lab() {
                 before: startOfDay(now),
                 after: addDays(startOfDay(now), 7),
               }}
-              timeZone={timeZone}
               required
             />
           </CardContent>
-          <CardFooter className="bg-card border-t flex-col gap-6">
+          <CardFooter className="bg-card flex-col gap-6 border-t">
             <Form action="/" className="w-full">
               <TimeRangeInput
                 schedule={schedule}
                 value={formSchedule}
                 onValueChange={setFormSchedule}
-                valid={!reservations?.filter(({ slotIds }) =>
-                  slotIds.some((value) => selected.includes(value))
-                ).some(({ schedule }) =>
-                  areIntervalsOverlapping(schedule, formSchedule)
-                )}
+                valid={
+                  !reservations
+                    ?.filter(({ slotIds }) =>
+                      slotIds.some((value) => selected.includes(value)),
+                    )
+                    .some(({ schedule }) =>
+                      areIntervalsOverlapping(schedule, formSchedule),
+                    )
+                }
               />
             </Form>
           </CardFooter>

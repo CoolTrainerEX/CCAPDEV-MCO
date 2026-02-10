@@ -7,6 +7,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -41,9 +42,9 @@ declare global {
   var __TANSTACK_QUERY_CLIENT__: QueryClient;
 }
 
-export default function Providers(
-  { children }: Readonly<{ children: React.ReactNode }>,
-) {
+export default function Providers({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   // NOTE: Avoid useState when initializing the query client if you don't
   //       have a suspense boundary between this and the code that may
   //       suspend because React will throw away the client on the initial
@@ -51,7 +52,9 @@ export default function Providers(
   const queryClient = getQueryClient();
 
   // This code is for all users
-  globalThis.__TANSTACK_QUERY_CLIENT__ = queryClient;
+  useEffect(() => {
+    globalThis.__TANSTACK_QUERY_CLIENT__ = queryClient;
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

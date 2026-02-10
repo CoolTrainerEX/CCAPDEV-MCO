@@ -236,13 +236,13 @@ function FieldError({
 
 export {
   Field,
-  FieldContent,
+  FieldLabel,
   FieldDescription,
   FieldError,
   FieldGroup,
-  FieldLabel,
   FieldLegend,
   FieldSeparator,
   FieldSet,
+  FieldContent,
   FieldTitle,
 };
