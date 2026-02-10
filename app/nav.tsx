@@ -10,6 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUser } from "@/src/sample";
 import useLogin from "@/src/store/login";
+import icon from "./icon.svg";
 
 export default function Nav() {
   const user = getUser(useLogin(({ id }) => id));
@@ -21,7 +22,7 @@ export default function Nav() {
           <NavigationMenuLink asChild>
             <Link href="/" className="flex-row gap-6">
               <div className="relative hidden w-10 sm:block">
-                <Image src="/icon.svg" alt="ArchersLab logo" fill />
+                <Image src={icon} alt="ArchersLab logo" fill />
               </div>
               <h1 className="scroll-m-20 font-sans text-4xl font-extrabold tracking-tight text-balance">
                 ArchersLab
