@@ -119,10 +119,10 @@ const labs: Lab[] = [
       },
       wednesday: {
         start: parse("7:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)), 
+        end: parse("18:00", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 4, x: 0, y: 1}],
+    slots: [{ id: 4, x: 0, y: 1 }],
   },
   {
     id: 4,
@@ -133,7 +133,7 @@ const labs: Lab[] = [
         end: parse("16:30", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 5, x: 0, y: 1}, {id: 4, x: 2, y:1}],
+    slots: [{ id: 5, x: 0, y: 1 }, { id: 4, x: 2, y: 1 }],
   },
   {
     id: 5,
@@ -141,11 +141,10 @@ const labs: Lab[] = [
     weeklySchedule: {
       friday: {
         start: parse("7:30", "HH:mm", new Date(0)),
-        end: parse("12:00", "HH:mm", new Date(0)), 
+        end: parse("12:00", "HH:mm", new Date(0)),
       },
     },
-    slots: [{ id: 5, x: 0, y: 1}],
-
+    slots: [{ id: 5, x: 0, y: 1 }],
   },
 ];
 

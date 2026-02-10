@@ -92,7 +92,7 @@ export default function Reservation(
     reservation ? reservation.slotIds : [],
   );
 
-  if (!reservation) return <>{children}</>;
+  if (!reservation) return children;
 
   const lab = getLab(reservation.labId);
 
