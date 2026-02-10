@@ -1,5 +1,5 @@
 {
-  "name": "ArchersLab",
+  "name": "archerslab",
   "version": "0.1.0",
   "private": true,
   "description": "CCAPDEV MCO",
@@ -14,13 +14,25 @@
     "type": "git",
     "url": "git+https://github.com/CoolTrainerEX/CCAPDEV-MCO.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "contributors": [
-    "Justin Ryan Uy <justin_ryan_uy@dlsu.edu.ph> (https://CoolTrainerEX.github.io)",
-    "Anie Guo <anie_guo@dlsu.edu.ph> (https://www.facebook.com/anie.guo)",
-    "Andrea Jadyn Tan <andrea_jadyn_tan@dlsu.edu.ph> (https://www.facebook.com/andreajadyn.tan.3)"
+    {
+      "name": "Justin Ryan Uy",
+      "email": "justin_ryan_uy@dlsu.edu.ph",
+      "url": "https://CoolTrainerEX.github.io"
+    },
+    {
+      "name": "Anie Guo",
+      "email": "anie_guo@dlsu.edu.ph",
+      "url": "https://www.facebook.com/anie.guo"
+    },
+    {
+      "name": "Andrea Jadyn Tan",
+      "email": "andrea_jadyn_tan@dlsu.edu.ph",
+      "url": "https://www.facebook.com/andreajadyn.tan.3"
+    }
   ],
-  "type": "module",
+  "type": "commonjs",
   "directories": {
     "lib": "lib",
     "test": "tests"
@@ -31,11 +43,6 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-tailwindcss"
-    ]
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",
@@ -80,6 +87,11 @@
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.0",
     "vitest": "^4.0.18"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ]
   },
   "ignoreScripts": [
     "sharp",
