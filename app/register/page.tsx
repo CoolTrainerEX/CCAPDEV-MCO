@@ -39,6 +39,7 @@ export default function Register() {
                   <FieldLabel htmlFor="firstname">First Name</FieldLabel>
                   <Input
                     id="firstname"
+                    name="firstname"
                     type="text"
                     placeholder="Juan"
                     required
@@ -48,6 +49,7 @@ export default function Register() {
                   <FieldLabel htmlFor="lastname">Last Name</FieldLabel>
                   <Input
                     id="lastname"
+                    name="lastname"
                     type="text"
                     placeholder="Dela Cruz"
                     required
@@ -57,6 +59,7 @@ export default function Register() {
                   <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="juan_dela_cruz@dlsu.edu.ph"
                     required
@@ -68,7 +71,13 @@ export default function Register() {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input id="password" type="password" minLength={8} required />
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    minLength={8}
+                    required
+                  />
                   <FieldDescription>
                     Must be at least 8 characters long.
                   </FieldDescription>
@@ -77,7 +86,12 @@ export default function Register() {
                   <FieldLabel htmlFor="confirm-password">
                     Confirm Password
                   </FieldLabel>
-                  <Input id="confirm-password" type="password" required />
+                  <Input
+                    id="confirm-password"
+                    name="confirm-password"
+                    type="password"
+                    required
+                  />
                   <FieldDescription>
                     Please confirm your password.
                   </FieldDescription>

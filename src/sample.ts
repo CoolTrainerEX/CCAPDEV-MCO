@@ -7,6 +7,7 @@ type User = {
   email: string;
   name: { first: string; last: string };
   password: string;
+  description: string;
   admin?: true;
 };
 
@@ -46,6 +47,7 @@ export const users: User[] = [
       last: "Dela Cruz",
     },
     password: "password",
+    description: "Student of DLSU",
   },
   {
     id: 2,
@@ -55,6 +57,7 @@ export const users: User[] = [
       last: "Dela Cruz",
     },
     password: "password",
+    description: "IT Employee",
     admin: true,
   },
   {
@@ -65,6 +68,7 @@ export const users: User[] = [
       last: "Orr",
     },
     password: "123456",
+    description: "Proud CCS Student",
   },
   {
     id: 4,
@@ -74,6 +78,7 @@ export const users: User[] = [
       last: "McLean",
     },
     password: "000000",
+    description: "ADSO Officer",
     admin: true,
   },
   {
@@ -84,6 +89,7 @@ export const users: User[] = [
       last: "Colon",
     },
     password: "654321",
+    description: "Epic gamer",
   },
 ];
 
@@ -477,39 +483,67 @@ export function login(): Pick<User, "id" | "admin"> {
 
 export function getUser(
   id: number,
-): Omit<User, "password" | "email"> | undefined {
+  loginId?: number,
+):
+  | (Omit<User, "password" | "email"> & Partial<Record<"editable", true>>)
+  | undefined {
   const user = users.find((value) => value.id === id);
 
   if (!user) return undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password, ...filtered } = user;
-  return filtered;
+  return {
+    editable:
+      filtered.id === loginId ||
+      (loginId && getUser(loginId)?.admin) ||
+      undefined,
+    ...filtered,
+  };
 }
 
-export function getLabs(name: string) {
-  return labs.filter((value) =>
-    value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
-  );
+export function getLabs(
+  name: string,
+  loginId?: number,
+): (Lab & Partial<Record<"editable", true>>)[] {
+  return labs
+    .filter((value) =>
+      value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
+    )
+    .map((value) => ({
+      editable: (loginId && getUser(loginId)?.admin) || undefined,
+      ...value,
+    }));
 }
 
-export function getLab(id: number) {
-  return labs.find((value) => value.id === id);
+export function getLab(
+  id: number,
+  loginId?: number,
+): (Lab & Partial<Record<"editable", true>>) | undefined {
+  const lab = labs.find((value) => value.id === id);
+
+  if (!lab) return undefined;
+
+  return {
+    editable: (loginId && getUser(loginId)?.admin) || undefined,
+    ...lab,
+  };
 }
 
 export function getReservationsFromLab(
   labId: number,
   loginId?: number,
 ): (Reservation & Partial<Record<"editable", true>>)[] | undefined {
-  const isAdmin = !!(loginId && getUser(loginId)?.admin);
-
   return reservations
     .filter(
       (value) =>
         value.labId === labId && isAfter(value.schedule.end, new Date()),
     )
     .map((value) => ({
-      editable: value.userId === loginId || isAdmin || undefined,
+      editable:
+        value.userId === loginId ||
+        (loginId && getUser(loginId)?.admin) ||
+        undefined,
       ...value,
       userId: value.anonymous ? 0 : value.userId,
     }));
