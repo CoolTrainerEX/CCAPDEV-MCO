@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function User() {
-  const loginId = useLogin(({ login: { id } }) => id);
+  const loginId = useLogin(({ id }) => id);
   const logout = useLogin(({ logout }) => logout);
   const { id, name, description, admin, editable } =
     getUser(Number.parseInt(useParams<{ id: string }>().id), loginId) ??

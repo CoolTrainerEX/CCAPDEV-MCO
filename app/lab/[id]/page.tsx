@@ -40,7 +40,7 @@ export default function Lab() {
 
   const reservations = getReservationsFromLab(
     id,
-    useLogin(({ login: { id } }) => id),
+    useLogin(({ id }) => id),
   );
 
   const now = new Date();

@@ -475,10 +475,8 @@ const reservations: Reservation[] = [
   },
 ];
 
-export function login(): Pick<User, "id" | "admin"> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { name, ...user } = getUser(1)!;
-  return user;
+export function login() {
+  return getUser(1)!.id;
 }
 
 export function getUser(

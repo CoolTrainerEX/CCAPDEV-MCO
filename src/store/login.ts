@@ -6,9 +6,7 @@ import { login } from "@/src/sample";
  *
  * @author Justin Ryan Uy
  */
-export default create<{ login: ReturnType<typeof login>; logout: () => void }>(
-  (set) => ({
-    login: login(),
-    logout: () => set({ login: { id: 0 } }),
-  }),
-);
+export default create<{ id: number; logout: () => void }>((set) => ({
+  id: login(),
+  logout: () => set({ id: Number.NaN }),
+}));

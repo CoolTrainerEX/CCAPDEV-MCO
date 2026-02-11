@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getLabs, getReservationsFromLab } from "@/src/sample";
+import { getLabs, getReservationsFromLab, getUser } from "@/src/sample";
 import Slots from "./slots";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ import { toDate } from "date-fns/toDate";
 import useLogin from "@/src/store/login";
 
 export default function Home() {
-  const admin = useLogin(({ login: { admin } }) => admin);
+  const admin = getUser(useLogin(({ id }) => id))?.admin;
   const labs = getLabs(useSearchParams().get("q") ?? "");
   const now = new Date();
 

@@ -76,7 +76,7 @@ export default function Reservation({
   reservation?: NonNullable<ReturnType<typeof getReservationsFromLab>>[number];
 }) {
   const router = useRouter();
-  const loginId = useLogin(({ login: { id } }) => id);
+  const loginId = useLogin(({ id }) => id);
   const now = new Date();
 
   const [formSchedule, setFormSchedule] = useState<Interval>(
