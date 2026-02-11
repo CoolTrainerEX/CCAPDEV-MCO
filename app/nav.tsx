@@ -13,7 +13,7 @@ import useLogin from "@/src/store/login";
 import icon from "./icon.svg";
 
 export default function Nav() {
-  const user = getUser(useLogin(({ id }) => id));
+  const user = getUser(useLogin(({ login: { id } }) => id));
 
   return (
     <NavigationMenu className="bg-card text-card-foreground sticky top-0 max-w-full p-4 [&>div]:w-full">

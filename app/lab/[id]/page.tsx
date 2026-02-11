@@ -30,14 +30,17 @@ import { areIntervalsOverlapping } from "date-fns/areIntervalsOverlapping";
 import { setMinutes } from "date-fns/setMinutes";
 import { setHours } from "date-fns/setHours";
 import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
+import { Button } from "@/components/ui/button";
+import { PencilIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function Lab() {
-  const { id, name, slots, weeklySchedule } =
+  const { id, name, slots, weeklySchedule, editable } =
     getLab(Number.parseInt(useParams<{ id: string }>().id)) ?? notFound();
 
   const reservations = getReservationsFromLab(
     id,
-    useLogin(({ id }) => id),
+    useLogin(({ login: { id } }) => id),
   );
 
   const now = new Date();
@@ -83,11 +86,20 @@ export default function Lab() {
 
   return (
     <>
-      <div className="container m-auto">
-        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-          {name}
-        </h1>
-        <p className="text-muted-foreground text-center text-sm">{id}</p>
+      <div className="container m-auto flex justify-center gap-6">
+        <div>
+          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+            {name}
+          </h1>
+          <p className="text-muted-foreground text-center text-sm">{id}</p>
+        </div>
+        {editable && (
+          <Button variant="outline" asChild>
+            <Link href={`/lab/${id}/edit`}>
+              <PencilIcon />
+            </Link>
+          </Button>
+        )}
       </div>
       <Separator className="my-6" />
       <div className="mx-6 flex flex-wrap gap-6">

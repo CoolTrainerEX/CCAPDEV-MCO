@@ -1,35 +1,41 @@
 "use client";
 import { notFound, useParams } from "next/navigation";
-import { getReservationsFromUser, getUser } from "@/src/sample";
+import { deleteUser, getReservationsFromUser, getUser } from "@/src/sample";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import Reservation, { ReservationContent } from "@/app/reservation";
 import useLogin from "@/src/store/login";
 import { Button } from "@/components/ui/button";
-import { BarChart, Minus, PencilIcon, Plus } from "lucide-react";
+import { PencilIcon } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import Form from "next/form";
-import {
-  FieldGroup,
-  Field,
-  FieldLabel,
-  FieldDescription,
-} from "@/components/ui/field";
+import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function User() {
-  const loginId = useLogin(({ id }) => id);
+  const loginId = useLogin(({ login: { id } }) => id);
+  const logout = useLogin(({ logout }) => logout);
   const { id, name, description, admin, editable } =
     getUser(Number.parseInt(useParams<{ id: string }>().id), loginId) ??
     notFound();
@@ -53,68 +59,105 @@ export default function User() {
           <p className="text-muted-foreground text-sm">{id}</p>
         </div>
         {editable && (
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button variant="outline">
-                <PencilIcon />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
-                <DrawerHeader>
-                  <DrawerTitle>Edit Profile</DrawerTitle>
-                </DrawerHeader>
-                <Form action="/">
-                  <div className="p-4 pb-0">
-                    <div className="flex items-center justify-center space-x-2">
-                      <FieldGroup>
-                        <Field>
-                          <FieldLabel htmlFor="firstname">
-                            First Name
-                          </FieldLabel>
-                          <Input
-                            id="firstname"
-                            name="firstname"
-                            type="text"
-                            placeholder="Juan"
-                            value={name.first}
-                            required
-                          />
-                        </Field>
-                        <Field>
-                          <FieldLabel htmlFor="lastname">Last Name</FieldLabel>
-                          <Input
-                            id="lastname"
-                            name="lastname"
-                            type="text"
-                            placeholder="Dela Cruz"
-                            value={name.last}
-                            required
-                          />
-                        </Field>
-                        <Field>
-                          <FieldLabel htmlFor="description">Message</FieldLabel>
-                          <Textarea
-                            id="description"
-                            placeholder="Type your description here."
-                            value={description}
-                          />
-                        </Field>
-                      </FieldGroup>
+          <>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="outline">
+                  <PencilIcon />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="mx-auto w-full max-w-sm">
+                  <DrawerHeader>
+                    <DrawerTitle>Edit Profile</DrawerTitle>
+                  </DrawerHeader>
+                  <Form action="/">
+                    <div className="p-4 pb-0">
+                      <div className="flex items-center justify-center space-x-2">
+                        <FieldGroup>
+                          <Field>
+                            <FieldLabel htmlFor="firstname">
+                              First Name
+                            </FieldLabel>
+                            <Input
+                              id="firstname"
+                              name="firstname"
+                              type="text"
+                              placeholder="Juan"
+                              value={name.first}
+                              required
+                            />
+                          </Field>
+                          <Field>
+                            <FieldLabel htmlFor="lastname">
+                              Last Name
+                            </FieldLabel>
+                            <Input
+                              id="lastname"
+                              name="lastname"
+                              type="text"
+                              placeholder="Dela Cruz"
+                              value={name.last}
+                              required
+                            />
+                          </Field>
+                          <Field>
+                            <FieldLabel htmlFor="description">
+                              Message
+                            </FieldLabel>
+                            <Textarea
+                              id="description"
+                              placeholder="Type your description here."
+                              value={description}
+                            />
+                          </Field>
+                        </FieldGroup>
+                      </div>
                     </div>
-                  </div>
-                  <DrawerFooter>
-                    <Button type="submit">Submit</Button>
-                    <DrawerClose asChild>
-                      <Button variant="outline" type="reset">
-                        Cancel
-                      </Button>
-                    </DrawerClose>
-                  </DrawerFooter>
-                </Form>
-              </div>
-            </DrawerContent>
-          </Drawer>
+                    <DrawerFooter>
+                      <Button type="submit">Update</Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive">Delete</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your account from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                deleteUser(id, loginId);
+                                logout();
+                              }}
+                            >
+                              Continue
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <DrawerClose asChild>
+                        <Button variant="outline" type="reset">
+                          Cancel
+                        </Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </Form>
+                </div>
+              </DrawerContent>
+            </Drawer>
+            <Button variant="destructive" onClick={logout}>
+              Logout
+            </Button>
+          </>
         )}
       </div>
       <p className="mx-auto mt-6 w-fit italic">{description}</p>

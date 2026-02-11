@@ -24,7 +24,7 @@ import { toDate } from "date-fns/toDate";
 import useLogin from "@/src/store/login";
 
 export default function Home() {
-  const admin = useLogin(({ admin }) => admin);
+  const admin = useLogin(({ login: { admin } }) => admin);
   const labs = getLabs(useSearchParams().get("q") ?? "");
   const now = new Date();
 

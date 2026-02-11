@@ -502,6 +502,14 @@ export function getUser(
   };
 }
 
+export function deleteUser(id: number, loginId: number) {
+  const user = users.find((value) => value.id === id);
+
+  if (user && (getUser(loginId)?.admin || getUser(user.id)?.id === loginId)) {
+    users.splice(users.findIndex((value) => value.id === user.id));
+  }
+}
+
 export function getLabs(
   name: string,
   loginId?: number,
