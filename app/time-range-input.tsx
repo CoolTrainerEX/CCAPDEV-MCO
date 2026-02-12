@@ -75,7 +75,7 @@ export default function TimeRangeInput({
               schedule &&
               onValueChange((value) => ({
                 ...value,
-                start: parse(event.target.value, "HH:mm", schedule.end),
+                end: parse(event.target.value, "HH:mm", schedule.end),
               }))
             }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
