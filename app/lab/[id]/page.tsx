@@ -35,13 +35,12 @@ import { PencilIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function Lab() {
+  const loginId = useLogin(({ id }) => id);
   const { id, name, slots, weeklySchedule, editable } =
-    getLab(Number.parseInt(useParams<{ id: string }>().id)) ?? notFound();
+    getLab(Number.parseInt(useParams<{ id: string }>().id), loginId) ??
+    notFound();
 
-  const reservations = getReservationsFromLab(
-    id,
-    useLogin(({ id }) => id),
-  );
+  const reservations = getReservationsFromLab(id, loginId);
 
   const now = new Date();
 
