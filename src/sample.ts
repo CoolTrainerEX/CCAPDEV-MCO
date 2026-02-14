@@ -509,12 +509,14 @@ export function deleteUser(id: number, loginId: number) {
 }
 
 export function getLabs(
-  name: string,
+  name?: string,
   loginId?: number,
 ): (Lab & Partial<Record<"editable", true>>)[] {
   return labs
-    .filter((value) =>
-      value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
+    .filter(
+      (value) =>
+        !name ||
+        value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
     )
     .map((value) => ({
       editable: (loginId && getUser(loginId)?.admin) || undefined,

@@ -13,7 +13,7 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  return getLabs("").map(({ id }) => ({ id: String(id) }));
+  return getLabs().map(({ id }) => ({ id: String(id) }));
 }
 
 export default function LabLayout({ children }: { children: React.ReactNode }) {

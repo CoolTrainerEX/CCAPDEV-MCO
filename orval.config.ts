@@ -10,14 +10,21 @@ export default defineConfig({
       mode: "tags-split",
       client: "react-query",
       target: "src/api/endpoints",
-      schemas: { path: "src/api/models", type: "zod" },
+      schemas: "src/api/models",
       mock: true,
       baseUrl: "/api",
-      override: {
-        fetch: {
-          runtimeValidation: true,
-        },
-      },
+    },
+  },
+  // Zod schema generation
+  apiZod: {
+    input: {
+      target: "./openapi.yaml",
+    },
+    output: {
+      mode: "tags-split",
+      client: "zod",
+      target: "src/api/endpoints",
+      fileExtension: ".zod.ts",
     },
   },
 });

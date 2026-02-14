@@ -1,0 +1,532 @@
+openapi: "3.1.0"
+servers:
+  - url: /api
+info:
+  version: "0.1.0"
+  title: "ArchersLab API"
+  description: CCAPDEV MCO
+  license:
+    name: MIT
+    identifier: MIT
+
+security:
+  - Jwt: []
+  - {}
+
+paths:
+  /login:
+    post:
+      summary: Login
+      operationId: login
+      tags:
+        - user
+      responses:
+        "200":
+          description: The user ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserId"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+  /user:
+    post:
+      summary: Create a user
+      operationId: createUser
+      tags:
+        - user
+      responses:
+        "201":
+          description: The user created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UserName"
+                - $ref: "#/components/schemas/UserLogin"
+  /user/{id}:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+    get:
+      summary: Read a user
+      operationId: readUser
+      tags:
+        - user
+      responses:
+        "200":
+          description: The user corresponding to the provided `id`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    put:
+      summary: Update a user
+      operationId: updateUser
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Update the user corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      summary: Delete a user
+      operationId: deleteUser
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Delete the user corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+  /lab:
+    get:
+      summary: Read all labs
+      operationId: getLabs
+      tags:
+        - lab
+      parameters:
+        - name: q
+          description: The search query to filter labs
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The labs containing the provided `q` in name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lab"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    post:
+      summary: Create a lab
+      operationId: createLab
+      tags:
+        - lab
+      security:
+        - Jwt: []
+      responses:
+        "201":
+          description: The lab created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lab"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+      requestBody:
+        description: The lab to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Lab"
+
+  /lab/{id}:
+    parameters:
+      - $ref: "#/components/parameters/labId"
+    get:
+      summary: Read a lab
+      operationId: getLab
+      tags:
+        - lab
+      responses:
+        "200":
+          description: The lab corresponding to the provided `id`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lab"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    put:
+      summary: Update a lab
+      operationId: updateLab
+      tags:
+        - lab
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Update the lab corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      summary: Delete a lab
+      operationId: deleteLab
+      tags:
+        - lab
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Delete the lab corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+  /reservation:
+    post:
+      summary: Create a reservation
+      operationId: createReservation
+      tags:
+        - reservation
+      security:
+        - Jwt: []
+      responses:
+        "201":
+          description: The reservation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Reservation"
+  /reservation/{id}:
+    parameters:
+      - name: id
+        description: The unique identifier of the reservation
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/ReservationId"
+    put:
+      summary: Update a reservation
+      operationId: updateReservation
+      tags:
+        - reservation
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Update the reservation corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Exists"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      summary: Delete a reservation
+      operationId: deleteReservation
+      tags:
+        - reservation
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Delete the reservation corresponding to the provided `id`
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+  /reservation/user/{id}:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+    get:
+      summary: Read the reservations of the user
+      operationId: getReservationUser
+      tags:
+        - reservation
+      responses:
+        "200":
+          description: The reservations corresponding to the provided `userId`
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+  /reservation/lab/{id}:
+    parameters:
+      - $ref: "#/components/parameters/labId"
+    get:
+      summary: Read the reservations of the lab
+      operationId: getReservationLab
+      tags:
+        - reservation
+      responses:
+        "200":
+          description: The reservations corresponding to the provided `labId`
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  schemas:
+    Id:
+      type: integer
+      minimum: 0
+    UserId:
+      description: The unique identifier of a user
+      $ref: "#/components/schemas/Id"
+      example: 12412201
+    LabId:
+      description: The unique identifier of a lab
+      $ref: "#/components/schemas/Id"
+      example: 1
+    ReservationId:
+      description: The unique identifier of a reservation
+      $ref: "#/components/schemas/Id"
+      example: 1
+    UserName:
+      type: object
+      required:
+        - first
+        - last
+      properties:
+        first:
+          type: string
+          example: "Juan"
+        last:
+          type: string
+          example: "Dela Cruz"
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "juan_dela_cruz@dlsu.edu.ph"
+        password:
+          type: string
+          format: password
+          example: "123456"
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserName"
+        - type: object
+          required:
+            - id
+            - description
+          properties:
+            id:
+              $ref: "#/components/schemas/UserId"
+            description:
+              type: string
+              example: "Epic gamer"
+            admin:
+              type: boolean
+    Lab:
+      type: object
+      required:
+        - id
+        - name
+        - weeklySchedule
+        - slots
+      properties:
+        id:
+          $ref: "#/components/schemas/UserId"
+        name:
+          type: string
+          example: "GK403"
+        weeklySchedule:
+          description: Weekly schedule of the lab
+          type: object
+          properties:
+            sunday:
+              $ref: "#/components/schemas/Interval"
+            monday:
+              $ref: "#/components/schemas/Interval"
+            tuesday:
+              $ref: "#/components/schemas/Interval"
+            wednesday:
+              $ref: "#/components/schemas/Interval"
+            thursday:
+              $ref: "#/components/schemas/Interval"
+            friday:
+              $ref: "#/components/schemas/Interval"
+            saturday:
+              $ref: "#/components/schemas/Interval"
+        slots:
+          description: Available slots in the lab
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - x
+              - y
+            properties:
+              id:
+                $ref: "#/components/schemas/Id"
+              x:
+                type: integer
+                minimum: 0
+              y:
+                type: integer
+                minimum: 0
+            example:
+              id: 1
+              x: 0
+              y: 0
+    Reservation:
+      type: object
+      required:
+        - id
+        - userId
+        - labId
+        - schedule
+        - slotIds
+      properties:
+        id:
+          $ref: "#/components/schemas/ReservationId"
+        userId:
+          $ref: "#/components/schemas/UserId"
+        labId:
+          $ref: "#/components/schemas/LabId"
+        anonymous:
+          type: boolean
+        schedule:
+          $ref: "#/components/schemas/Interval"
+        slotIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/Id"
+    Interval:
+      description: Time interval
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
+  responses:
+    NotFound:
+      description: No items found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Unauthorized access
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Exists:
+      description: Data already Exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unexpected:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  parameters:
+    userId:
+      name: id
+      description: The unique identifier of the user
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/UserId"
+    labId:
+      name: id
+      description: The unique identifier of the lab
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/LabId"
+  securitySchemes:
+    Jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -25,7 +25,7 @@ import useLogin from "@/src/store/login";
 
 export default function Home() {
   const admin = getUser(useLogin(({ id }) => id))?.admin;
-  const labs = getLabs(useSearchParams().get("q") ?? "");
+  const labs = getLabs(useSearchParams().get("q") || undefined);
   const now = new Date();
 
   return (
