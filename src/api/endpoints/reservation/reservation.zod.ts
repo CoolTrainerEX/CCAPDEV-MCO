@@ -5,8 +5,7 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import * as zod from 'zod';
-
+import * as zod from "zod";
 
 /**
  * @summary Create a reservation
@@ -19,52 +18,55 @@ export const createReservationBodyLabIdMin = 0;
 
 export const createReservationBodySlotIdsItemMin = 0;
 
-
-
 export const CreateReservationBody = zod.object({
-  "id": zod.number().min(createReservationBodyIdMin),
-  "userId": zod.number().min(createReservationBodyUserIdMin),
-  "labId": zod.number().min(createReservationBodyLabIdMin),
-  "anonymous": zod.boolean().optional(),
-  "schedule": zod.object({
-  "start": zod.iso.datetime({}),
-  "end": zod.iso.datetime({})
-}).describe('Time interval'),
-  "slotIds": zod.array(zod.number().min(createReservationBodySlotIdsItemMin))
-})
+  id: zod.number().min(createReservationBodyIdMin),
+  userId: zod.number().min(createReservationBodyUserIdMin),
+  labId: zod.number().min(createReservationBodyLabIdMin),
+  anonymous: zod.boolean().optional(),
+  schedule: zod
+    .object({
+      start: zod.iso.datetime({}),
+      end: zod.iso.datetime({}),
+    })
+    .describe("Time interval"),
+  slotIds: zod.array(zod.number().min(createReservationBodySlotIdsItemMin)),
+});
 
 /**
  * @summary Update a reservation
  */
 export const updateReservationPathIdMin = 0;
 
-
-
 export const UpdateReservationParams = zod.object({
-  "id": zod.number().min(updateReservationPathIdMin).describe('The unique identifier of the reservation')
-})
+  id: zod
+    .number()
+    .min(updateReservationPathIdMin)
+    .describe("The unique identifier of the reservation"),
+});
 
 /**
  * @summary Delete a reservation
  */
 export const deleteReservationPathIdMin = 0;
 
-
-
 export const DeleteReservationParams = zod.object({
-  "id": zod.number().min(deleteReservationPathIdMin).describe('The unique identifier of the reservation')
-})
+  id: zod
+    .number()
+    .min(deleteReservationPathIdMin)
+    .describe("The unique identifier of the reservation"),
+});
 
 /**
  * @summary Read the reservations of the user
  */
 export const getReservationUserPathIdMin = 0;
 
-
-
 export const GetReservationUserParams = zod.object({
-  "id": zod.number().min(getReservationUserPathIdMin).describe('The unique identifier of the user')
-})
+  id: zod
+    .number()
+    .min(getReservationUserPathIdMin)
+    .describe("The unique identifier of the user"),
+});
 
 export const getReservationUserResponseIdMin = 0;
 
@@ -74,31 +76,36 @@ export const getReservationUserResponseLabIdMin = 0;
 
 export const getReservationUserResponseSlotIdsItemMin = 0;
 
-
-
 export const GetReservationUserResponseItem = zod.object({
-  "id": zod.number().min(getReservationUserResponseIdMin),
-  "userId": zod.number().min(getReservationUserResponseUserIdMin),
-  "labId": zod.number().min(getReservationUserResponseLabIdMin),
-  "anonymous": zod.boolean().optional(),
-  "schedule": zod.object({
-  "start": zod.iso.datetime({}),
-  "end": zod.iso.datetime({})
-}).describe('Time interval'),
-  "slotIds": zod.array(zod.number().min(getReservationUserResponseSlotIdsItemMin))
-})
-export const GetReservationUserResponse = zod.array(GetReservationUserResponseItem)
+  id: zod.number().min(getReservationUserResponseIdMin),
+  userId: zod.number().min(getReservationUserResponseUserIdMin),
+  labId: zod.number().min(getReservationUserResponseLabIdMin),
+  anonymous: zod.boolean().optional(),
+  schedule: zod
+    .object({
+      start: zod.iso.datetime({}),
+      end: zod.iso.datetime({}),
+    })
+    .describe("Time interval"),
+  slotIds: zod.array(
+    zod.number().min(getReservationUserResponseSlotIdsItemMin),
+  ),
+});
+export const GetReservationUserResponse = zod.array(
+  GetReservationUserResponseItem,
+);
 
 /**
  * @summary Read the reservations of the lab
  */
 export const getReservationLabPathIdMin = 0;
 
-
-
 export const GetReservationLabParams = zod.object({
-  "id": zod.number().min(getReservationLabPathIdMin).describe('The unique identifier of the lab')
-})
+  id: zod
+    .number()
+    .min(getReservationLabPathIdMin)
+    .describe("The unique identifier of the lab"),
+});
 
 export const getReservationLabResponseIdMin = 0;
 
@@ -108,18 +115,19 @@ export const getReservationLabResponseLabIdMin = 0;
 
 export const getReservationLabResponseSlotIdsItemMin = 0;
 
-
-
 export const GetReservationLabResponseItem = zod.object({
-  "id": zod.number().min(getReservationLabResponseIdMin),
-  "userId": zod.number().min(getReservationLabResponseUserIdMin),
-  "labId": zod.number().min(getReservationLabResponseLabIdMin),
-  "anonymous": zod.boolean().optional(),
-  "schedule": zod.object({
-  "start": zod.iso.datetime({}),
-  "end": zod.iso.datetime({})
-}).describe('Time interval'),
-  "slotIds": zod.array(zod.number().min(getReservationLabResponseSlotIdsItemMin))
-})
-export const GetReservationLabResponse = zod.array(GetReservationLabResponseItem)
-
+  id: zod.number().min(getReservationLabResponseIdMin),
+  userId: zod.number().min(getReservationLabResponseUserIdMin),
+  labId: zod.number().min(getReservationLabResponseLabIdMin),
+  anonymous: zod.boolean().optional(),
+  schedule: zod
+    .object({
+      start: zod.iso.datetime({}),
+      end: zod.iso.datetime({}),
+    })
+    .describe("Time interval"),
+  slotIds: zod.array(zod.number().min(getReservationLabResponseSlotIdsItemMin)),
+});
+export const GetReservationLabResponse = zod.array(
+  GetReservationLabResponseItem,
+);

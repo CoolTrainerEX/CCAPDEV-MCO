@@ -6,7 +6,12 @@ import { login } from "@/src/sample";
  *
  * @author Justin Ryan Uy
  */
-export default create<{ id: number; logout: () => void }>((set) => ({
-  id: login(),
+export default create<{
+  id: number;
+  login: (id: number) => void;
+  logout: () => void;
+}>((set) => ({
+  id: Number.NaN,
+  login: (id) => set({ id }),
   logout: () => set({ id: Number.NaN }),
 }));

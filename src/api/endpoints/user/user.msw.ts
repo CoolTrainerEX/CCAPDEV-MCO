@@ -5,90 +5,161 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  Id,
-  User
-} from '../../models';
+import type { Id, User } from "../../models";
 
+export const getLoginResponseMock = (): Id =>
+  faker.number.int({ min: 0, max: undefined });
 
-export const getLoginResponseMock = (): Id => (faker.number.int({min: 0, max: undefined}))
+export const getCreateUserResponseMock = (): User => ({
+  ...{
+    first: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    last: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  ...{
+    id: faker.number.int({ min: 0, max: undefined }),
+    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  },
+});
 
-export const getCreateUserResponseMock = (): User => ({...{first: faker.string.alpha({length: {min: 10, max: 20}}), last: faker.string.alpha({length: {min: 10, max: 20}})},...{id: faker.number.int({min: 0, max: undefined}), description: faker.string.alpha({length: {min: 10, max: 20}}), admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined])},})
+export const getReadUserResponseMock = (): User => ({
+  ...{
+    first: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    last: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  ...{
+    id: faker.number.int({ min: 0, max: undefined }),
+    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  },
+});
 
-export const getReadUserResponseMock = (): User => ({...{first: faker.string.alpha({length: {min: 10, max: 20}}), last: faker.string.alpha({length: {min: 10, max: 20}})},...{id: faker.number.int({min: 0, max: undefined}), description: faker.string.alpha({length: {min: 10, max: 20}}), admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined])},})
+export const getLoginMockHandler = (
+  overrideResponse?:
+    | Id
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Id> | Id),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/login",
+    async (info) => {
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getLoginResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 
+export const getCreateUserMockHandler = (
+  overrideResponse?:
+    | User
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<User> | User),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/user",
+    async (info) => {
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getCreateUserResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 
-export const getLoginMockHandler = (overrideResponse?: Id | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Id> | Id), options?: RequestHandlerOptions) => {
-  return http.post('*/login', async (info) => {
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getLoginResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  }, options)
-}
+export const getReadUserMockHandler = (
+  overrideResponse?:
+    | User
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<User> | User),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/user/:id",
+    async (info) => {
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getReadUserResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 
-export const getCreateUserMockHandler = (overrideResponse?: User | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<User> | User), options?: RequestHandlerOptions) => {
-  return http.post('*/user', async (info) => {
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateUserResponseMock()),
-      { status: 201,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  }, options)
-}
+export const getUpdateUserMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/user/:id",
+    async (info) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
 
-export const getReadUserMockHandler = (overrideResponse?: User | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<User> | User), options?: RequestHandlerOptions) => {
-  return http.get('*/user/:id', async (info) => {
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getReadUserResponseMock()),
-      { status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      })
-  }, options)
-}
-
-export const getUpdateUserMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.put('*/user/:id', async (info) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 204,
-        
-      })
-  }, options)
-}
-
-export const getDeleteUserMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/user/:id', async (info) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
-      { status: 204,
-        
-      })
-  }, options)
-}
+export const getDeleteUserMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/user/:id",
+    async (info) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
 export const getUserMock = () => [
   getLoginMockHandler(),
   getCreateUserMockHandler(),
   getReadUserMockHandler(),
   getUpdateUserMockHandler(),
-  getDeleteUserMockHandler()
-]
+  getDeleteUserMockHandler(),
+];

@@ -7,8 +7,8 @@
  */
 
 export type GetLabsParams = {
-/**
- * The search query to filter labs
- */
-q?: string;
+  /**
+   * The search query to filter labs
+   */
+  q?: string;
 };
