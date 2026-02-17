@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  BadRequestResponse,
   ExistsResponse,
   Id,
   NotFoundResponse,
@@ -36,6 +37,11 @@ import type {
 export type createReservationResponse201 = {
   data: Reservation;
   status: 201;
+};
+
+export type createReservationResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type createReservationResponse401 = {
@@ -57,6 +63,7 @@ export type createReservationResponseSuccess = createReservationResponse201 & {
   headers: Headers;
 };
 export type createReservationResponseError = (
+  | createReservationResponse400
   | createReservationResponse401
   | createReservationResponse409
   | createReservationResponse500
@@ -94,7 +101,11 @@ export const createReservation = async (
 };
 
 export const getCreateReservationMutationOptions = <
-  TError = UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -136,6 +147,7 @@ export type CreateReservationMutationResult = NonNullable<
 >;
 export type CreateReservationMutationBody = Reservation;
 export type CreateReservationMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | ExistsResponse
   | UnexpectedResponse;
@@ -144,7 +156,11 @@ export type CreateReservationMutationError =
  * @summary Create a reservation
  */
 export const useCreateReservation = <
-  TError = UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {

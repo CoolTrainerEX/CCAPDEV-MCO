@@ -22,6 +22,8 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  BadRequestResponse,
+  CreateUserBody,
   ExistsResponse,
   Id,
   NotFoundResponse,
@@ -29,7 +31,6 @@ import type {
   UnexpectedResponse,
   User,
   UserLogin,
-  UserName,
 } from "../../models";
 
 /**
@@ -38,6 +39,11 @@ import type {
 export type loginResponse200 = {
   data: Id;
   status: 200;
+};
+
+export type loginResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type loginResponse404 = {
@@ -53,7 +59,11 @@ export type loginResponse500 = {
 export type loginResponseSuccess = loginResponse200 & {
   headers: Headers;
 };
-export type loginResponseError = (loginResponse404 | loginResponse500) & {
+export type loginResponseError = (
+  | loginResponse400
+  | loginResponse404
+  | loginResponse500
+) & {
   headers: Headers;
 };
 
@@ -81,7 +91,7 @@ export const login = async (
 };
 
 export const getLoginMutationOptions = <
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -122,13 +132,16 @@ export type LoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof login>>
 >;
 export type LoginMutationBody = UserLogin;
-export type LoginMutationError = NotFoundResponse | UnexpectedResponse;
+export type LoginMutationError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 /**
  * @summary Login
  */
 export const useLogin = <
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {
@@ -157,6 +170,11 @@ export type createUserResponse201 = {
   status: 201;
 };
 
+export type createUserResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type createUserResponse409 = {
   data: ExistsResponse;
   status: 409;
@@ -171,6 +189,7 @@ export type createUserResponseSuccess = createUserResponse201 & {
   headers: Headers;
 };
 export type createUserResponseError = (
+  | createUserResponse400
   | createUserResponse409
   | createUserResponse500
 ) & {
@@ -186,14 +205,14 @@ export const getCreateUserUrl = () => {
 };
 
 export const createUser = async (
-  userNameUserLogin: UserName & UserLogin,
+  createUserBody: CreateUserBody,
   options?: RequestInit,
 ): Promise<createUserResponse> => {
   const res = await fetch(getCreateUserUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(userNameUserLogin),
+    body: JSON.stringify(createUserBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -207,20 +226,20 @@ export const createUser = async (
 };
 
 export const getCreateUserMutationOptions = <
-  TError = ExistsResponse | UnexpectedResponse,
+  TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUser>>,
     TError,
-    { data: UserName & UserLogin },
+    { data: CreateUserBody },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createUser>>,
   TError,
-  { data: UserName & UserLogin },
+  { data: CreateUserBody },
   TContext
 > => {
   const mutationKey = ["createUser"];
@@ -234,7 +253,7 @@ export const getCreateUserMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createUser>>,
-    { data: UserName & UserLogin }
+    { data: CreateUserBody }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -247,21 +266,24 @@ export const getCreateUserMutationOptions = <
 export type CreateUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof createUser>>
 >;
-export type CreateUserMutationBody = UserName & UserLogin;
-export type CreateUserMutationError = ExistsResponse | UnexpectedResponse;
+export type CreateUserMutationBody = CreateUserBody;
+export type CreateUserMutationError =
+  | BadRequestResponse
+  | ExistsResponse
+  | UnexpectedResponse;
 
 /**
  * @summary Create a user
  */
 export const useCreateUser = <
-  TError = ExistsResponse | UnexpectedResponse,
+  TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createUser>>,
       TError,
-      { data: UserName & UserLogin },
+      { data: CreateUserBody },
       TContext
     >;
     fetch?: RequestInit;
@@ -270,7 +292,7 @@ export const useCreateUser = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof createUser>>,
   TError,
-  { data: UserName & UserLogin },
+  { data: CreateUserBody },
   TContext
 > => {
   return useMutation(getCreateUserMutationOptions(options), queryClient);

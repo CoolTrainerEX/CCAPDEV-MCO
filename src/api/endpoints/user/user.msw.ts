@@ -15,28 +15,30 @@ import type { Id, User } from "../../models";
 export const getLoginResponseMock = (): Id =>
   faker.number.int({ min: 0, max: undefined });
 
-export const getCreateUserResponseMock = (): User => ({
-  ...{
+export const getCreateUserResponseMock = (
+  overrideResponse: Partial<User> = {},
+): User => ({
+  id: faker.number.int({ min: 0, max: undefined }),
+  name: {
     first: faker.string.alpha({ length: { min: 10, max: 20 } }),
     last: faker.string.alpha({ length: { min: 10, max: 20 } }),
   },
-  ...{
-    id: faker.number.int({ min: 0, max: undefined }),
-    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  },
+  description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  ...overrideResponse,
 });
 
-export const getReadUserResponseMock = (): User => ({
-  ...{
+export const getReadUserResponseMock = (
+  overrideResponse: Partial<User> = {},
+): User => ({
+  id: faker.number.int({ min: 0, max: undefined }),
+  name: {
     first: faker.string.alpha({ length: { min: 10, max: 20 } }),
     last: faker.string.alpha({ length: { min: 10, max: 20 } }),
   },
-  ...{
-    id: faker.number.int({ min: 0, max: undefined }),
-    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  },
+  description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  ...overrideResponse,
 });
 
 export const getLoginMockHandler = (

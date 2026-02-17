@@ -24,13 +24,15 @@ export const LoginResponse = zod.number().min(loginResponseMin);
  */
 export const CreateUserBody = zod
   .object({
-    first: zod.string(),
-    last: zod.string(),
+    email: zod.email(),
+    password: zod.string(),
   })
   .and(
     zod.object({
-      email: zod.email(),
-      password: zod.string(),
+      name: zod.object({
+        first: zod.string(),
+        last: zod.string(),
+      }),
     }),
   );
 
@@ -46,20 +48,17 @@ export const ReadUserParams = zod.object({
     .describe("The unique identifier of the user"),
 });
 
-export const readUserResponseTwoIdMin = 0;
+export const readUserResponseIdMin = 0;
 
-export const ReadUserResponse = zod
-  .object({
+export const ReadUserResponse = zod.object({
+  id: zod.number().min(readUserResponseIdMin),
+  name: zod.object({
     first: zod.string(),
     last: zod.string(),
-  })
-  .and(
-    zod.object({
-      id: zod.number().min(readUserResponseTwoIdMin),
-      description: zod.string(),
-      admin: zod.boolean().optional(),
-    }),
-  );
+  }),
+  description: zod.string(),
+  admin: zod.boolean().optional(),
+});
 
 /**
  * @summary Update a user

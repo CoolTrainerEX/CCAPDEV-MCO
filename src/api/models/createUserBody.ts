@@ -5,12 +5,9 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Id } from "./id";
+import type { UserLogin } from "./userLogin";
 import type { UserName } from "./userName";
 
-export interface User {
-  id: Id;
+export type CreateUserBody = UserLogin & {
   name: UserName;
-  description: string;
-  admin?: boolean;
-}
+};

@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  BadRequestResponse,
   ExistsResponse,
   GetLabsParams,
   Lab,
@@ -222,6 +223,11 @@ export type createLabResponse201 = {
   status: 201;
 };
 
+export type createLabResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type createLabResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -241,6 +247,7 @@ export type createLabResponseSuccess = createLabResponse201 & {
   headers: Headers;
 };
 export type createLabResponseError = (
+  | createLabResponse400
   | createLabResponse401
   | createLabResponse409
   | createLabResponse500
@@ -278,7 +285,11 @@ export const createLab = async (
 };
 
 export const getCreateLabMutationOptions = <
-  TError = UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -320,6 +331,7 @@ export type CreateLabMutationResult = NonNullable<
 >;
 export type CreateLabMutationBody = Lab;
 export type CreateLabMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | ExistsResponse
   | UnexpectedResponse;
@@ -328,7 +340,11 @@ export type CreateLabMutationError =
  * @summary Create a lab
  */
 export const useCreateLab = <
-  TError = UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {

@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./badRequestResponse";
+export * from "./createUserBody";
 export * from "./error";
 export * from "./existsResponse";
 export * from "./getLabsParams";
