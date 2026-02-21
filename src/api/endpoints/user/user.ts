@@ -164,6 +164,118 @@ export const useLogin = <
   return useMutation(getLoginMutationOptions(options), queryClient);
 };
 /**
+ * @summary Logout
+ */
+export type logoutResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type logoutResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type logoutResponse500 = {
+  data: UnexpectedResponse;
+  status: 500;
+};
+
+export type logoutResponseSuccess = logoutResponse204 & {
+  headers: Headers;
+};
+export type logoutResponseError = (logoutResponse401 | logoutResponse500) & {
+  headers: Headers;
+};
+
+export type logoutResponse = logoutResponseSuccess | logoutResponseError;
+
+export const getLogoutUrl = () => {
+  return `/api/login`;
+};
+
+export const logout = async (
+  options?: RequestInit,
+): Promise<logoutResponse> => {
+  const res = await fetch(getLogoutUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: logoutResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as logoutResponse;
+};
+
+export const getLogoutMutationOptions = <
+  TError = UnauthorizedResponse | UnexpectedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof logout>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof logout>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["logout"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof logout>>,
+    void
+  > = () => {
+    return logout(fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LogoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof logout>>
+>;
+
+export type LogoutMutationError = UnauthorizedResponse | UnexpectedResponse;
+
+/**
+ * @summary Logout
+ */
+export const useLogout = <
+  TError = UnauthorizedResponse | UnexpectedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof logout>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof logout>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getLogoutMutationOptions(options), queryClient);
+};
+/**
  * @summary Create a user
  */
 export type createUserResponse201 = {

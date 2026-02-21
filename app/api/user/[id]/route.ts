@@ -2,7 +2,11 @@ import {
   ReadUserParams,
   ReadUserResponse,
 } from "@/src/api/endpoints/user/user.zod";
-import { BadRequestResponse, NotFoundResponse } from "@/src/api/models";
+import {
+  BadRequestResponse,
+  NotFoundResponse,
+  UnexpectedResponse,
+} from "@/src/api/models";
 import { users } from "@/src/sample";
 import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
@@ -29,17 +33,29 @@ export async function GET(
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password, ...filtered } = user;
 
     logger.info("Success");
 
     return NextResponse.json(ReadUserResponse.parse(filtered));
   } catch (e) {
-    if (e instanceof ZodError) logger.info({ issues: e.issues });
+    if (e instanceof ZodError) {
+      logger.info({ issues: e.issues });
+
+      return NextResponse.json(
+        { message: "Bad request." } as BadRequestResponse,
+        { status: 400 },
+      );
+    }
+
+    logger.info(e);
 
     return NextResponse.json(
-      { message: "Bad request." } as BadRequestResponse,
-      { status: 400 },
+      {
+        message: "Unexpected error.",
+      } as UnexpectedResponse,
+      { status: 500 },
     );
   }
 }

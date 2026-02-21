@@ -1,17 +1,19 @@
 import "server-only";
-import { JWTPayload, SignJWT, jwtVerify } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { pino } from "pino";
+
+type SessionPayload = { id: number; expiresAt: Date };
 
 const encodedKey = new TextEncoder().encode(process.env.SESSION_SECRET);
 const logger = pino().child({ operation: "session" });
 
 /**
  * Encrypts payload into JWT.
- * @param {JWTPayload} payload Payload to encrypt
+ * @param {SessionPayload} payload Payload to encrypt
  * @returns {Promise<string>} Session string
  */
-export async function encrypt(payload: JWTPayload) {
+export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -22,7 +24,7 @@ export async function encrypt(payload: JWTPayload) {
 /**
  * Decrypt JWT into payload object.
  * @param {string} session Session string
- * @returns {Promise<JWTPayload | undefined>} Decrypted object
+ * @returns {Promise<SessionPayload | undefined>} Decrypted object
  */
 export async function decrypt(session: string = "") {
   try {
@@ -30,9 +32,9 @@ export async function decrypt(session: string = "") {
       await jwtVerify(session, encodedKey, {
         algorithms: ["HS256"],
       })
-    ).payload;
-  } catch (error) {
-    logger.info(error);
+    ).payload as SessionPayload;
+  } catch {
+    logger.info("Unable to decrypt.");
   }
 }
 

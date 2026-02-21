@@ -5,6 +5,7 @@ import "./globals.css";
 import Providers from "./providers";
 import Nav from "./nav";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
               <Nav />
               <main className="p-4">{children}</main>
             </TooltipProvider>
+            <Toaster />
           </ThemeProvider>
         </Providers>
       </body>

@@ -38,6 +38,20 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UserLogin"
+    delete:
+      summary: Logout
+      operationId: logout
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Logs the user out
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/Unexpected"
   /user:
     post:
       summary: Create a user

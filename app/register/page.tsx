@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,13 +16,38 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Form from "next/form";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Register",
-};
+import { useRouter } from "next/navigation";
+import useUser from "@/src/store/login";
+import { useCreateUser } from "@/src/api/endpoints/user/user";
+import { toast } from "sonner";
+import { CreateUserBody } from "@/src/api/endpoints/user/user.zod";
 
 export default function Register() {
+  const router = useRouter();
+  const login = useUser(({ login }) => login);
+  const { mutate, isPending } = useCreateUser({
+    mutation: {
+      onSuccess(data) {
+        switch (data.status) {
+          case 201:
+            login(data.data);
+            router.push("/");
+            toast.success("Logged in.");
+            break;
+
+          case 400:
+          case 409:
+            toast.error(data.data.message);
+            break;
+
+          default:
+            toast.warning("Unexpected error.");
+            break;
+        }
+      },
+    },
+  });
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -33,7 +59,30 @@ export default function Register() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form action="/">
+            <Form
+              action={(formData) => {
+                const data = Object.fromEntries(formData.entries());
+
+                if (data["password"] !== data["confirm-password"]) {
+                  toast.error("Passwords do not match.");
+                  return;
+                }
+
+                try {
+                  mutate({
+                    data: CreateUserBody.parse({
+                      name: {
+                        first: data["firstname"],
+                        last: data["lastname"],
+                      },
+                      ...data,
+                    }),
+                  });
+                } catch {
+                  toast.error("Invalid fields.");
+                }
+              }}
+            >
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="firstname">First Name</FieldLabel>
@@ -98,7 +147,9 @@ export default function Register() {
                 </Field>
                 <FieldGroup>
                   <Field>
-                    <Button type="submit">Create Account</Button>
+                    <Button type="submit" disabled={isPending}>
+                      Create Account
+                    </Button>
                     <FieldDescription className="px-6 text-center">
                       Already have an account?{" "}
                       <Link href="/login">Sign in</Link>

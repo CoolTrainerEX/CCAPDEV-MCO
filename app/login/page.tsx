@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,13 +16,38 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Form from "next/form";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Login",
-};
+import { useLogin } from "@/src/api/endpoints/user/user";
+import { LoginBody } from "@/src/api/endpoints/user/user.zod";
+import useUser from "@/src/store/login";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
+  const login = useUser(({ login }) => login);
+  const { mutate, isPending } = useLogin({
+    mutation: {
+      onSuccess(data) {
+        switch (data.status) {
+          case 200:
+            login(data.data);
+            router.push("/");
+            toast.success("Logged in.");
+            break;
+
+          case 400:
+          case 404:
+            toast.error(data.data.message);
+            break;
+
+          default:
+            toast.warning("Unexpected error.");
+            break;
+        }
+      },
+    },
+  });
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -33,7 +59,19 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form action="/">
+            <Form
+              action={(formData) => {
+                try {
+                  mutate({
+                    data: LoginBody.parse(
+                      Object.fromEntries(formData.entries()),
+                    ),
+                  });
+                } catch {
+                  toast.error("Invalid fields.");
+                }
+              }}
+            >
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -55,7 +93,9 @@ export default function Login() {
                   />
                 </Field>
                 <Field>
-                  <Button type="submit">Login</Button>
+                  <Button type="submit" disabled={isPending}>
+                    Login
+                  </Button>
                   <FieldDescription className="text-center">
                     Don&apos;t have an account?{" "}
                     <Link href="/register">Register</Link>
