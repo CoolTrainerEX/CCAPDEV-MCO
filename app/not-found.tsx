@@ -7,7 +7,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
-import { HomeIcon, XIcon } from "lucide-react";
+import { Home, X } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -15,7 +15,7 @@ export default function NotFound() {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <XIcon />
+          <X />
         </EmptyMedia>
         <EmptyTitle>404</EmptyTitle>
         <EmptyDescription>Page not found</EmptyDescription>
@@ -28,7 +28,7 @@ export default function NotFound() {
           size="sm"
         >
           <Link href="/">
-            <HomeIcon /> Return home
+            <Home /> Return home
           </Link>
         </Button>
       </EmptyContent>

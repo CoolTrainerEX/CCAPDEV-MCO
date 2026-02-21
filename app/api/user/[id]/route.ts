@@ -1,18 +1,26 @@
-import { LoginBody, LoginResponse } from "@/src/api/endpoints/user/user.zod";
+import {
+  ReadUserParams,
+  ReadUserResponse,
+} from "@/src/api/endpoints/user/user.zod";
 import { BadRequestResponse, NotFoundResponse } from "@/src/api/models";
 import { users } from "@/src/sample";
 import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
 import { ZodError } from "zod";
 
-const logger = pino().child({ operation: "login" });
+const logger = pino().child({ operation: "user" });
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  ctx: RouteContext<"/api/user/[id]">,
+) {
   try {
-    const body = LoginBody.parse(await request.json());
-    const user = users.find(({ email }) => email === body.email);
+    const params = ReadUserParams.parse({
+      id: Number.parseInt((await ctx.params).id),
+    });
+    const user = users.find(({ id }) => id === params.id);
 
-    if (user?.password !== body.password) {
+    if (!user) {
       logger.info("User not found.");
 
       return NextResponse.json(
@@ -21,9 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { email, password, ...filtered } = user;
+
     logger.info("Success");
 
-    return NextResponse.json(LoginResponse.parse(user.id));
+    return NextResponse.json(ReadUserResponse.parse(filtered));
   } catch (e) {
     if (e instanceof ZodError) logger.info({ issues: e.issues });
 

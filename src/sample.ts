@@ -46,7 +46,7 @@ export const users: User[] = [
       first: "Juan",
       last: "Dela Cruz",
     },
-    password: "password",
+    password: "123456",
     description: "Student of DLSU",
   },
   {

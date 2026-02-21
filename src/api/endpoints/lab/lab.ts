@@ -24,7 +24,10 @@ import type {
 import type {
   BadRequestResponse,
   ExistsResponse,
+  GetLab200,
+  GetLabs200Item,
   GetLabsParams,
+  Id,
   Lab,
   NotFoundResponse,
   UnauthorizedResponse,
@@ -35,7 +38,7 @@ import type {
  * @summary Read all labs
  */
 export type getLabsResponse200 = {
-  data: Lab[];
+  data: GetLabs200Item[];
   status: 200;
 };
 
@@ -219,7 +222,7 @@ export function useGetLabs<
  * @summary Create a lab
  */
 export type createLabResponse201 = {
-  data: Lab;
+  data: Id;
   status: 201;
 };
 
@@ -369,8 +372,13 @@ export const useCreateLab = <
  * @summary Read a lab
  */
 export type getLabResponse200 = {
-  data: Lab;
+  data: GetLab200;
   status: 200;
+};
+
+export type getLabResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type getLabResponse404 = {
@@ -386,7 +394,11 @@ export type getLabResponse500 = {
 export type getLabResponseSuccess = getLabResponse200 & {
   headers: Headers;
 };
-export type getLabResponseError = (getLabResponse404 | getLabResponse500) & {
+export type getLabResponseError = (
+  | getLabResponse400
+  | getLabResponse404
+  | getLabResponse500
+) & {
   headers: Headers;
 };
 
@@ -417,7 +429,7 @@ export const getGetLabQueryKey = (id: number) => {
 
 export const getGetLabQueryOptions = <
   TData = Awaited<ReturnType<typeof getLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -446,11 +458,14 @@ export const getGetLabQueryOptions = <
 };
 
 export type GetLabQueryResult = NonNullable<Awaited<ReturnType<typeof getLab>>>;
-export type GetLabQueryError = NotFoundResponse | UnexpectedResponse;
+export type GetLabQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 export function useGetLab<
   TData = Awaited<ReturnType<typeof getLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options: {
@@ -473,7 +488,7 @@ export function useGetLab<
 };
 export function useGetLab<
   TData = Awaited<ReturnType<typeof getLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -496,7 +511,7 @@ export function useGetLab<
 };
 export function useGetLab<
   TData = Awaited<ReturnType<typeof getLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -515,7 +530,7 @@ export function useGetLab<
 
 export function useGetLab<
   TData = Awaited<ReturnType<typeof getLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -546,6 +561,11 @@ export type updateLabResponse204 = {
   status: 204;
 };
 
+export type updateLabResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type updateLabResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -554,11 +574,6 @@ export type updateLabResponse401 = {
 export type updateLabResponse404 = {
   data: NotFoundResponse;
   status: 404;
-};
-
-export type updateLabResponse409 = {
-  data: ExistsResponse;
-  status: 409;
 };
 
 export type updateLabResponse500 = {
@@ -570,9 +585,9 @@ export type updateLabResponseSuccess = updateLabResponse204 & {
   headers: Headers;
 };
 export type updateLabResponseError = (
+  | updateLabResponse400
   | updateLabResponse401
   | updateLabResponse404
-  | updateLabResponse409
   | updateLabResponse500
 ) & {
   headers: Headers;
@@ -607,9 +622,9 @@ export const updateLab = async (
 
 export const getUpdateLabMutationOptions = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
@@ -652,9 +667,9 @@ export type UpdateLabMutationResult = NonNullable<
 >;
 
 export type UpdateLabMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
-  | ExistsResponse
   | UnexpectedResponse;
 
 /**
@@ -662,9 +677,9 @@ export type UpdateLabMutationError =
  */
 export const useUpdateLab = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(
@@ -694,6 +709,11 @@ export type deleteLabResponse204 = {
   status: 204;
 };
 
+export type deleteLabResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type deleteLabResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -713,6 +733,7 @@ export type deleteLabResponseSuccess = deleteLabResponse204 & {
   headers: Headers;
 };
 export type deleteLabResponseError = (
+  | deleteLabResponse400
   | deleteLabResponse401
   | deleteLabResponse404
   | deleteLabResponse500
@@ -748,7 +769,11 @@ export const deleteLab = async (
 };
 
 export const getDeleteLabMutationOptions = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -790,6 +815,7 @@ export type DeleteLabMutationResult = NonNullable<
 >;
 
 export type DeleteLabMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
   | UnexpectedResponse;
@@ -798,7 +824,11 @@ export type DeleteLabMutationError =
  * @summary Delete a lab
  */
 export const useDeleteLab = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {

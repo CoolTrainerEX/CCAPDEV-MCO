@@ -7,7 +7,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
-import { FlaskConicalOffIcon, HomeIcon } from "lucide-react";
+import { FlaskConicalOff, Home } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -15,7 +15,7 @@ export default function NotFound() {
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <FlaskConicalOffIcon />
+          <FlaskConicalOff />
         </EmptyMedia>
         <EmptyTitle>Invalid Lab</EmptyTitle>
         <EmptyDescription>Lab not found</EmptyDescription>
@@ -28,7 +28,7 @@ export default function NotFound() {
           size="sm"
         >
           <Link href="/">
-            <HomeIcon /> Return home
+            <Home /> Return home
           </Link>
         </Button>
       </EmptyContent>

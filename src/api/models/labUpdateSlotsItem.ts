@@ -7,7 +7,7 @@
  */
 import type { Id } from "./id";
 
-export type LabSlotsItem = {
+export type LabUpdateSlotsItem = {
   id: Id;
   /** @minimum 0 */
   x: number;

@@ -10,216 +10,166 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { Lab } from "../../models";
+import type { GetLab200, GetLabs200Item, Id } from "../../models";
 
-export const getGetLabsResponseMock = (): Lab[] =>
+export const getGetLabsResponseMock = (): GetLabs200Item[] =>
   Array.from(
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
   ).map(() => ({
-    id: faker.number.int({ min: 0, max: undefined }),
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    weeklySchedule: {
-      sunday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
+    ...{
+      ...{
+        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        weeklySchedule: {
+          sunday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          monday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          tuesday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          wednesday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          thursday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          friday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
+          saturday: faker.helpers.arrayElement([
+            {
+              start: faker.date.past().toISOString().slice(0, 19) + "Z",
+              end: faker.date.past().toISOString().slice(0, 19) + "Z",
+            },
+            undefined,
+          ]),
         },
-        undefined,
-      ]),
-      monday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
-        undefined,
-      ]),
-      tuesday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
-        undefined,
-      ]),
-      wednesday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
-        undefined,
-      ]),
-      thursday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
-        undefined,
-      ]),
-      friday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
-        undefined,
-      ]),
-      saturday: faker.helpers.arrayElement([
-        {
-          start: faker.date.past().toISOString().slice(0, 19) + "Z",
-          end: faker.date.past().toISOString().slice(0, 19) + "Z",
-        },
+        slots: Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          id: faker.number.int({ min: 0, max: undefined }),
+          x: faker.number.int({ min: 0, max: undefined }),
+          y: faker.number.int({ min: 0, max: undefined }),
+        })),
+      },
+      ...{ id: faker.number.int({ min: 0, max: undefined }) },
+    },
+    ...{
+      editable: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
         undefined,
       ]),
     },
-    slots: Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      id: faker.number.int({ min: 0, max: undefined }),
-      x: faker.number.int({ min: 0, max: undefined }),
-      y: faker.number.int({ min: 0, max: undefined }),
-    })),
   }));
 
-export const getCreateLabResponseMock = (
-  overrideResponse: Partial<Lab> = {},
-): Lab => ({
-  id: faker.number.int({ min: 0, max: undefined }),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  weeklySchedule: {
-    sunday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    monday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    tuesday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    wednesday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    thursday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    friday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    saturday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-  },
-  slots: Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.number.int({ min: 0, max: undefined }),
-    x: faker.number.int({ min: 0, max: undefined }),
-    y: faker.number.int({ min: 0, max: undefined }),
-  })),
-  ...overrideResponse,
-});
+export const getCreateLabResponseMock = (): Id =>
+  faker.number.int({ min: 0, max: undefined });
 
-export const getGetLabResponseMock = (
-  overrideResponse: Partial<Lab> = {},
-): Lab => ({
-  id: faker.number.int({ min: 0, max: undefined }),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  weeklySchedule: {
-    sunday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
+export const getGetLabResponseMock = (): GetLab200 => ({
+  ...{
+    ...{
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      weeklySchedule: {
+        sunday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        monday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        tuesday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        wednesday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        thursday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        friday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
+        saturday: faker.helpers.arrayElement([
+          {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          undefined,
+        ]),
       },
-      undefined,
-    ]),
-    monday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    tuesday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    wednesday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    thursday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    friday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
-    saturday: faker.helpers.arrayElement([
-      {
-        start: faker.date.past().toISOString().slice(0, 19) + "Z",
-        end: faker.date.past().toISOString().slice(0, 19) + "Z",
-      },
-      undefined,
-    ]),
+      slots: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1,
+      ).map(() => ({
+        id: faker.number.int({ min: 0, max: undefined }),
+        x: faker.number.int({ min: 0, max: undefined }),
+        y: faker.number.int({ min: 0, max: undefined }),
+      })),
+    },
+    ...{ id: faker.number.int({ min: 0, max: undefined }) },
   },
-  slots: Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.number.int({ min: 0, max: undefined }),
-    x: faker.number.int({ min: 0, max: undefined }),
-    y: faker.number.int({ min: 0, max: undefined }),
-  })),
-  ...overrideResponse,
+  ...{
+    editable: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  },
 });
 
 export const getGetLabsMockHandler = (
   overrideResponse?:
-    | Lab[]
+    | GetLabs200Item[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Lab[]> | Lab[]),
+      ) => Promise<GetLabs200Item[]> | GetLabs200Item[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -242,10 +192,10 @@ export const getGetLabsMockHandler = (
 
 export const getCreateLabMockHandler = (
   overrideResponse?:
-    | Lab
+    | Id
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<Lab> | Lab),
+      ) => Promise<Id> | Id),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -268,10 +218,10 @@ export const getCreateLabMockHandler = (
 
 export const getGetLabMockHandler = (
   overrideResponse?:
-    | Lab
+    | GetLab200
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Lab> | Lab),
+      ) => Promise<GetLab200> | GetLab200),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(

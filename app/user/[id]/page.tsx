@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import Reservation, { ReservationContent } from "@/app/reservation";
 import useLogin from "@/src/store/login";
 import { Button } from "@/components/ui/button";
-import { PencilIcon } from "lucide-react";
+import { Pencil } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -63,7 +63,7 @@ export default function User() {
             <Drawer>
               <DrawerTrigger asChild>
                 <Button variant="outline">
-                  <PencilIcon />
+                  <Pencil />
                 </Button>
               </DrawerTrigger>
               <DrawerContent>
@@ -103,7 +103,7 @@ export default function User() {
                           </Field>
                           <Field>
                             <FieldLabel htmlFor="description">
-                              Message
+                              Description
                             </FieldLabel>
                             <Textarea
                               id="description"

@@ -1,6 +1,6 @@
 import { differenceInMinutes } from "date-fns/differenceInMinutes";
 import { startOfDay } from "date-fns/startOfDay";
-import { Clock2Icon } from "lucide-react";
+import { Clock2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -55,7 +55,7 @@ export default function TimeRangeInput({
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
           <InputGroupAddon>
-            <Clock2Icon className="text-muted-foreground" />
+            <Clock2 className="text-muted-foreground" />
           </InputGroupAddon>
         </InputGroup>
       </Field>
@@ -81,7 +81,7 @@ export default function TimeRangeInput({
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
           <InputGroupAddon>
-            <Clock2Icon className="text-muted-foreground" />
+            <Clock2 className="text-muted-foreground" />
           </InputGroupAddon>
         </InputGroup>
       </Field>

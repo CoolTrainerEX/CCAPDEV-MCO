@@ -5,9 +5,5 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { UserPassword } from "./userPassword";
 
-export interface UserLogin {
-  email: string;
-  password: UserPassword;
-}
+export type Editable = boolean;

@@ -5,9 +5,9 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { UserPassword } from "./userPassword";
+import type { UserName } from "./userName";
 
-export interface UserLogin {
-  email: string;
-  password: UserPassword;
+export interface UserDetails {
+  name?: UserName;
+  description?: string;
 }

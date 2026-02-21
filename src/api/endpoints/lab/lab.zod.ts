@@ -14,159 +14,178 @@ export const GetLabsQueryParams = zod.object({
   q: zod.string().optional().describe("The search query to filter labs"),
 });
 
-export const getLabsResponseIdMin = 0;
+export const getLabsResponseOneOneSlotsItemIdMin = 0;
 
-export const getLabsResponseSlotsItemIdMin = 0;
+export const getLabsResponseOneOneSlotsItemXMin = 0;
 
-export const getLabsResponseSlotsItemXMin = 0;
+export const getLabsResponseOneOneSlotsItemYMin = 0;
 
-export const getLabsResponseSlotsItemYMin = 0;
+export const getLabsResponseOneTwoIdMin = 0;
 
-export const GetLabsResponseItem = zod.object({
-  id: zod.number().min(getLabsResponseIdMin),
-  name: zod.string(),
-  weeklySchedule: zod
-    .object({
-      sunday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      monday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      tuesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      wednesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      thursday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      friday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      saturday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-    })
-    .describe("Weekly schedule of the lab"),
-  slots: zod
-    .array(
-      zod.object({
-        id: zod.number().min(getLabsResponseSlotsItemIdMin),
-        x: zod.number().min(getLabsResponseSlotsItemXMin),
-        y: zod.number().min(getLabsResponseSlotsItemYMin),
-      }),
-    )
-    .describe("Available slots in the lab"),
-});
+export const GetLabsResponseItem = zod
+  .object({
+    name: zod.string().optional(),
+    weeklySchedule: zod
+      .object({
+        sunday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        monday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        tuesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        wednesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        thursday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        friday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        saturday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+      })
+      .optional()
+      .describe("Weekly schedule of the lab"),
+    slots: zod
+      .array(
+        zod.object({
+          id: zod.number().min(getLabsResponseOneOneSlotsItemIdMin),
+          x: zod.number().min(getLabsResponseOneOneSlotsItemXMin),
+          y: zod.number().min(getLabsResponseOneOneSlotsItemYMin),
+        }),
+      )
+      .optional()
+      .describe("Available slots in the lab"),
+  })
+  .and(
+    zod.object({
+      id: zod.number().min(getLabsResponseOneTwoIdMin),
+    }),
+  )
+  .and(
+    zod.object({
+      editable: zod.boolean().optional(),
+    }),
+  );
 export const GetLabsResponse = zod.array(GetLabsResponseItem);
 
 /**
  * @summary Create a lab
  */
-export const createLabBodyIdMin = 0;
+export const createLabBodyOneSlotsItemIdMin = 0;
 
-export const createLabBodySlotsItemIdMin = 0;
+export const createLabBodyOneSlotsItemXMin = 0;
 
-export const createLabBodySlotsItemXMin = 0;
+export const createLabBodyOneSlotsItemYMin = 0;
 
-export const createLabBodySlotsItemYMin = 0;
+export const createLabBodyTwoIdMin = 0;
 
-export const CreateLabBody = zod.object({
-  id: zod.number().min(createLabBodyIdMin),
-  name: zod.string(),
-  weeklySchedule: zod
-    .object({
-      sunday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      monday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      tuesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      wednesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      thursday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      friday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      saturday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-    })
-    .describe("Weekly schedule of the lab"),
-  slots: zod
-    .array(
-      zod.object({
-        id: zod.number().min(createLabBodySlotsItemIdMin),
-        x: zod.number().min(createLabBodySlotsItemXMin),
-        y: zod.number().min(createLabBodySlotsItemYMin),
-      }),
-    )
-    .describe("Available slots in the lab"),
-});
+export const CreateLabBody = zod
+  .object({
+    name: zod.string().optional(),
+    weeklySchedule: zod
+      .object({
+        sunday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        monday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        tuesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        wednesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        thursday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        friday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        saturday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+      })
+      .optional()
+      .describe("Weekly schedule of the lab"),
+    slots: zod
+      .array(
+        zod.object({
+          id: zod.number().min(createLabBodyOneSlotsItemIdMin),
+          x: zod.number().min(createLabBodyOneSlotsItemXMin),
+          y: zod.number().min(createLabBodyOneSlotsItemYMin),
+        }),
+      )
+      .optional()
+      .describe("Available slots in the lab"),
+  })
+  .and(
+    zod.object({
+      id: zod.number().min(createLabBodyTwoIdMin),
+    }),
+  );
 
 /**
  * @summary Read a lab
@@ -180,80 +199,92 @@ export const GetLabParams = zod.object({
     .describe("The unique identifier of the lab"),
 });
 
-export const getLabResponseIdMin = 0;
+export const getLabResponseOneOneSlotsItemIdMin = 0;
 
-export const getLabResponseSlotsItemIdMin = 0;
+export const getLabResponseOneOneSlotsItemXMin = 0;
 
-export const getLabResponseSlotsItemXMin = 0;
+export const getLabResponseOneOneSlotsItemYMin = 0;
 
-export const getLabResponseSlotsItemYMin = 0;
+export const getLabResponseOneTwoIdMin = 0;
 
-export const GetLabResponse = zod.object({
-  id: zod.number().min(getLabResponseIdMin),
-  name: zod.string(),
-  weeklySchedule: zod
-    .object({
-      sunday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      monday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      tuesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      wednesday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      thursday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      friday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-      saturday: zod
-        .object({
-          start: zod.iso.datetime({}),
-          end: zod.iso.datetime({}),
-        })
-        .optional()
-        .describe("Time interval"),
-    })
-    .describe("Weekly schedule of the lab"),
-  slots: zod
-    .array(
-      zod.object({
-        id: zod.number().min(getLabResponseSlotsItemIdMin),
-        x: zod.number().min(getLabResponseSlotsItemXMin),
-        y: zod.number().min(getLabResponseSlotsItemYMin),
-      }),
-    )
-    .describe("Available slots in the lab"),
-});
+export const GetLabResponse = zod
+  .object({
+    name: zod.string().optional(),
+    weeklySchedule: zod
+      .object({
+        sunday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        monday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        tuesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        wednesday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        thursday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        friday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+        saturday: zod
+          .object({
+            start: zod.iso.datetime({}),
+            end: zod.iso.datetime({}),
+          })
+          .optional()
+          .describe("Time interval"),
+      })
+      .optional()
+      .describe("Weekly schedule of the lab"),
+    slots: zod
+      .array(
+        zod.object({
+          id: zod.number().min(getLabResponseOneOneSlotsItemIdMin),
+          x: zod.number().min(getLabResponseOneOneSlotsItemXMin),
+          y: zod.number().min(getLabResponseOneOneSlotsItemYMin),
+        }),
+      )
+      .optional()
+      .describe("Available slots in the lab"),
+  })
+  .and(
+    zod.object({
+      id: zod.number().min(getLabResponseOneTwoIdMin),
+    }),
+  )
+  .and(
+    zod.object({
+      editable: zod.boolean().optional(),
+    }),
+  );
 
 /**
  * @summary Update a lab

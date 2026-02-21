@@ -10,35 +10,31 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { Id, User } from "../../models";
+import type { Id, ReadUser200 } from "../../models";
 
 export const getLoginResponseMock = (): Id =>
   faker.number.int({ min: 0, max: undefined });
 
-export const getCreateUserResponseMock = (
-  overrideResponse: Partial<User> = {},
-): User => ({
-  id: faker.number.int({ min: 0, max: undefined }),
-  name: {
-    first: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    last: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  },
-  description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  ...overrideResponse,
-});
+export const getCreateUserResponseMock = (): Id =>
+  faker.number.int({ min: 0, max: undefined });
 
-export const getReadUserResponseMock = (
-  overrideResponse: Partial<User> = {},
-): User => ({
-  id: faker.number.int({ min: 0, max: undefined }),
-  name: {
-    first: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    last: faker.string.alpha({ length: { min: 10, max: 20 } }),
+export const getReadUserResponseMock = (): ReadUser200 => ({
+  ...{
+    ...{
+      name: {
+        first: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        last: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      },
+      description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    },
+    ...{
+      id: faker.number.int({ min: 0, max: undefined }),
+      admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    },
   },
-  description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  admin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  ...overrideResponse,
+  ...{
+    editable: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  },
 });
 
 export const getLoginMockHandler = (
@@ -69,10 +65,10 @@ export const getLoginMockHandler = (
 
 export const getCreateUserMockHandler = (
   overrideResponse?:
-    | User
+    | Id
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<User> | User),
+      ) => Promise<Id> | Id),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -95,10 +91,10 @@ export const getCreateUserMockHandler = (
 
 export const getReadUserMockHandler = (
   overrideResponse?:
-    | User
+    | ReadUser200
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<User> | User),
+      ) => Promise<ReadUser200> | ReadUser200),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(

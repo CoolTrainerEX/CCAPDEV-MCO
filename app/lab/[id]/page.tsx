@@ -31,7 +31,7 @@ import { setMinutes } from "date-fns/setMinutes";
 import { setHours } from "date-fns/setHours";
 import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
 import { Button } from "@/components/ui/button";
-import { PencilIcon } from "lucide-react";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 export default function Lab() {
@@ -95,7 +95,7 @@ export default function Lab() {
         {editable && (
           <Button variant="outline" asChild>
             <Link href={`/lab/${id}/edit`}>
-              <PencilIcon />
+              <Pencil />
             </Link>
           </Button>
         )}

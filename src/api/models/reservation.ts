@@ -6,13 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Id } from "./id";
-import type { Interval } from "./interval";
+import type { ReservationUpdate } from "./reservationUpdate";
 
-export interface Reservation {
+export type Reservation = ReservationUpdate & {
   id: Id;
   userId: Id;
   labId: Id;
-  anonymous?: boolean;
-  schedule: Interval;
-  slotIds: Id[];
-}
+};

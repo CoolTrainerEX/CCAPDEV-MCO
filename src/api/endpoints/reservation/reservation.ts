@@ -24,6 +24,8 @@ import type {
 import type {
   BadRequestResponse,
   ExistsResponse,
+  GetReservationLab200Item,
+  GetReservationUser200Item,
   Id,
   NotFoundResponse,
   Reservation,
@@ -35,7 +37,7 @@ import type {
  * @summary Create a reservation
  */
 export type createReservationResponse201 = {
-  data: Reservation;
+  data: Id;
   status: 201;
 };
 
@@ -189,6 +191,11 @@ export type updateReservationResponse204 = {
   status: 204;
 };
 
+export type updateReservationResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type updateReservationResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -197,11 +204,6 @@ export type updateReservationResponse401 = {
 export type updateReservationResponse404 = {
   data: NotFoundResponse;
   status: 404;
-};
-
-export type updateReservationResponse409 = {
-  data: ExistsResponse;
-  status: 409;
 };
 
 export type updateReservationResponse500 = {
@@ -213,9 +215,9 @@ export type updateReservationResponseSuccess = updateReservationResponse204 & {
   headers: Headers;
 };
 export type updateReservationResponseError = (
+  | updateReservationResponse400
   | updateReservationResponse401
   | updateReservationResponse404
-  | updateReservationResponse409
   | updateReservationResponse500
 ) & {
   headers: Headers;
@@ -250,9 +252,9 @@ export const updateReservation = async (
 
 export const getUpdateReservationMutationOptions = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
@@ -295,9 +297,9 @@ export type UpdateReservationMutationResult = NonNullable<
 >;
 
 export type UpdateReservationMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
-  | ExistsResponse
   | UnexpectedResponse;
 
 /**
@@ -305,9 +307,9 @@ export type UpdateReservationMutationError =
  */
 export const useUpdateReservation = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(
@@ -337,6 +339,11 @@ export type deleteReservationResponse204 = {
   status: 204;
 };
 
+export type deleteReservationResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type deleteReservationResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -356,6 +363,7 @@ export type deleteReservationResponseSuccess = deleteReservationResponse204 & {
   headers: Headers;
 };
 export type deleteReservationResponseError = (
+  | deleteReservationResponse400
   | deleteReservationResponse401
   | deleteReservationResponse404
   | deleteReservationResponse500
@@ -391,7 +399,11 @@ export const deleteReservation = async (
 };
 
 export const getDeleteReservationMutationOptions = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -433,6 +445,7 @@ export type DeleteReservationMutationResult = NonNullable<
 >;
 
 export type DeleteReservationMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
   | UnexpectedResponse;
@@ -441,7 +454,11 @@ export type DeleteReservationMutationError =
  * @summary Delete a reservation
  */
 export const useDeleteReservation = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {
@@ -466,8 +483,13 @@ export const useDeleteReservation = <
  * @summary Read the reservations of the user
  */
 export type getReservationUserResponse200 = {
-  data: Reservation[];
+  data: GetReservationUser200Item[];
   status: 200;
+};
+
+export type getReservationUserResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type getReservationUserResponse404 = {
@@ -485,6 +507,7 @@ export type getReservationUserResponseSuccess =
     headers: Headers;
   };
 export type getReservationUserResponseError = (
+  | getReservationUserResponse400
   | getReservationUserResponse404
   | getReservationUserResponse500
 ) & {
@@ -524,7 +547,7 @@ export const getGetReservationUserQueryKey = (id: number) => {
 
 export const getGetReservationUserQueryOptions = <
   TData = Awaited<ReturnType<typeof getReservationUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -562,12 +585,13 @@ export type GetReservationUserQueryResult = NonNullable<
   Awaited<ReturnType<typeof getReservationUser>>
 >;
 export type GetReservationUserQueryError =
+  | BadRequestResponse
   | NotFoundResponse
   | UnexpectedResponse;
 
 export function useGetReservationUser<
   TData = Awaited<ReturnType<typeof getReservationUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options: {
@@ -594,7 +618,7 @@ export function useGetReservationUser<
 };
 export function useGetReservationUser<
   TData = Awaited<ReturnType<typeof getReservationUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -621,7 +645,7 @@ export function useGetReservationUser<
 };
 export function useGetReservationUser<
   TData = Awaited<ReturnType<typeof getReservationUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -644,7 +668,7 @@ export function useGetReservationUser<
 
 export function useGetReservationUser<
   TData = Awaited<ReturnType<typeof getReservationUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -675,8 +699,13 @@ export function useGetReservationUser<
  * @summary Read the reservations of the lab
  */
 export type getReservationLabResponse200 = {
-  data: Reservation[];
+  data: GetReservationLab200Item[];
   status: 200;
+};
+
+export type getReservationLabResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type getReservationLabResponse404 = {
@@ -693,6 +722,7 @@ export type getReservationLabResponseSuccess = getReservationLabResponse200 & {
   headers: Headers;
 };
 export type getReservationLabResponseError = (
+  | getReservationLabResponse400
   | getReservationLabResponse404
   | getReservationLabResponse500
 ) & {
@@ -732,7 +762,7 @@ export const getGetReservationLabQueryKey = (id: number) => {
 
 export const getGetReservationLabQueryOptions = <
   TData = Awaited<ReturnType<typeof getReservationLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -769,11 +799,14 @@ export const getGetReservationLabQueryOptions = <
 export type GetReservationLabQueryResult = NonNullable<
   Awaited<ReturnType<typeof getReservationLab>>
 >;
-export type GetReservationLabQueryError = NotFoundResponse | UnexpectedResponse;
+export type GetReservationLabQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 export function useGetReservationLab<
   TData = Awaited<ReturnType<typeof getReservationLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options: {
@@ -800,7 +833,7 @@ export function useGetReservationLab<
 };
 export function useGetReservationLab<
   TData = Awaited<ReturnType<typeof getReservationLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -827,7 +860,7 @@ export function useGetReservationLab<
 };
 export function useGetReservationLab<
   TData = Awaited<ReturnType<typeof getReservationLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -850,7 +883,7 @@ export function useGetReservationLab<
 
 export function useGetReservationLab<
   TData = Awaited<ReturnType<typeof getReservationLab>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {

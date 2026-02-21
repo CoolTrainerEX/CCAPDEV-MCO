@@ -27,6 +27,7 @@ import type {
   ExistsResponse,
   Id,
   NotFoundResponse,
+  ReadUser200,
   UnauthorizedResponse,
   UnexpectedResponse,
   User,
@@ -166,7 +167,7 @@ export const useLogin = <
  * @summary Create a user
  */
 export type createUserResponse201 = {
-  data: User;
+  data: Id;
   status: 201;
 };
 
@@ -301,8 +302,13 @@ export const useCreateUser = <
  * @summary Read a user
  */
 export type readUserResponse200 = {
-  data: User;
+  data: ReadUser200;
   status: 200;
+};
+
+export type readUserResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type readUserResponse404 = {
@@ -319,6 +325,7 @@ export type readUserResponseSuccess = readUserResponse200 & {
   headers: Headers;
 };
 export type readUserResponseError = (
+  | readUserResponse400
   | readUserResponse404
   | readUserResponse500
 ) & {
@@ -352,7 +359,7 @@ export const getReadUserQueryKey = (id: number) => {
 
 export const getReadUserQueryOptions = <
   TData = Awaited<ReturnType<typeof readUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -383,11 +390,14 @@ export const getReadUserQueryOptions = <
 export type ReadUserQueryResult = NonNullable<
   Awaited<ReturnType<typeof readUser>>
 >;
-export type ReadUserQueryError = NotFoundResponse | UnexpectedResponse;
+export type ReadUserQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 export function useReadUser<
   TData = Awaited<ReturnType<typeof readUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options: {
@@ -410,7 +420,7 @@ export function useReadUser<
 };
 export function useReadUser<
   TData = Awaited<ReturnType<typeof readUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -433,7 +443,7 @@ export function useReadUser<
 };
 export function useReadUser<
   TData = Awaited<ReturnType<typeof readUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -452,7 +462,7 @@ export function useReadUser<
 
 export function useReadUser<
   TData = Awaited<ReturnType<typeof readUser>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
   options?: {
@@ -483,6 +493,11 @@ export type updateUserResponse204 = {
   status: 204;
 };
 
+export type updateUserResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type updateUserResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
@@ -491,11 +506,6 @@ export type updateUserResponse401 = {
 export type updateUserResponse404 = {
   data: NotFoundResponse;
   status: 404;
-};
-
-export type updateUserResponse409 = {
-  data: ExistsResponse;
-  status: 409;
 };
 
 export type updateUserResponse500 = {
@@ -507,9 +517,9 @@ export type updateUserResponseSuccess = updateUserResponse204 & {
   headers: Headers;
 };
 export type updateUserResponseError = (
+  | updateUserResponse400
   | updateUserResponse401
   | updateUserResponse404
-  | updateUserResponse409
   | updateUserResponse500
 ) & {
   headers: Headers;
@@ -525,11 +535,14 @@ export const getUpdateUserUrl = (id: number) => {
 
 export const updateUser = async (
   id: number,
+  user: User,
   options?: RequestInit,
 ): Promise<updateUserResponse> => {
   const res = await fetch(getUpdateUserUrl(id), {
     ...options,
     method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(user),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -544,23 +557,23 @@ export const updateUser = async (
 
 export const getUpdateUserMutationOptions = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateUser>>,
     TError,
-    { id: number },
+    { id: number; data: User },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateUser>>,
   TError,
-  { id: number },
+  { id: number; data: User },
   TContext
 > => {
   const mutationKey = ["updateUser"];
@@ -574,11 +587,11 @@ export const getUpdateUserMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateUser>>,
-    { id: number }
+    { id: number; data: User }
   > = (props) => {
-    const { id } = props ?? {};
+    const { id, data } = props ?? {};
 
-    return updateUser(id, fetchOptions);
+    return updateUser(id, data, fetchOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -587,11 +600,11 @@ export const getUpdateUserMutationOptions = <
 export type UpdateUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateUser>>
 >;
-
+export type UpdateUserMutationBody = User;
 export type UpdateUserMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
-  | ExistsResponse
   | UnexpectedResponse;
 
 /**
@@ -599,9 +612,9 @@ export type UpdateUserMutationError =
  */
 export const useUpdateUser = <
   TError =
+    | BadRequestResponse
     | UnauthorizedResponse
     | NotFoundResponse
-    | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
 >(
@@ -609,7 +622,7 @@ export const useUpdateUser = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof updateUser>>,
       TError,
-      { id: number },
+      { id: number; data: User },
       TContext
     >;
     fetch?: RequestInit;
@@ -618,7 +631,7 @@ export const useUpdateUser = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof updateUser>>,
   TError,
-  { id: number },
+  { id: number; data: User },
   TContext
 > => {
   return useMutation(getUpdateUserMutationOptions(options), queryClient);
@@ -629,6 +642,11 @@ export const useUpdateUser = <
 export type deleteUserResponse204 = {
   data: void;
   status: 204;
+};
+
+export type deleteUserResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type deleteUserResponse401 = {
@@ -650,6 +668,7 @@ export type deleteUserResponseSuccess = deleteUserResponse204 & {
   headers: Headers;
 };
 export type deleteUserResponseError = (
+  | deleteUserResponse400
   | deleteUserResponse401
   | deleteUserResponse404
   | deleteUserResponse500
@@ -685,7 +704,11 @@ export const deleteUser = async (
 };
 
 export const getDeleteUserMutationOptions = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -727,6 +750,7 @@ export type DeleteUserMutationResult = NonNullable<
 >;
 
 export type DeleteUserMutationError =
+  | BadRequestResponse
   | UnauthorizedResponse
   | NotFoundResponse
   | UnexpectedResponse;
@@ -735,7 +759,11 @@ export type DeleteUserMutationError =
  * @summary Delete a user
  */
 export const useDeleteUser = <
-  TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
   TContext = unknown,
 >(
   options?: {

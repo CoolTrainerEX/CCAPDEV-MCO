@@ -6,9 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Id } from "./id";
-import type { UserDetails } from "./userDetails";
+import type { Interval } from "./interval";
 
-export type User = UserDetails & {
-  id: Id;
-  admin?: boolean;
-};
+export interface ReservationUpdate {
+  anonymous?: boolean;
+  schedule?: Interval;
+  slotIds?: Id[];
+}

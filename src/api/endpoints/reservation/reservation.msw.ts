@@ -10,76 +10,91 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { Reservation } from "../../models";
+import type {
+  GetReservationLab200Item,
+  GetReservationUser200Item,
+  Id,
+} from "../../models";
 
-export const getCreateReservationResponseMock = (
-  overrideResponse: Partial<Reservation> = {},
-): Reservation => ({
-  id: faker.number.int({ min: 0, max: undefined }),
-  userId: faker.number.int({ min: 0, max: undefined }),
-  labId: faker.number.int({ min: 0, max: undefined }),
-  anonymous: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  schedule: {
-    start: faker.date.past().toISOString().slice(0, 19) + "Z",
-    end: faker.date.past().toISOString().slice(0, 19) + "Z",
-  },
-  slotIds: Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => faker.number.int({ min: 0, max: undefined })),
-  ...overrideResponse,
-});
+export const getCreateReservationResponseMock = (): Id =>
+  faker.number.int({ min: 0, max: undefined });
 
-export const getGetReservationUserResponseMock = (): Reservation[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.number.int({ min: 0, max: undefined }),
-    userId: faker.number.int({ min: 0, max: undefined }),
-    labId: faker.number.int({ min: 0, max: undefined }),
-    anonymous: faker.helpers.arrayElement([
-      faker.datatype.boolean(),
-      undefined,
-    ]),
-    schedule: {
-      start: faker.date.past().toISOString().slice(0, 19) + "Z",
-      end: faker.date.past().toISOString().slice(0, 19) + "Z",
-    },
-    slotIds: Array.from(
+export const getGetReservationUserResponseMock =
+  (): GetReservationUser200Item[] =>
+    Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
-    ).map(() => faker.number.int({ min: 0, max: undefined })),
-  }));
+    ).map(() => ({
+      ...{
+        ...{
+          anonymous: faker.helpers.arrayElement([
+            faker.datatype.boolean(),
+            undefined,
+          ]),
+          schedule: {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          slotIds: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1,
+          ).map(() => faker.number.int({ min: 0, max: undefined })),
+        },
+        ...{
+          id: faker.number.int({ min: 0, max: undefined }),
+          userId: faker.number.int({ min: 0, max: undefined }),
+          labId: faker.number.int({ min: 0, max: undefined }),
+        },
+      },
+      ...{
+        editable: faker.helpers.arrayElement([
+          faker.datatype.boolean(),
+          undefined,
+        ]),
+      },
+    }));
 
-export const getGetReservationLabResponseMock = (): Reservation[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.number.int({ min: 0, max: undefined }),
-    userId: faker.number.int({ min: 0, max: undefined }),
-    labId: faker.number.int({ min: 0, max: undefined }),
-    anonymous: faker.helpers.arrayElement([
-      faker.datatype.boolean(),
-      undefined,
-    ]),
-    schedule: {
-      start: faker.date.past().toISOString().slice(0, 19) + "Z",
-      end: faker.date.past().toISOString().slice(0, 19) + "Z",
-    },
-    slotIds: Array.from(
+export const getGetReservationLabResponseMock =
+  (): GetReservationLab200Item[] =>
+    Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
-    ).map(() => faker.number.int({ min: 0, max: undefined })),
-  }));
+    ).map(() => ({
+      ...{
+        ...{
+          anonymous: faker.helpers.arrayElement([
+            faker.datatype.boolean(),
+            undefined,
+          ]),
+          schedule: {
+            start: faker.date.past().toISOString().slice(0, 19) + "Z",
+            end: faker.date.past().toISOString().slice(0, 19) + "Z",
+          },
+          slotIds: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1,
+          ).map(() => faker.number.int({ min: 0, max: undefined })),
+        },
+        ...{
+          id: faker.number.int({ min: 0, max: undefined }),
+          userId: faker.number.int({ min: 0, max: undefined }),
+          labId: faker.number.int({ min: 0, max: undefined }),
+        },
+      },
+      ...{
+        editable: faker.helpers.arrayElement([
+          faker.datatype.boolean(),
+          undefined,
+        ]),
+      },
+    }));
 
 export const getCreateReservationMockHandler = (
   overrideResponse?:
-    | Reservation
+    | Id
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<Reservation> | Reservation),
+      ) => Promise<Id> | Id),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
@@ -142,10 +157,10 @@ export const getDeleteReservationMockHandler = (
 
 export const getGetReservationUserMockHandler = (
   overrideResponse?:
-    | Reservation[]
+    | GetReservationUser200Item[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Reservation[]> | Reservation[]),
+      ) => Promise<GetReservationUser200Item[]> | GetReservationUser200Item[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -168,10 +183,10 @@ export const getGetReservationUserMockHandler = (
 
 export const getGetReservationLabMockHandler = (
   overrideResponse?:
-    | Reservation[]
+    | GetReservationLab200Item[]
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<Reservation[]> | Reservation[]),
+      ) => Promise<GetReservationLab200Item[]> | GetReservationLab200Item[]),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
