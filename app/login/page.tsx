@@ -18,21 +18,24 @@ import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { useLogin } from "@/src/api/endpoints/user/user";
 import { LoginBody } from "@/src/api/endpoints/user/user.zod";
-import useUser from "@/src/store/login";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Login() {
   const router = useRouter();
-  const login = useUser(({ login }) => login);
+  const queryClient = useQueryClient();
   const { mutate, isPending } = useLogin({
     mutation: {
       onSuccess(data) {
         switch (data.status) {
-          case 200:
-            login(data.data);
-            router.push("/");
-            toast.success("Logged in.");
+          case 204:
+            try {
+              router.push("/");
+              toast.success("Logged in.");
+            } catch {
+              toast.warning("Bad response.");
+            }
             break;
 
           case 400:
@@ -40,10 +43,16 @@ export default function Login() {
             toast.error(data.data.message);
             break;
 
+          case 500:
+            toast.warning(data.data.message);
+            break;
+
           default:
             toast.warning("Unexpected error.");
             break;
         }
+
+        queryClient.invalidateQueries();
       },
     },
   });

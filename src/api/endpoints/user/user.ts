@@ -5,7 +5,10 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,8 +21,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   BadRequestResponse,
@@ -30,869 +33,807 @@ import type {
   ReadUser200,
   UnauthorizedResponse,
   UnexpectedResponse,
-  User,
   UserLogin,
-} from "../../models";
+  UserUpdate
+} from '../../models';
+
+
+
+
 
 /**
  * @summary Login
  */
-export type loginResponse200 = {
-  data: Id;
-  status: 200;
-};
+export type loginResponse204 = {
+  data: void
+  status: 204
+}
 
 export type loginResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type loginResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
+  data: NotFoundResponse
+  status: 404
+}
 
 export type loginResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type loginResponseSuccess = loginResponse200 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type loginResponseSuccess = (loginResponse204) & {
   headers: Headers;
 };
-export type loginResponseError = (
-  | loginResponse400
-  | loginResponse404
-  | loginResponse500
-) & {
+export type loginResponseError = (loginResponse400 | loginResponse404 | loginResponse500) & {
   headers: Headers;
 };
 
-export type loginResponse = loginResponseSuccess | loginResponseError;
+export type loginResponse = (loginResponseSuccess | loginResponseError)
 
 export const getLoginUrl = () => {
-  return `/api/login`;
-};
 
-export const login = async (
-  userLogin: UserLogin,
-  options?: RequestInit,
-): Promise<loginResponse> => {
-  const res = await fetch(getLoginUrl(), {
+
+  
+
+  return `/api/login`
+}
+
+export const login = async (userLogin: UserLogin, options?: RequestInit): Promise<loginResponse> => {
+  
+  const res = await fetch(getLoginUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(userLogin),
-  });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      userLogin,)
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: loginResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as loginResponse
+}
 
-  const data: loginResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as loginResponse;
-};
 
-export const getLoginMutationOptions = <
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof login>>,
-    TError,
-    { data: UserLogin },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof login>>,
-  TError,
-  { data: UserLogin },
-  TContext
-> => {
-  const mutationKey = ["login"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof login>>,
-    { data: UserLogin }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return login(data, fetchOptions);
-  };
+export const getLoginMutationOptions = <TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: UserLogin}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: UserLogin}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['login'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type LoginMutationResult = NonNullable<
-  Awaited<ReturnType<typeof login>>
->;
-export type LoginMutationBody = UserLogin;
-export type LoginMutationError =
-  | BadRequestResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof login>>, {data: UserLogin}> = (props) => {
+          const {data} = props ?? {};
+
+          return  login(data,fetchOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginMutationResult = NonNullable<Awaited<ReturnType<typeof login>>>
+    export type LoginMutationBody = UserLogin
+    export type LoginMutationError = BadRequestResponse | NotFoundResponse | UnexpectedResponse
+
+    /**
  * @summary Login
  */
-export const useLogin = <
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof login>>,
-      TError,
-      { data: UserLogin },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof login>>,
-  TError,
-  { data: UserLogin },
-  TContext
-> => {
-  return useMutation(getLoginMutationOptions(options), queryClient);
-};
-/**
+export const useLogin = <TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof login>>, TError,{data: UserLogin}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof login>>,
+        TError,
+        {data: UserLogin},
+        TContext
+      > => {
+      return useMutation(getLoginMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Logout
  */
 export type logoutResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type logoutResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
 export type logoutResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type logoutResponseSuccess = logoutResponse204 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type logoutResponseSuccess = (logoutResponse204) & {
   headers: Headers;
 };
 export type logoutResponseError = (logoutResponse401 | logoutResponse500) & {
   headers: Headers;
 };
 
-export type logoutResponse = logoutResponseSuccess | logoutResponseError;
+export type logoutResponse = (logoutResponseSuccess | logoutResponseError)
 
 export const getLogoutUrl = () => {
-  return `/api/login`;
-};
 
-export const logout = async (
-  options?: RequestInit,
-): Promise<logoutResponse> => {
-  const res = await fetch(getLogoutUrl(), {
+
+  
+
+  return `/api/login`
+}
+
+export const logout = async ( options?: RequestInit): Promise<logoutResponse> => {
+  
+  const res = await fetch(getLogoutUrl(),
+  {      
     ...options,
-    method: "DELETE",
-  });
+    method: 'DELETE'
+    
+    
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: logoutResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as logoutResponse
+}
 
-  const data: logoutResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as logoutResponse;
-};
 
-export const getLogoutMutationOptions = <
-  TError = UnauthorizedResponse | UnexpectedResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof logout>>,
-    TError,
-    void,
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof logout>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["logout"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof logout>>,
-    void
-  > = () => {
-    return logout(fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getLogoutMutationOptions = <TError = UnauthorizedResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext> => {
 
-export type LogoutMutationResult = NonNullable<
-  Awaited<ReturnType<typeof logout>>
->;
+const mutationKey = ['logout'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type LogoutMutationError = UnauthorizedResponse | UnexpectedResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logout>>, void> = () => {
+          
+
+          return  logout(fetchOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>
+    
+    export type LogoutMutationError = UnauthorizedResponse | UnexpectedResponse
+
+    /**
  * @summary Logout
  */
-export const useLogout = <
-  TError = UnauthorizedResponse | UnexpectedResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof logout>>,
-      TError,
-      void,
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof logout>>,
-  TError,
-  void,
-  TContext
-> => {
-  return useMutation(getLogoutMutationOptions(options), queryClient);
-};
-/**
+export const useLogout = <TError = UnauthorizedResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError,void, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof logout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Create a user
  */
 export type createUserResponse201 = {
-  data: Id;
-  status: 201;
-};
+  data: void
+  status: 201
+}
 
 export type createUserResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type createUserResponse409 = {
-  data: ExistsResponse;
-  status: 409;
-};
+  data: ExistsResponse
+  status: 409
+}
 
 export type createUserResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type createUserResponseSuccess = createUserResponse201 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type createUserResponseSuccess = (createUserResponse201) & {
   headers: Headers;
 };
-export type createUserResponseError = (
-  | createUserResponse400
-  | createUserResponse409
-  | createUserResponse500
-) & {
+export type createUserResponseError = (createUserResponse400 | createUserResponse409 | createUserResponse500) & {
   headers: Headers;
 };
 
-export type createUserResponse =
-  | createUserResponseSuccess
-  | createUserResponseError;
+export type createUserResponse = (createUserResponseSuccess | createUserResponseError)
 
 export const getCreateUserUrl = () => {
-  return `/api/user`;
-};
 
-export const createUser = async (
-  createUserBody: CreateUserBody,
-  options?: RequestInit,
-): Promise<createUserResponse> => {
-  const res = await fetch(getCreateUserUrl(), {
+
+  
+
+  return `/api/user`
+}
+
+export const createUser = async (createUserBody: CreateUserBody, options?: RequestInit): Promise<createUserResponse> => {
+  
+  const res = await fetch(getCreateUserUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createUserBody),
-  });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createUserBody,)
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: createUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createUserResponse
+}
 
-  const data: createUserResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createUserResponse;
-};
 
-export const getCreateUserMutationOptions = <
-  TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUser>>,
-    TError,
-    { data: CreateUserBody },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createUser>>,
-  TError,
-  { data: CreateUserBody },
-  TContext
-> => {
-  const mutationKey = ["createUser"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createUser>>,
-    { data: CreateUserBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createUser(data, fetchOptions);
-  };
+export const getCreateUserMutationOptions = <TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['createUser'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type CreateUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createUser>>
->;
-export type CreateUserMutationBody = CreateUserBody;
-export type CreateUserMutationError =
-  | BadRequestResponse
-  | ExistsResponse
-  | UnexpectedResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: CreateUserBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUser(data,fetchOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    export type CreateUserMutationBody = CreateUserBody
+    export type CreateUserMutationError = BadRequestResponse | ExistsResponse | UnexpectedResponse
+
+    /**
  * @summary Create a user
  */
-export const useCreateUser = <
-  TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createUser>>,
-      TError,
-      { data: CreateUserBody },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createUser>>,
-  TError,
-  { data: CreateUserBody },
-  TContext
-> => {
-  return useMutation(getCreateUserMutationOptions(options), queryClient);
+export const useCreateUser = <TError = BadRequestResponse | ExistsResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createUser>>,
+        TError,
+        {data: CreateUserBody},
+        TContext
+      > => {
+      return useMutation(getCreateUserMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Get current user ID
+ */
+export type readCurrentUserResponse200 = {
+  data: Id
+  status: 200
+}
+
+export type readCurrentUserResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type readCurrentUserResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type readCurrentUserResponse500 = {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type readCurrentUserResponseSuccess = (readCurrentUserResponse200) & {
+  headers: Headers;
 };
+export type readCurrentUserResponseError = (readCurrentUserResponse401 | readCurrentUserResponse404 | readCurrentUserResponse500) & {
+  headers: Headers;
+};
+
+export type readCurrentUserResponse = (readCurrentUserResponseSuccess | readCurrentUserResponseError)
+
+export const getReadCurrentUserUrl = () => {
+
+
+  
+
+  return `/api/user`
+}
+
+export const readCurrentUser = async ( options?: RequestInit): Promise<readCurrentUserResponse> => {
+  
+  const res = await fetch(getReadCurrentUserUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: readCurrentUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as readCurrentUserResponse
+}
+
+
+
+
+
+export const getReadCurrentUserQueryKey = () => {
+    return [
+    `/api/user`
+    ] as const;
+    }
+
+    
+export const getReadCurrentUserQueryOptions = <TData = Awaited<ReturnType<typeof readCurrentUser>>, TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReadCurrentUserQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readCurrentUser>>> = ({ signal }) => readCurrentUser({ signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof readCurrentUser>>>
+export type ReadCurrentUserQueryError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse
+
+
+export function useReadCurrentUser<TData = Awaited<ReturnType<typeof readCurrentUser>>, TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readCurrentUser>>,
+          TError,
+          Awaited<ReturnType<typeof readCurrentUser>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadCurrentUser<TData = Awaited<ReturnType<typeof readCurrentUser>>, TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readCurrentUser>>,
+          TError,
+          Awaited<ReturnType<typeof readCurrentUser>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadCurrentUser<TData = Awaited<ReturnType<typeof readCurrentUser>>, TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get current user ID
+ */
+
+export function useReadCurrentUser<TData = Awaited<ReturnType<typeof readCurrentUser>>, TError = UnauthorizedResponse | NotFoundResponse | UnexpectedResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReadCurrentUserQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 /**
  * @summary Read a user
  */
 export type readUserResponse200 = {
-  data: ReadUser200;
-  status: 200;
-};
+  data: ReadUser200
+  status: 200
+}
 
 export type readUserResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type readUserResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
+  data: NotFoundResponse
+  status: 404
+}
 
 export type readUserResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type readUserResponseSuccess = readUserResponse200 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type readUserResponseSuccess = (readUserResponse200) & {
   headers: Headers;
 };
-export type readUserResponseError = (
-  | readUserResponse400
-  | readUserResponse404
-  | readUserResponse500
-) & {
+export type readUserResponseError = (readUserResponse400 | readUserResponse404 | readUserResponse500) & {
   headers: Headers;
 };
 
-export type readUserResponse = readUserResponseSuccess | readUserResponseError;
+export type readUserResponse = (readUserResponseSuccess | readUserResponseError)
 
-export const getReadUserUrl = (id: number) => {
-  return `/api/user/${id}`;
-};
+export const getReadUserUrl = (id: number,) => {
 
-export const readUser = async (
-  id: number,
-  options?: RequestInit,
-): Promise<readUserResponse> => {
-  const res = await fetch(getReadUserUrl(id), {
+
+  
+
+  return `/api/user/${id}`
+}
+
+export const readUser = async (id: number, options?: RequestInit): Promise<readUserResponse> => {
+  
+  const res = await fetch(getReadUserUrl(id),
+  {      
     ...options,
-    method: "GET",
-  });
+    method: 'GET'
+    
+    
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: readUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as readUserResponse
+}
 
-  const data: readUserResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as readUserResponse;
-};
 
-export const getReadUserQueryKey = (id: number) => {
-  return [`/api/user/${id}`] as const;
-};
 
-export const getReadUserQueryOptions = <
-  TData = Awaited<ReturnType<typeof readUser>>,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
+
+
+export const getReadUserQueryKey = (id: number,) => {
+    return [
+    `/api/user/${id}`
+    ] as const;
+    }
+
+    
+export const getReadUserQueryOptions = <TData = Awaited<ReturnType<typeof readUser>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>>, fetch?: RequestInit}
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getReadUserQueryKey(id);
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof readUser>>> = ({
-    signal,
-  }) => readUser(id, { signal, ...fetchOptions });
+  const queryKey =  queryOptions?.queryKey ?? getReadUserQueryKey(id);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-};
+  
 
-export type ReadUserQueryResult = NonNullable<
-  Awaited<ReturnType<typeof readUser>>
->;
-export type ReadUserQueryError =
-  | BadRequestResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUser>>> = ({ signal }) => readUser(id, { signal, ...fetchOptions });
 
-export function useReadUser<
-  TData = Awaited<ReturnType<typeof readUser>>,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadUserQueryResult = NonNullable<Awaited<ReturnType<typeof readUser>>>
+export type ReadUserQueryError = BadRequestResponse | NotFoundResponse | UnexpectedResponse
+
+
+export function useReadUser<TData = Awaited<ReturnType<typeof readUser>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
+ id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readUser>>,
           TError,
           Awaited<ReturnType<typeof readUser>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadUser<
-  TData = Awaited<ReturnType<typeof readUser>>,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUser<TData = Awaited<ReturnType<typeof readUser>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readUser>>,
           TError,
           Awaited<ReturnType<typeof readUser>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadUser<
-  TData = Awaited<ReturnType<typeof readUser>>,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUser<TData = Awaited<ReturnType<typeof readUser>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read a user
  */
 
-export function useReadUser<
-  TData = Awaited<ReturnType<typeof readUser>>,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getReadUserQueryOptions(id, options);
+export function useReadUser<TData = Awaited<ReturnType<typeof readUser>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUser>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getReadUserQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * @summary Update a user
  */
 export type updateUserResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type updateUserResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type updateUserResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
 export type updateUserResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
+  data: NotFoundResponse
+  status: 404
+}
 
 export type updateUserResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type updateUserResponseSuccess = updateUserResponse204 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type updateUserResponseSuccess = (updateUserResponse204) & {
   headers: Headers;
 };
-export type updateUserResponseError = (
-  | updateUserResponse400
-  | updateUserResponse401
-  | updateUserResponse404
-  | updateUserResponse500
-) & {
+export type updateUserResponseError = (updateUserResponse400 | updateUserResponse401 | updateUserResponse404 | updateUserResponse500) & {
   headers: Headers;
 };
 
-export type updateUserResponse =
-  | updateUserResponseSuccess
-  | updateUserResponseError;
+export type updateUserResponse = (updateUserResponseSuccess | updateUserResponseError)
 
-export const getUpdateUserUrl = (id: number) => {
-  return `/api/user/${id}`;
-};
+export const getUpdateUserUrl = (id: number,) => {
 
-export const updateUser = async (
-  id: number,
-  user: User,
-  options?: RequestInit,
-): Promise<updateUserResponse> => {
-  const res = await fetch(getUpdateUserUrl(id), {
+
+  
+
+  return `/api/user/${id}`
+}
+
+export const updateUser = async (id: number,
+    userUpdate: UserUpdate, options?: RequestInit): Promise<updateUserResponse> => {
+  
+  const res = await fetch(getUpdateUserUrl(id),
+  {      
     ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(user),
-  });
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      userUpdate,)
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: updateUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateUserResponse
+}
 
-  const data: updateUserResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as updateUserResponse;
-};
 
-export const getUpdateUserMutationOptions = <
-  TError =
-    | BadRequestResponse
-    | UnauthorizedResponse
-    | NotFoundResponse
-    | UnexpectedResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateUser>>,
-    TError,
-    { id: number; data: User },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateUser>>,
-  TError,
-  { id: number; data: User },
-  TContext
-> => {
-  const mutationKey = ["updateUser"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateUser>>,
-    { id: number; data: User }
-  > = (props) => {
-    const { id, data } = props ?? {};
 
-    return updateUser(id, data, fetchOptions);
-  };
+export const getUpdateUserMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,{id: number;data: UserUpdate}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,{id: number;data: UserUpdate}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['updateUser'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type UpdateUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateUser>>
->;
-export type UpdateUserMutationBody = User;
-export type UpdateUserMutationError =
-  | BadRequestResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUser>>, {id: number;data: UserUpdate}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateUser(id,data,fetchOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateUser>>>
+    export type UpdateUserMutationBody = UserUpdate
+    export type UpdateUserMutationError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse
+
+    /**
  * @summary Update a user
  */
-export const useUpdateUser = <
-  TError =
-    | BadRequestResponse
-    | UnauthorizedResponse
-    | NotFoundResponse
-    | UnexpectedResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateUser>>,
-      TError,
-      { id: number; data: User },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateUser>>,
-  TError,
-  { id: number; data: User },
-  TContext
-> => {
-  return useMutation(getUpdateUserMutationOptions(options), queryClient);
-};
-/**
+export const useUpdateUser = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUser>>, TError,{id: number;data: UserUpdate}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateUser>>,
+        TError,
+        {id: number;data: UserUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateUserMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Delete a user
  */
 export type deleteUserResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type deleteUserResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type deleteUserResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
 export type deleteUserResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
+  data: NotFoundResponse
+  status: 404
+}
 
 export type deleteUserResponse500 = {
-  data: UnexpectedResponse;
-  status: 500;
-};
-
-export type deleteUserResponseSuccess = deleteUserResponse204 & {
+  data: UnexpectedResponse
+  status: 500
+}
+    
+export type deleteUserResponseSuccess = (deleteUserResponse204) & {
   headers: Headers;
 };
-export type deleteUserResponseError = (
-  | deleteUserResponse400
-  | deleteUserResponse401
-  | deleteUserResponse404
-  | deleteUserResponse500
-) & {
+export type deleteUserResponseError = (deleteUserResponse400 | deleteUserResponse401 | deleteUserResponse404 | deleteUserResponse500) & {
   headers: Headers;
 };
 
-export type deleteUserResponse =
-  | deleteUserResponseSuccess
-  | deleteUserResponseError;
+export type deleteUserResponse = (deleteUserResponseSuccess | deleteUserResponseError)
 
-export const getDeleteUserUrl = (id: number) => {
-  return `/api/user/${id}`;
-};
+export const getDeleteUserUrl = (id: number,) => {
 
-export const deleteUser = async (
-  id: number,
-  options?: RequestInit,
-): Promise<deleteUserResponse> => {
-  const res = await fetch(getDeleteUserUrl(id), {
+
+  
+
+  return `/api/user/${id}`
+}
+
+export const deleteUser = async (id: number, options?: RequestInit): Promise<deleteUserResponse> => {
+  
+  const res = await fetch(getDeleteUserUrl(id),
+  {      
     ...options,
-    method: "DELETE",
-  });
+    method: 'DELETE'
+    
+    
+  }
+)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: deleteUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as deleteUserResponse
+}
 
-  const data: deleteUserResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as deleteUserResponse;
-};
 
-export const getDeleteUserMutationOptions = <
-  TError =
-    | BadRequestResponse
-    | UnauthorizedResponse
-    | NotFoundResponse
-    | UnexpectedResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteUser>>,
-    TError,
-    { id: number },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteUser>>,
-  TError,
-  { id: number },
-  TContext
-> => {
-  const mutationKey = ["deleteUser"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteUser>>,
-    { id: number }
-  > = (props) => {
-    const { id } = props ?? {};
 
-    return deleteUser(id, fetchOptions);
-  };
+export const getDeleteUserMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['deleteUser'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type DeleteUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteUser>>
->;
+      
 
-export type DeleteUserMutationError =
-  | BadRequestResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUser>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteUser(id,fetchOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteUserMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUser>>>
+    
+    export type DeleteUserMutationError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse
+
+    /**
  * @summary Delete a user
  */
-export const useDeleteUser = <
-  TError =
-    | BadRequestResponse
-    | UnauthorizedResponse
-    | NotFoundResponse
-    | UnexpectedResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteUser>>,
-      TError,
-      { id: number },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteUser>>,
-  TError,
-  { id: number },
-  TContext
-> => {
-  return useMutation(getDeleteUserMutationOptions(options), queryClient);
-};
+export const useDeleteUser = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteUser>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteUserMutationOptions(options), queryClient);
+    }
+    

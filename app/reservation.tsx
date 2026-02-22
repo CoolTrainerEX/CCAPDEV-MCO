@@ -43,7 +43,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import useLogin from "@/src/store/login";
+import useLogin from "@/src/store/user";
 import {
   Card,
   CardAction,

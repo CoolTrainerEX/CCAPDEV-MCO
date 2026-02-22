@@ -21,11 +21,11 @@ import { startOfDay } from "date-fns/startOfDay";
 import { cn } from "../lib/utils";
 import { isWithinInterval } from "date-fns/isWithinInterval";
 import { toDate } from "date-fns/toDate";
-import useLogin from "@/src/store/login";
+import useLogin from "@/src/store/user";
 
 export default function Home() {
   const admin = getUser(useLogin(({ id }) => id))?.admin;
-  const labs = getLabs(useSearchParams().get("q") || undefined);
+  const labs = getLabs(useSearchParams().get("q") ?? undefined);
   const now = new Date();
 
   return (

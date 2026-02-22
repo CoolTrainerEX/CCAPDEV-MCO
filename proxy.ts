@@ -7,7 +7,8 @@ const publicRoutes = new Set(["/login", "/register"]);
 export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.has(path);
-  const session = await decrypt((await cookies()).get("session")?.value);
+  const sessionRaw = (await cookies()).get("session")?.value;
+  const session = await decrypt(sessionRaw);
 
   if (!isPublicRoute && !session?.id)
     return NextResponse.redirect(new URL("/login", request.nextUrl));
@@ -15,7 +16,18 @@ export default async function proxy(request: NextRequest) {
   if (isPublicRoute && session?.id)
     return NextResponse.redirect(new URL("/", request.nextUrl));
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (sessionRaw)
+    response.cookies.set("session", sessionRaw, {
+      httpOnly: true,
+      secure: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      sameSite: "lax",
+      path: "/",
+    });
+
+  return response;
 }
 
 export const config = {

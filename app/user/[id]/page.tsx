@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import Reservation, { ReservationContent } from "@/app/reservation";
-import useLogin from "@/src/store/login";
+import useLogin from "@/src/store/user";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import {

@@ -6,9 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetLabsParams = {
-  /**
-   * The search query to filter labs
-   */
-  q?: string;
+export type ReadLabsParams = {
+/**
+ * The search query to filter labs
+ */
+q?: string;
 };

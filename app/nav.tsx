@@ -8,12 +8,39 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getUser } from "@/src/sample";
-import useLogin from "@/src/store/login";
 import icon from "./icon.svg";
+import { useReadCurrentUser, useReadUser } from "@/src/api/endpoints/user/user";
+import {
+  ReadCurrentUserResponse,
+  ReadUserResponse,
+} from "@/src/api/endpoints/user/user.zod";
+import { toast } from "sonner";
+import z from "zod";
 
 export default function Nav() {
-  const user = getUser(useLogin(({ id }) => id));
+  const { data: currentUserData } = useReadCurrentUser();
+
+  let currentUserId = Number.NaN;
+
+  try {
+    if (currentUserData?.status === 200)
+      currentUserId = ReadCurrentUserResponse.parse(currentUserData.data);
+  } catch {
+    toast.warning("Bad Response.");
+  }
+
+  const { data, isEnabled } = useReadUser(currentUserId, {
+    query: { enabled: currentUserData?.status === 200 },
+  });
+
+  let user: z.infer<typeof ReadUserResponse> | undefined;
+
+  try {
+    if (isEnabled && data?.status === 200)
+      user = ReadUserResponse.parse(data.data);
+  } catch {
+    toast.warning("Bad response.");
+  }
 
   return (
     <NavigationMenu className="bg-card text-card-foreground sticky top-0 max-w-full p-4 [&>div]:w-full">
@@ -38,11 +65,11 @@ export default function Nav() {
                 className="flex-row gap-4 align-middle"
               >
                 <p className="hidden leading-7 not-first:mt-6 sm:block">
-                  Hello, {user.name.first}!
+                  Hello, {user.name!.first}!
                 </p>
                 <Avatar>
                   <AvatarImage src="" />
-                  <AvatarFallback>{user.name.first[0]}</AvatarFallback>
+                  <AvatarFallback>{user.name!.first[0]}</AvatarFallback>
                 </Avatar>
               </Link>
             ) : (

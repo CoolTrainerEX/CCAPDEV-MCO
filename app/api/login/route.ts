@@ -1,5 +1,5 @@
-import { createSession, decrypt, deleteSession } from "@/lib/session";
-import { LoginBody, LoginResponse } from "@/src/api/endpoints/user/user.zod";
+import { createSession, decrypt } from "@/lib/session";
+import { LoginBody } from "@/src/api/endpoints/user/user.zod";
 import {
   BadRequestResponse,
   NotFoundResponse,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     await createSession(user.id);
     loginLogger.info("Success");
 
-    return NextResponse.json(LoginResponse.parse(user.id));
+    return new NextResponse(undefined, { status: 204 });
   } catch (e) {
     if (e instanceof ZodError) {
       loginLogger.info({ issues: e.issues });
@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   try {
-    const session = await decrypt((await cookies()).get("session")?.value);
+    const cookieStore = await cookies();
+    const session = await decrypt(cookieStore.get("session")?.value);
 
     if (!session?.id)
       return NextResponse.json(
@@ -67,10 +68,10 @@ export async function DELETE() {
         { status: 401 },
       );
 
-    await deleteSession();
+    cookieStore.delete("session");
     logoutLogger.info("Success");
 
-    return NextResponse.json(undefined, { status: 204 });
+    return new NextResponse(undefined, { status: 204 });
   } catch (e) {
     logoutLogger.error(e);
 

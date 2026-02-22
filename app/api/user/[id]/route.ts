@@ -1,3 +1,4 @@
+import { decrypt } from "@/lib/session";
 import {
   ReadUserParams,
   ReadUserResponse,
@@ -8,6 +9,7 @@ import {
   UnexpectedResponse,
 } from "@/src/api/models";
 import { users } from "@/src/sample";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
 import { ZodError } from "zod";
@@ -15,12 +17,12 @@ import { ZodError } from "zod";
 const logger = pino().child({ operation: "user" });
 
 export async function GET(
-  request: NextRequest,
-  ctx: RouteContext<"/api/user/[id]">,
+  _: NextRequest,
+  context: RouteContext<"/api/user/[id]">,
 ) {
   try {
     const params = ReadUserParams.parse({
-      id: Number.parseInt((await ctx.params).id),
+      id: Number.parseInt((await context.params).id),
     });
     const user = users.find(({ id }) => id === params.id);
 
@@ -35,10 +37,18 @@ export async function GET(
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password, ...filtered } = user;
-
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
     logger.info("Success");
 
-    return NextResponse.json(ReadUserResponse.parse(filtered));
+    return NextResponse.json(
+      ReadUserResponse.parse({
+        editable:
+          sessionId === user.id ||
+          users.find(({ id }) => id === sessionId)?.admin,
+        ...filtered,
+      }),
+    );
   } catch (e) {
     if (e instanceof ZodError) {
       logger.info({ issues: e.issues });
@@ -49,7 +59,7 @@ export async function GET(
       );
     }
 
-    logger.info(e);
+    logger.error(e);
 
     return NextResponse.json(
       {

@@ -21,12 +21,8 @@ paths:
       tags:
         - user
       responses:
-        "200":
-          description: The user ID
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserId"
+        "204":
+          description: Create session
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -60,11 +56,7 @@ paths:
         - user
       responses:
         "201":
-          description: The user created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserId"
+          description: Create session
         "400":
           $ref: "#/components/responses/BadRequest"
         "409":
@@ -83,6 +75,26 @@ paths:
                   properties:
                     name:
                       $ref: "#/components/schemas/UserName"
+    get:
+      summary: Get current user ID
+      operationId: readCurrentUser
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "200":
+          description: Current user ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserId"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
   /user/{id}:
     parameters:
       - $ref: "#/components/parameters/userId"
@@ -131,7 +143,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/UserUpdate"
     delete:
       summary: Delete a user
       operationId: deleteUser
@@ -153,7 +165,7 @@ paths:
   /lab:
     get:
       summary: Read all labs
-      operationId: getLabs
+      operationId: readLabs
       tags:
         - lab
       parameters:
@@ -215,7 +227,7 @@ paths:
       - $ref: "#/components/parameters/labId"
     get:
       summary: Read a lab
-      operationId: getLab
+      operationId: readLab
       tags:
         - lab
       responses:
@@ -254,6 +266,11 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabUpdate"
     delete:
       summary: Delete a lab
       operationId: deleteLab
@@ -326,6 +343,11 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationUpdate"
     delete:
       summary: Delete a reservation
       operationId: deleteReservation
@@ -349,7 +371,7 @@ paths:
       - $ref: "#/components/parameters/userId"
     get:
       summary: Read the reservations of the user
-      operationId: getReservationUser
+      operationId: readReservationUser
       tags:
         - reservation
       responses:
@@ -377,7 +399,7 @@ paths:
       - $ref: "#/components/parameters/labId"
     get:
       summary: Read the reservations of the lab
-      operationId: getReservationLab
+      operationId: readReservationLab
       tags:
         - reservation
       responses:
