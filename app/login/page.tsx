@@ -21,6 +21,7 @@ import { LoginBody } from "@/src/api/endpoints/user/user.zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Login() {
   const router = useRouter();
@@ -30,12 +31,8 @@ export default function Login() {
       onSuccess(data) {
         switch (data.status) {
           case 204:
-            try {
-              router.push("/");
-              toast.success("Logged in.");
-            } catch {
-              toast.warning("Bad response.");
-            }
+            router.push("/");
+            toast.success("Logged in.");
             break;
 
           case 400:
@@ -98,12 +95,13 @@ export default function Login() {
                     id="password"
                     name="password"
                     type="password"
+                    minLength={8}
                     required
                   />
                 </Field>
                 <Field>
                   <Button type="submit" disabled={isPending}>
-                    Login
+                    {isPending ? <Spinner /> : "Login"}
                   </Button>
                   <FieldDescription className="text-center">
                     Don&apos;t have an account?{" "}

@@ -21,6 +21,7 @@ import { useCreateUser } from "@/src/api/endpoints/user/user";
 import { toast } from "sonner";
 import { CreateUserBody } from "@/src/api/endpoints/user/user.zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Register() {
   const router = useRouter();
@@ -30,12 +31,8 @@ export default function Register() {
       onSuccess(data) {
         switch (data.status) {
           case 201:
-            try {
-              router.push("/");
-              toast.success("Logged in.");
-            } catch {
-              toast.warning("Bad Response.");
-            }
+            router.push("/");
+            toast.success("Logged in.");
             break;
 
           case 400:
@@ -157,7 +154,7 @@ export default function Register() {
                 <FieldGroup>
                   <Field>
                     <Button type="submit" disabled={isPending}>
-                      Create Account
+                      {isPending ? <Spinner /> : "Create Account"}
                     </Button>
                     <FieldDescription className="px-6 text-center">
                       Already have an account?{" "}

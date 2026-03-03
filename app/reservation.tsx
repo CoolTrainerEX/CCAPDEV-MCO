@@ -18,7 +18,7 @@ import {
   getReservationsFromLab,
   getUser,
 } from "@/src/sample";
-import { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   getHours,
   getMinutes,
@@ -57,7 +57,16 @@ import { cn } from "@/lib/utils";
 import Slots from "./slots";
 import { useRouter } from "next/navigation";
 import { Toggle } from "@/components/ui/toggle";
+import { ReadReservationLabResponse } from "@/src/api/endpoints/reservation/reservation.zod";
+import z from "zod";
 
+/**
+ * Modify selected on toggle.
+ * @param {Dispatch<SetStateAction<number[]>>} setSelected Selected state set
+ * @param {number} slotId Slot ID
+ * @returns {(pressed: boolean) => void} Function to run
+ * @author Justin Ryan Uy
+ */
 export function onPressedChange(
   setSelected: Dispatch<SetStateAction<number[]>>,
   slotId: number,
@@ -68,12 +77,19 @@ export function onPressedChange(
     );
 }
 
+// eslint-disable-next-line jsdoc/require-returns
+/**
+ * Reservation wrapper for {@link Drawer} functionality.
+ * @param {Parameters<typeof Drawer>[0]} param0 props
+ * @param {z.infer<typeof ReadReservationLabResponse>[number] | undefined} param0.reservation Reservation to display
+ * @author Justin Ryan Uy
+ */
 export default function Reservation({
   children,
   reservation,
   ...props
 }: Parameters<typeof Drawer>[0] & {
-  reservation?: NonNullable<ReturnType<typeof getReservationsFromLab>>[number];
+  reservation?: z.infer<typeof ReadReservationLabResponse>[number];
 }) {
   const router = useRouter();
   const loginId = useLogin(({ id }) => id);
@@ -82,14 +98,14 @@ export default function Reservation({
   const [formSchedule, setFormSchedule] = useState<Interval>(
     reservation
       ? {
-          start: new Date(reservation.schedule.start),
-          end: new Date(reservation.schedule.end),
+          start: new Date(reservation.schedule!.start),
+          end: new Date(reservation.schedule!.end),
         }
       : { start: new Date(now), end: new Date(now) },
   );
 
   const [selected, setSelected] = useState(
-    reservation ? reservation.slotIds : [],
+    reservation ? reservation.slotIds! : [],
   );
 
   if (!reservation) return children;
@@ -114,14 +130,14 @@ export default function Reservation({
           "friday",
           "saturday",
         ] as (keyof typeof lab.weeklySchedule)[]
-      )[startOfDay(reservation.schedule.start).getDay()]
+      )[startOfDay(reservation.schedule!.start).getDay()]
     ];
 
   let schedule = rawSchedule && {
     start: max([
       setMinutes(
         setHours(
-          new Date(reservation.schedule.start),
+          new Date(reservation.schedule!.start),
           getHours(rawSchedule.start),
         ),
         getMinutes(rawSchedule.start),
@@ -129,7 +145,7 @@ export default function Reservation({
       roundToNearestMinutes(now, { nearestTo: 30, roundingMethod: "ceil" }),
     ]),
     end: setMinutes(
-      setHours(new Date(reservation.schedule.end), getHours(rawSchedule.end)),
+      setHours(new Date(reservation.schedule!.end), getHours(rawSchedule.end)),
       getMinutes(rawSchedule.end),
     ),
   };
@@ -176,7 +192,7 @@ export default function Reservation({
               <TimeRangeInput
                 schedule={schedule}
                 value={formSchedule}
-                onValueChange={setFormSchedule}
+                setValue={setFormSchedule}
                 valid={
                   !reservations
                     ?.filter(({ slotIds }) =>
@@ -230,12 +246,19 @@ export default function Reservation({
   );
 }
 
+// eslint-disable-next-line jsdoc/require-returns
+/**
+ * Reservation display
+ * @param {React.ComponentProps<"div">} param0 props
+ * @param {z.infer<typeof ReadReservationLabResponse>[number] | undefined} param0.reservation Reservation to display
+ * @author Justin Ryan Uy
+ */
 export function ReservationContent({
   className,
   reservation,
   ...props
 }: React.ComponentProps<"div"> & {
-  reservation: NonNullable<ReturnType<typeof getReservationsFromLab>>[number];
+  reservation: z.infer<typeof ReadReservationLabResponse>[number];
 }) {
   const user = reservation.anonymous
     ? { name: { first: "Anonymous", last: "" } }
@@ -271,7 +294,7 @@ export function ReservationContent({
             <div
               className={cn(
                 "h-full",
-                reservation.slotIds.includes(id) ? "bg-primary" : "bg-muted",
+                reservation.slotIds!.includes(id) ? "bg-primary" : "bg-muted",
               )}
             />
           )}
@@ -282,8 +305,8 @@ export function ReservationContent({
           dateStyle: "medium",
           timeStyle: "short",
         })?.formatRange(
-          toDate(reservation.schedule.start),
-          toDate(reservation.schedule.end),
+          toDate(reservation.schedule!.start),
+          toDate(reservation.schedule!.end),
         )}
       </CardFooter>
     </Card>

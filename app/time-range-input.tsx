@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns/format";
-import { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Interval } from "date-fns";
 import { parse } from "date-fns/parse";
 import { getHours } from "date-fns/getHours";
@@ -19,17 +19,27 @@ import { getMinutes } from "date-fns/getMinutes";
 import { setHours } from "date-fns/setHours";
 import { cn } from "@/lib/utils";
 
+// eslint-disable-next-line jsdoc/require-returns
+/**
+ * Time Range form field.
+ * @param {React.ComponentProps<"div">} param0 props
+ * @param {Interval | undefined} param0.schedule Available schedule
+ * @param {boolean | undefined} param0.valid Toggle validity style
+ * @param {Interval} param0.value Value state
+ * @param {Dispatch<SetStateAction<Interval>>} param0.setValue Value state set
+ * @author Justin Ryan Uy
+ */
 export default function TimeRangeInput({
   schedule,
   valid,
   value,
-  onValueChange,
+  setValue,
   ...props
 }: React.ComponentProps<"div"> & {
   schedule?: Interval;
   valid?: boolean;
   value: Interval;
-  onValueChange: Dispatch<SetStateAction<Interval>>;
+  setValue: Dispatch<SetStateAction<Interval>>;
 }) {
   return (
     <FieldGroup {...props}>
@@ -47,7 +57,7 @@ export default function TimeRangeInput({
             value={format(value.start, "HH:mm")}
             onChange={(event) =>
               schedule &&
-              onValueChange((value) => ({
+              setValue((value) => ({
                 ...value,
                 start: parse(event.target.value, "HH:mm", schedule.start),
               }))
@@ -73,7 +83,7 @@ export default function TimeRangeInput({
             value={format(value.end, "HH:mm")}
             onChange={(event) =>
               schedule &&
-              onValueChange((value) => ({
+              setValue((value) => ({
                 ...value,
                 end: parse(event.target.value, "HH:mm", schedule.end),
               }))
@@ -92,7 +102,7 @@ export default function TimeRangeInput({
         ]}
         onValueChange={(value) =>
           schedule &&
-          onValueChange({
+          setValue({
             start: setMinutes(
               setHours(new Date(schedule.start), value[0]),
               (value[0] % 1) * 60,

@@ -1,25 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decrypt } from "@/lib/session";
-import { cookies } from "next/headers";
+import { decrypt } from "./lib/session";
 
-const publicRoutes = new Set(["/login", "/register"]);
+const publicRoutes = new Set(["/login", "/register", "/api/login"]);
 
 export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.has(path);
-  const sessionRaw = (await cookies()).get("session")?.value;
-  const session = await decrypt(sessionRaw);
+  const session = request.cookies.get("session")?.value;
+  const sessionId = await decrypt(session);
 
-  if (!isPublicRoute && !session?.id)
+  console.log(sessionId);
+
+  if (!isPublicRoute && !sessionId)
     return NextResponse.redirect(new URL("/login", request.nextUrl));
 
-  if (isPublicRoute && session?.id)
+  if (isPublicRoute && sessionId)
     return NextResponse.redirect(new URL("/", request.nextUrl));
 
   const response = NextResponse.next();
 
-  if (sessionRaw)
-    response.cookies.set("session", sessionRaw, {
+  if (session)
+    response.cookies.set("session", session, {
       httpOnly: true,
       secure: true,
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),

@@ -13,8 +13,8 @@ import { pino } from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
-const loginLogger = logger.child({ operation: "login" });
-const logoutLogger = logger.child({ operation: "logout" });
+const postLogger = logger.child({ operation: "login" });
+const deleteLogger = logger.child({ operation: "logout" });
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const user = users.find(({ email }) => email === body.email);
 
     if (user?.password !== body.password) {
-      loginLogger.info("User not found.");
+      postLogger.info("User not found.");
 
       return NextResponse.json(
         { message: "User not found." } as NotFoundResponse,
@@ -31,12 +31,12 @@ export async function POST(request: NextRequest) {
     }
 
     await createSession(user.id);
-    loginLogger.info("Success");
+    postLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
   } catch (e) {
     if (e instanceof ZodError) {
-      loginLogger.info({ issues: e.issues });
+      postLogger.info({ issues: e.issues });
 
       return NextResponse.json(
         { message: "Bad request." } as BadRequestResponse,
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    loginLogger.error(e);
+    postLogger.error(e);
 
     return NextResponse.json(
       {
@@ -58,22 +58,25 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
-    const session = await decrypt(cookieStore.get("session")?.value);
+    const sessionId = await decrypt(cookieStore.get("session")?.value);
 
-    if (!session?.id)
+    if (!sessionId) {
+      deleteLogger.info("Unauthorized.");
+
       return NextResponse.json(
         {
           message: "Unauthorized.",
         } as UnauthorizedResponse,
         { status: 401 },
       );
+    }
 
     cookieStore.delete("session");
-    logoutLogger.info("Success");
+    deleteLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
   } catch (e) {
-    logoutLogger.error(e);
+    deleteLogger.error(e);
 
     return NextResponse.json({ message: "Unexpected error." }, { status: 500 });
   }

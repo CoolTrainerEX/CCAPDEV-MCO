@@ -17,15 +17,13 @@ import { pino } from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
-const createLogger = logger.child({ operation: "create user" });
 const getLogger = logger.child({ operation: "get current user" });
+const postLogger = logger.child({ operation: "create user" });
 
 export async function GET() {
   try {
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-
-    if (!sessionId) {
+    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    if (sessionId === undefined) {
       getLogger.info("Unauthorized.");
 
       return NextResponse.json(
@@ -34,7 +32,7 @@ export async function GET() {
       );
     }
 
-    if (!users.some(({ id }) => id === sessionId)) {
+    if (sessionId === null) {
       getLogger.info("User not found.");
 
       return NextResponse.json(
@@ -44,6 +42,8 @@ export async function GET() {
         { status: 404 },
       );
     }
+
+    getLogger.info("Success");
 
     return NextResponse.json(ReadCurrentUserResponse.parse(sessionId));
   } catch (e) {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const body = CreateUserBody.parse(await request.json());
 
     if (users.some(({ email }) => email === body.email)) {
-      createLogger.info("User already exists.");
+      postLogger.info("User already exists.");
 
       return NextResponse.json(
         { message: "User already exists." } as ExistsResponse,
@@ -77,14 +77,14 @@ export async function POST(request: NextRequest) {
 
     users.push(user);
     await createSession(user.id);
-    createLogger.info("Success");
+    postLogger.info("Success");
 
     return new NextResponse(undefined, {
       status: 201,
     });
   } catch (e) {
     if (e instanceof ZodError) {
-      createLogger.info({ issues: e.issues });
+      postLogger.info({ issues: e.issues });
 
       return NextResponse.json(
         { message: "Bad request." } as BadRequestResponse,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    createLogger.error(e);
+    postLogger.error(e);
 
     return NextResponse.json(
       {

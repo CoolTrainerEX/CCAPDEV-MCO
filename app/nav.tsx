@@ -12,35 +12,78 @@ import icon from "./icon.svg";
 import { useReadCurrentUser, useReadUser } from "@/src/api/endpoints/user/user";
 import {
   ReadCurrentUserResponse,
+  ReadUserParams,
   ReadUserResponse,
 } from "@/src/api/endpoints/user/user.zod";
 import { toast } from "sonner";
 import z from "zod";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Nav() {
-  const { data: currentUserData } = useReadCurrentUser();
+  const { data: currentUserData, isSuccess: isCurrentUserSuccess } =
+    useReadCurrentUser();
 
   let currentUserId = Number.NaN;
 
-  try {
-    if (currentUserData?.status === 200)
-      currentUserId = ReadCurrentUserResponse.parse(currentUserData.data);
-  } catch {
-    toast.warning("Bad Response.");
-  }
+  if (isCurrentUserSuccess)
+    switch (currentUserData.status) {
+      case 200:
+        try {
+          currentUserId = ReadCurrentUserResponse.parse(currentUserData.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
 
-  const { data, isEnabled } = useReadUser(currentUserId, {
-    query: { enabled: currentUserData?.status === 200 },
-  });
+      case 401:
+        break;
+      case 404:
+        toast.error(currentUserData.data.message);
+        break;
+
+      case 500:
+        toast.warning(currentUserData.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+
+  const { data, isPending, isSuccess, isEnabled } = useReadUser(
+    ReadUserParams.safeParse({ id: currentUserId }).data?.id ?? Number.NaN,
+    {
+      query: {
+        enabled: isCurrentUserSuccess && currentUserData.status === 200,
+      },
+    },
+  );
 
   let user: z.infer<typeof ReadUserResponse> | undefined;
 
-  try {
-    if (isEnabled && data?.status === 200)
-      user = ReadUserResponse.parse(data.data);
-  } catch {
-    toast.warning("Bad response.");
-  }
+  if (isSuccess)
+    switch (data.status) {
+      case 200:
+        try {
+          user = ReadUserResponse.parse(data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(data.data.message);
+        break;
+
+      case 500:
+        toast.warning(data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
 
   return (
     <NavigationMenu className="bg-card text-card-foreground sticky top-0 max-w-full p-4 [&>div]:w-full">
@@ -59,27 +102,38 @@ export default function Nav() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
-            {user ? (
-              <Link
-                href={`/user/${user.id}`}
-                className="flex-row gap-4 align-middle"
-              >
-                <p className="hidden leading-7 not-first:mt-6 sm:block">
-                  Hello, {user.name!.first}!
-                </p>
-                <Avatar>
-                  <AvatarImage src="" />
-                  <AvatarFallback>{user.name!.first[0]}</AvatarFallback>
-                </Avatar>
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="bg-primary text-primary-foreground"
-              >
-                Login
-              </Link>
-            )}
+            {(() => {
+              if (isSuccess && user)
+                return (
+                  <Link
+                    href={`/user/${user.id}`}
+                    className="flex-row gap-4 align-middle"
+                  >
+                    <p className="hidden leading-7 not-first:mt-6 sm:block">
+                      Hello, {user.name!.first}!
+                    </p>
+                    <Avatar>
+                      <AvatarImage src="" />
+                      <AvatarFallback>{user.name!.first[0]}</AvatarFallback>
+                    </Avatar>
+                  </Link>
+                );
+              else if (isPending && isEnabled)
+                return (
+                  <div className="container">
+                    <Spinner />
+                  </div>
+                );
+              else
+                return (
+                  <Link
+                    href="/login"
+                    className="bg-primary text-primary-foreground"
+                  >
+                    Login
+                  </Link>
+                );
+            })()}
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

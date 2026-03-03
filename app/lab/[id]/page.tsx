@@ -164,7 +164,7 @@ export default function Lab() {
               <TimeRangeInput
                 schedule={schedule}
                 value={formSchedule}
-                onValueChange={setFormSchedule}
+                setValue={setFormSchedule}
                 valid={
                   !reservations
                     ?.filter(({ slotIds }) =>

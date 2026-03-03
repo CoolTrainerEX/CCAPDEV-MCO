@@ -1,7 +1,16 @@
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
-import { getLab } from "@/src/sample";
+import React, { ReactNode } from "react";
+import z from "zod";
+import { ReadLabResponse } from "@/src/api/endpoints/lab/lab.zod";
 
+// eslint-disable-next-line jsdoc/require-returns
+/**
+ * Reservation slots display.
+ * @param {React.ComponentProps<"div">} param0 props
+ * @param {(slot: NonNullable<z.infer<typeof ReadLabResponse>["slots"]>[number]) => ReactNode} param0.children Slot item
+ * @param {NonNullable<z.infer<typeof ReadLabResponse>["slots"]>} param0.slots List of slots
+ * @author Justin Ryan Uy
+ */
 export default function Slots({
   className,
   style,
@@ -10,7 +19,7 @@ export default function Slots({
   ...props
 }: Omit<React.ComponentProps<"div">, "children"> & {
   children: (slot: (typeof slots)[number]) => ReactNode;
-  slots: NonNullable<ReturnType<typeof getLab>>["slots"][number][];
+  slots: NonNullable<z.infer<typeof ReadLabResponse>["slots"]>;
 }) {
   const { x, y } = slots
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

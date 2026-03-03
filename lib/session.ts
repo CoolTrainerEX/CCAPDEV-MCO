@@ -2,8 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { pino } from "pino";
-
-type SessionPayload = { id: number };
+import { users } from "@/src/sample";
 
 const encodedKey = new TextEncoder().encode(process.env.SESSION_SECRET);
 const logger = pino().child({ operation: "session" });
@@ -11,15 +10,20 @@ const logger = pino().child({ operation: "session" });
 /**
  * Decrypt JWT into payload object.
  * @param {string} session Session string
- * @returns {Promise<SessionPayload | undefined>} Decrypted object
+ * @returns {number | null | undefined} User ID (`null` if user not found; `undefined` if no session)
+ * @author Justin Ryan Uy
  */
 export async function decrypt(session: string = "") {
   try {
-    return (
-      await jwtVerify(session, encodedKey, {
-        algorithms: ["HS256"],
-      })
-    ).payload as SessionPayload;
+    const sessionId = (
+      (
+        await jwtVerify(session, encodedKey, {
+          algorithms: ["HS256"],
+        })
+      ).payload as { id: number }
+    ).id;
+
+    return users.find(({ id }) => id === sessionId)?.id ?? null;
   } catch {
     logger.info("Unable to decrypt.");
   }
@@ -28,6 +32,7 @@ export async function decrypt(session: string = "") {
 /**
  * Creates a user session.
  * @param {number} id User ID
+ * @author Justin Ryan Uy
  */
 export async function createSession(id: number) {
   (await cookies()).set(
