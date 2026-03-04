@@ -14,7 +14,7 @@ export type ReadLabsParams = {
   q?: string;
   /**
    * Pagination query
-   * @minimum 0
+   * @minimum 1
    */
   page?: PageParameter;
 };

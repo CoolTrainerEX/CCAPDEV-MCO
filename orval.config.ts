@@ -56,6 +56,11 @@ export default defineConfig({
       client: "zod",
       target: "src/api/endpoints",
       fileExtension: ".zod.ts",
+      override: {
+        zod: {
+          coerce: { param: true, query: true },
+        },
+      },
     },
   },
 });

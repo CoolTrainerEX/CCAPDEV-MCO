@@ -5,11 +5,11 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
+import type { Editable } from "./editable";
 import type { Id } from "./id";
-import type { ReservationUpdate } from "./reservationUpdate";
+import type { ReservationDetails } from "./reservationDetails";
 
-export type Reservation = ReservationUpdate & {
+export type Reservation = ReservationDetails & {
   id: Id;
-  userId: Id;
-  labId: Id;
+  editable?: Editable;
 };

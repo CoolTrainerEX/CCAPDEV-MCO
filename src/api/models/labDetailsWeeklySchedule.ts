@@ -10,7 +10,7 @@ import type { Interval } from "./interval";
 /**
  * Weekly schedule of the lab
  */
-export type LabUpdateWeeklySchedule = {
+export type LabDetailsWeeklySchedule = {
   sunday?: Interval;
   monday?: Interval;
   tuesday?: Interval;

@@ -30,8 +30,8 @@ import type {
   ReadUser200,
   UnauthorizedResponse,
   UnexpectedResponse,
+  UpdateUserBody,
   UserLogin,
-  UserUpdate,
 } from "../../models";
 
 /**
@@ -279,7 +279,7 @@ export const useLogout = <
  * @summary Create a user
  */
 export type createUserResponse201 = {
-  data: void;
+  data: Id;
   status: 201;
 };
 
@@ -845,14 +845,14 @@ export const getUpdateUserUrl = (id: number) => {
 
 export const updateUser = async (
   id: number,
-  userUpdate: UserUpdate,
+  updateUserBody: UpdateUserBody,
   options?: RequestInit,
 ): Promise<updateUserResponse> => {
   const res = await fetch(getUpdateUserUrl(id), {
     ...options,
     method: "PUT",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(userUpdate),
+    body: JSON.stringify(updateUserBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -876,14 +876,14 @@ export const getUpdateUserMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateUser>>,
     TError,
-    { id: number; data: UserUpdate },
+    { id: number; data: UpdateUserBody },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateUser>>,
   TError,
-  { id: number; data: UserUpdate },
+  { id: number; data: UpdateUserBody },
   TContext
 > => {
   const mutationKey = ["updateUser"];
@@ -897,7 +897,7 @@ export const getUpdateUserMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateUser>>,
-    { id: number; data: UserUpdate }
+    { id: number; data: UpdateUserBody }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -910,7 +910,7 @@ export const getUpdateUserMutationOptions = <
 export type UpdateUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateUser>>
 >;
-export type UpdateUserMutationBody = UserUpdate;
+export type UpdateUserMutationBody = UpdateUserBody;
 export type UpdateUserMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
@@ -932,7 +932,7 @@ export const useUpdateUser = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof updateUser>>,
       TError,
-      { id: number; data: UserUpdate },
+      { id: number; data: UpdateUserBody },
       TContext
     >;
     fetch?: RequestInit;
@@ -941,7 +941,7 @@ export const useUpdateUser = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof updateUser>>,
   TError,
-  { id: number; data: UserUpdate },
+  { id: number; data: UpdateUserBody },
   TContext
 > => {
   return useMutation(getUpdateUserMutationOptions(options), queryClient);

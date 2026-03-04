@@ -10,7 +10,7 @@ import type { PageParameter } from "./pageParameter";
 export type ReadReservationUserParams = {
   /**
    * Pagination query
-   * @minimum 0
+   * @minimum 1
    */
   page?: PageParameter;
 };

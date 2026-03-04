@@ -62,9 +62,7 @@ export default function User() {
   const queryClient = useQueryClient();
 
   const { data, isPending, isSuccess } = useReadUser(
-    ReadUserParams.safeParse({
-      id: Number.parseInt(useParams<{ id: string }>().id),
-    }).data?.id ?? Number.NaN,
+    ReadUserParams.safeParse(useParams()).data?.id ?? Number.NaN,
   );
 
   let user: z.infer<typeof ReadUserResponse> | undefined;
@@ -223,12 +221,12 @@ export default function User() {
               <div className="container m-auto flex items-center justify-center gap-6">
                 <Avatar size="lg">
                   <AvatarImage src="" />
-                  <AvatarFallback>{user.name!.first[0]}</AvatarFallback>
+                  <AvatarFallback>{user.name.first[0]}</AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="flex items-baseline justify-center gap-6">
                     <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">
-                      {user.name!.first} {user.name!.last}
+                      {user.name.first} {user.name.last}
                     </h1>
                     {user.admin && <Badge>Admin</Badge>}
                   </div>
@@ -253,16 +251,6 @@ export default function User() {
                                 formData.entries(),
                               );
 
-                              for (const field in data) {
-                                if (!Object.hasOwn(data, field)) continue;
-
-                                if (
-                                  field !== "description" &&
-                                  data[field] === ""
-                                )
-                                  delete data[field];
-                              }
-
                               if (
                                 data["password"] !== data["confirm-password"]
                               ) {
@@ -281,6 +269,7 @@ export default function User() {
                                       last: data["lastname"],
                                     },
                                     ...data,
+                                    password: data["password"] || undefined,
                                   }),
                                 });
                               } catch {
@@ -300,7 +289,7 @@ export default function User() {
                                       name="firstname"
                                       type="text"
                                       placeholder="Juan"
-                                      defaultValue={user.name!.first}
+                                      defaultValue={user.name.first}
                                       required
                                     />
                                   </Field>
@@ -313,7 +302,7 @@ export default function User() {
                                       name="lastname"
                                       type="text"
                                       placeholder="Dela Cruz"
-                                      defaultValue={user.name!.last}
+                                      defaultValue={user.name.last}
                                       required
                                     />
                                   </Field>

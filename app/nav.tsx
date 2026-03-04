@@ -110,11 +110,11 @@ export default function Nav() {
                     className="flex-row gap-4 align-middle"
                   >
                     <p className="hidden leading-7 not-first:mt-6 sm:block">
-                      Hello, {user.name!.first}!
+                      Hello, {user.name.first}!
                     </p>
                     <Avatar>
                       <AvatarImage src="" />
-                      <AvatarFallback>{user.name!.first[0]}</AvatarFallback>
+                      <AvatarFallback>{user.name.first[0]}</AvatarFallback>
                     </Avatar>
                   </Link>
                 );

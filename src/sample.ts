@@ -93,30 +93,30 @@ export const users: User[] = [
   },
 ];
 
-const labs: Lab[] = [
+export const labs: Lab[] = [
   {
     id: 1,
     name: "GK203",
     weeklySchedule: {
       monday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       tuesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       thursday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       friday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       saturday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
     },
     slots: [
@@ -175,24 +175,24 @@ const labs: Lab[] = [
     name: "GK204",
     weeklySchedule: {
       monday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       tuesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       thursday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       friday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       saturday: {
-        start: parse("09:30", "HH:mm", new Date(0)),
-        end: parse("16:00", "HH:mm", new Date(0)),
+        start: parse("09:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("16:00", "HH:mm", new Date(0)).toISOString(),
       },
     },
     slots: [
@@ -231,24 +231,24 @@ const labs: Lab[] = [
     name: "GK302A",
     weeklySchedule: {
       monday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       tuesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       thursday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       friday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       saturday: {
-        start: parse("09:30", "HH:mm", new Date(0)),
-        end: parse("16:00", "HH:mm", new Date(0)),
+        start: parse("09:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("16:00", "HH:mm", new Date(0)).toISOString(),
       },
     },
     slots: [
@@ -301,28 +301,28 @@ const labs: Lab[] = [
     name: "GK302B",
     weeklySchedule: {
       monday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       tuesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       wednesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       thursday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       friday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       saturday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
     },
     slots: [
@@ -349,28 +349,28 @@ const labs: Lab[] = [
     name: "GK304A",
     weeklySchedule: {
       monday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       tuesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       wednesday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       thursday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       friday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
       saturday: {
-        start: parse("07:30", "HH:mm", new Date(0)),
-        end: parse("18:00", "HH:mm", new Date(0)),
+        start: parse("07:30", "HH:mm", new Date(0)).toISOString(),
+        end: parse("18:00", "HH:mm", new Date(0)).toISOString(),
       },
     },
     slots: [

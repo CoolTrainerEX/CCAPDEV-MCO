@@ -2884,7 +2884,7 @@
                                           >"email"</span
                                         >:
                                         <span class="token string"
-                                          >&quot;juan_dela_cruz@dlsu.edu.ph&quot;</span
+                                          >&quot;user@example.com&quot;</span
                                         ><span class="token punctuation"
                                           >,</span
                                         >
@@ -3427,14 +3427,26 @@
                 <div>
                   <h3 class="sc-fJjTez hsJdXF">Responses</h3>
                   <div>
-                    <button class="sc-caslwi gQivdi" disabled="">
-                      <strong class="sc-fYaxgW jJkGwY">201<!-- --> </strong>
+                    <button class="sc-caslwi brztng">
+                      <svg
+                        class="sc-fbJfz iZiZiV"
+                        version="1.1"
+                        viewBox="0 0 24 24"
+                        x="0"
+                        xmlns="http://www.w3.org/2000/svg"
+                        y="0"
+                        aria-hidden="true"
+                      >
+                        <polygon
+                          points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "
+                        ></polygon></svg
+                      ><strong class="sc-fYaxgW jJkGwY">201<!-- --> </strong>
                       <div
-                        html="&lt;p&gt;Create session&lt;/p&gt;
+                        html="&lt;p&gt;The user created&lt;/p&gt;
 "
                         class="sc-iKGpAq sc-cCYyou sc-cjERFZ dXXcln fTBBlJ dkmSdy"
                       >
-                        <p>Create session</p>
+                        <p>The user created</p>
                       </div>
                     </button>
                   </div>
@@ -3604,7 +3616,7 @@
                                           >"email"</span
                                         >:
                                         <span class="token string"
-                                          >&quot;juan_dela_cruz@dlsu.edu.ph&quot;</span
+                                          >&quot;user@example.com&quot;</span
                                         ><span class="token punctuation"
                                           >,</span
                                         >
@@ -3680,7 +3692,7 @@
                   <div class="sc-cyRfQY lbIFgo" data-rttabs="true">
                     <ul class="react-tabs__tab-list" role="tablist">
                       <li
-                        class="tab-error react-tabs__tab--selected"
+                        class="tab-success react-tabs__tab--selected"
                         role="tab"
                         id="tab_R_jisq_0"
                         aria-selected="true"
@@ -3689,7 +3701,7 @@
                         tabindex="0"
                         data-rttab="true"
                       >
-                        400
+                        201
                       </li>
                       <li
                         class="tab-error"
@@ -3700,7 +3712,7 @@
                         aria-controls="panel_R_jisq_1"
                         data-rttab="true"
                       >
-                        409
+                        400
                       </li>
                       <li
                         class="tab-error"
@@ -3709,6 +3721,17 @@
                         aria-selected="false"
                         aria-disabled="false"
                         aria-controls="panel_R_jisq_2"
+                        data-rttab="true"
+                      >
+                        409
+                      </li>
+                      <li
+                        class="tab-error"
+                        role="tab"
+                        id="tab_R_jisq_3"
+                        aria-selected="false"
+                        aria-disabled="false"
+                        aria-controls="panel_R_jisq_3"
                         data-rttab="true"
                       >
                         500
@@ -3729,35 +3752,15 @@
                           <div class="sc-cRZddz iLjyyA">
                             <div class="sc-gjTGSz btblAa">
                               <button>
-                                <div class="sc-jegxcw fJsoyS">Copy</div>
-                              </button>
+                                <div class="sc-jegxcw fJsoyS">Copy</div></button
+                              >0
                             </div>
                             <div
                               tabindex="0"
                               class="sc-iKGpAq dXXcln sc-jMAIzW jKIGwd"
                             >
                               <div class="redoc-json">
-                                <code
-                                  ><button
-                                    class="collapser"
-                                    aria-label="collapse"
-                                  ></button
-                                  ><span class="token punctuation">{</span
-                                  ><span class="ellipsis"></span>
-                                  <ul class="obj collapsible">
-                                    <li>
-                                      <div class="hoverable">
-                                        <span class="property token string"
-                                          >"message"</span
-                                        >:
-                                        <span class="token string"
-                                          >&quot;string&quot;</span
-                                        >
-                                      </div>
-                                    </li>
-                                  </ul>
-                                  <span class="token punctuation">}</span></code
-                                >
+                                <code><span class="token number">0</span></code>
                               </div>
                             </div>
                           </div>
@@ -3775,6 +3778,12 @@
                       role="tabpanel"
                       id="panel_R_jisq_2"
                       aria-labelledby="tab_R_jisq_2"
+                    ></div>
+                    <div
+                      class="react-tabs__tab-panel"
+                      role="tabpanel"
+                      id="panel_R_jisq_3"
+                      aria-labelledby="tab_R_jisq_3"
                     ></div>
                   </div>
                 </div>
@@ -4636,6 +4645,9 @@
                             ></polygon>
                           </svg>
                         </button>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -4666,6 +4678,9 @@
                       >
                         <span class="sc-ieZDjf bEKmDE"></span
                         ><span class="property-name">description</span>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -5616,8 +5631,16 @@
                                 >integer</span
                               ><span>
                                 <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                  <!-- -->&gt;= 0<!-- -->
+                                  <!-- -->&gt;= 1<!-- -->
                                 </span></span
+                              >
+                            </div>
+                            <div>
+                              <span class="sc-gUrTyB bPAaet">
+                                <!-- -->Default:<!-- -->
+                              </span>
+                              <span class="sc-gUrTyB sc-ldFCYc bPAaet eShQxX"
+                                >1</span
                               >
                             </div>
                             <div>
@@ -5661,6 +5684,30 @@
                           The labs containing the provided <code>q</code> in
                           name
                         </p>
+                      </div>
+                    </button>
+                  </div>
+                  <div>
+                    <button class="sc-caslwi fvWYOy">
+                      <svg
+                        class="sc-fbJfz kiMFkB"
+                        version="1.1"
+                        viewBox="0 0 24 24"
+                        x="0"
+                        xmlns="http://www.w3.org/2000/svg"
+                        y="0"
+                        aria-hidden="true"
+                      >
+                        <polygon
+                          points="17.3 8.3 12 13.6 6.7 8.3 5.3 9.7 12 16.4 18.7 9.7 "
+                        ></polygon></svg
+                      ><strong class="sc-fYaxgW jJkGwY">400<!-- --> </strong>
+                      <div
+                        html="&lt;p&gt;Bad request&lt;/p&gt;
+"
+                        class="sc-iKGpAq sc-cCYyou sc-cjERFZ dXXcln fTBBlJ dkmSdy"
+                      >
+                        <p>Bad request</p>
                       </div>
                     </button>
                   </div>
@@ -5776,7 +5823,7 @@
                         aria-controls="panel_R_jida_1"
                         data-rttab="true"
                       >
-                        404
+                        400
                       </li>
                       <li
                         class="tab-error"
@@ -5785,6 +5832,17 @@
                         aria-selected="false"
                         aria-disabled="false"
                         aria-controls="panel_R_jida_2"
+                        data-rttab="true"
+                      >
+                        404
+                      </li>
+                      <li
+                        class="tab-error"
+                        role="tab"
+                        id="tab_R_jida_3"
+                        aria-selected="false"
+                        aria-disabled="false"
+                        aria-controls="panel_R_jida_3"
                         data-rttab="true"
                       >
                         500
@@ -6423,6 +6481,12 @@
                       id="panel_R_jida_2"
                       aria-labelledby="tab_R_jida_2"
                     ></div>
+                    <div
+                      class="react-tabs__tab-panel"
+                      role="tabpanel"
+                      id="panel_R_jida_3"
+                      aria-labelledby="tab_R_jida_3"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -6570,7 +6634,7 @@
                         </div>
                       </td>
                     </tr>
-                    <tr class="">
+                    <tr class="last">
                       <td
                         class="sc-hAtEya sc-fGFwA-d sc-jhSXcs kddqHa eIujjv bXwTFl"
                         kind="field"
@@ -6613,46 +6677,6 @@
                               class="sc-iKGpAq sc-cCYyou dXXcln cFvDiF"
                             >
                               <p>Available slots in the lab</p>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr class="last">
-                      <td
-                        kind="field"
-                        title="id"
-                        class="sc-hAtEya sc-fGFwA-d kddqHa eIujjv"
-                      >
-                        <span class="sc-ieZDjf bEKmDE"></span
-                        ><span class="property-name">id</span>
-                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
-                          required
-                        </div>
-                      </td>
-                      <td class="sc-blLsxE bmauLr">
-                        <div>
-                          <div>
-                            <span
-                              class="sc-gUrTyB sc-kZGvTq bPAaet UMvzF"
-                            ></span
-                            ><span class="sc-gUrTyB sc-iMfspz bPAaet fEQrHJ"
-                              >integer</span
-                            ><span class="sc-gUrTyB sc-jfSnVt bPAaet kEFcTG">
-                              (<!-- -->LabId<!-- -->) </span
-                            ><span>
-                              <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                <!-- -->&gt;= 0<!-- -->
-                              </span></span
-                            >
-                          </div>
-                          <div>
-                            <div
-                              html="&lt;p&gt;The unique identifier of a lab&lt;/p&gt;
-"
-                              class="sc-iKGpAq sc-cCYyou dXXcln cFvDiF"
-                            >
-                              <p>The unique identifier of a lab</p>
                             </div>
                           </div>
                         </div>
@@ -7330,17 +7354,7 @@
                                             </div>
                                           </li>
                                         </ul>
-                                        <span class="token punctuation">]</span
-                                        ><span class="token punctuation"
-                                          >,</span
-                                        >
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="hoverable">
-                                        <span class="property token string"
-                                          >"id"</span
-                                        >: <span class="token number">0</span>
+                                        <span class="token punctuation">]</span>
                                       </div>
                                     </li>
                                   </ul>
@@ -8432,6 +8446,9 @@
                       >
                         <span class="sc-ieZDjf bEKmDE"></span
                         ><span class="property-name">name</span>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -8475,6 +8492,9 @@
                             ></polygon>
                           </svg>
                         </button>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -8521,6 +8541,9 @@
                             ></polygon>
                           </svg>
                         </button>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -9915,46 +9938,6 @@
                     <tr class="">
                       <td
                         kind="field"
-                        title="id"
-                        class="sc-hAtEya sc-fGFwA-d kddqHa eIujjv"
-                      >
-                        <span class="sc-ieZDjf bEKmDE"></span
-                        ><span class="property-name">id</span>
-                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
-                          required
-                        </div>
-                      </td>
-                      <td class="sc-blLsxE bmauLr">
-                        <div>
-                          <div>
-                            <span
-                              class="sc-gUrTyB sc-kZGvTq bPAaet UMvzF"
-                            ></span
-                            ><span class="sc-gUrTyB sc-iMfspz bPAaet fEQrHJ"
-                              >integer</span
-                            ><span class="sc-gUrTyB sc-jfSnVt bPAaet kEFcTG">
-                              (<!-- -->ReservationId<!-- -->) </span
-                            ><span>
-                              <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                <!-- -->&gt;= 0<!-- -->
-                              </span></span
-                            >
-                          </div>
-                          <div>
-                            <div
-                              html="&lt;p&gt;The unique identifier of a reservation&lt;/p&gt;
-"
-                              class="sc-iKGpAq sc-cCYyou dXXcln cFvDiF"
-                            >
-                              <p>The unique identifier of a reservation</p>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr class="">
-                      <td
-                        kind="field"
                         title="userId"
                         class="sc-hAtEya sc-fGFwA-d kddqHa eIujjv"
                       >
@@ -10327,16 +10310,6 @@
                                     <li>
                                       <div class="hoverable">
                                         <span class="property token string"
-                                          >"id"</span
-                                        >: <span class="token number">0</span
-                                        ><span class="token punctuation"
-                                          >,</span
-                                        >
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="hoverable">
-                                        <span class="property token string"
                                           >"userId"</span
                                         >: <span class="token number">0</span
                                         ><span class="token punctuation"
@@ -10644,6 +10617,9 @@
                             ></polygon>
                           </svg>
                         </button>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -10677,6 +10653,9 @@
                       >
                         <span class="sc-ieZDjf bEKmDE"></span
                         ><span class="property-name">slotIds</span>
+                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
+                          required
+                        </div>
                       </td>
                       <td class="sc-blLsxE bmauLr">
                         <div>
@@ -11629,8 +11608,16 @@
                                 >integer</span
                               ><span>
                                 <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                  <!-- -->&gt;= 0<!-- -->
+                                  <!-- -->&gt;= 1<!-- -->
                                 </span></span
+                              >
+                            </div>
+                            <div>
+                              <span class="sc-gUrTyB bPAaet">
+                                <!-- -->Default:<!-- -->
+                              </span>
+                              <span class="sc-gUrTyB sc-ldFCYc bPAaet eShQxX"
+                                >1</span
                               >
                             </div>
                             <div>
@@ -11978,18 +11965,6 @@
                                             <div class="hoverable collapsed">
                                               <span
                                                 class="property token string"
-                                                >"id"</span
-                                              >:
-                                              <span class="token number">0</span
-                                              ><span class="token punctuation"
-                                                >,</span
-                                              >
-                                            </div>
-                                          </li>
-                                          <li>
-                                            <div class="hoverable collapsed">
-                                              <span
-                                                class="property token string"
                                                 >"userId"</span
                                               >:
                                               <span class="token number">0</span
@@ -12003,6 +11978,18 @@
                                               <span
                                                 class="property token string"
                                                 >"labId"</span
+                                              >:
+                                              <span class="token number">0</span
+                                              ><span class="token punctuation"
+                                                >,</span
+                                              >
+                                            </div>
+                                          </li>
+                                          <li>
+                                            <div class="hoverable collapsed">
+                                              <span
+                                                class="property token string"
+                                                >"id"</span
                                               >:
                                               <span class="token number">0</span
                                               ><span class="token punctuation"
@@ -12185,8 +12172,16 @@
                                 >integer</span
                               ><span>
                                 <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                  <!-- -->&gt;= 0<!-- -->
+                                  <!-- -->&gt;= 1<!-- -->
                                 </span></span
+                              >
+                            </div>
+                            <div>
+                              <span class="sc-gUrTyB bPAaet">
+                                <!-- -->Default:<!-- -->
+                              </span>
+                              <span class="sc-gUrTyB sc-ldFCYc bPAaet eShQxX"
+                                >1</span
                               >
                             </div>
                             <div>
@@ -12534,18 +12529,6 @@
                                             <div class="hoverable collapsed">
                                               <span
                                                 class="property token string"
-                                                >"id"</span
-                                              >:
-                                              <span class="token number">0</span
-                                              ><span class="token punctuation"
-                                                >,</span
-                                              >
-                                            </div>
-                                          </li>
-                                          <li>
-                                            <div class="hoverable collapsed">
-                                              <span
-                                                class="property token string"
                                                 >"userId"</span
                                               >:
                                               <span class="token number">0</span
@@ -12559,6 +12542,18 @@
                                               <span
                                                 class="property token string"
                                                 >"labId"</span
+                                              >:
+                                              <span class="token number">0</span
+                                              ><span class="token punctuation"
+                                                >,</span
+                                              >
+                                            </div>
+                                          </li>
+                                          <li>
+                                            <div class="hoverable collapsed">
+                                              <span
+                                                class="property token string"
+                                                >"id"</span
                                               >:
                                               <span class="token number">0</span
                                               ><span class="token punctuation"
@@ -12669,7 +12664,14 @@
                   operationId: "createUser",
                   tags: ["user"],
                   responses: {
-                    201: { description: "Create session" },
+                    201: {
+                      description: "The user created",
+                      content: {
+                        "application/json": {
+                          schema: { $ref: "#/components/schemas/UserId" },
+                        },
+                      },
+                    },
                     400: { $ref: "#/components/responses/BadRequest" },
                     409: { $ref: "#/components/responses/Exists" },
                     500: { $ref: "#/components/responses/Unexpected" },
@@ -12727,10 +12729,13 @@
                         "application/json": {
                           schema: {
                             allOf: [
-                              { $ref: "#/components/schemas/User" },
+                              { $ref: "#/components/schemas/UserDetails" },
                               {
                                 type: "object",
+                                required: ["id"],
                                 properties: {
+                                  id: { $ref: "#/components/schemas/UserId" },
+                                  admin: { type: "boolean" },
                                   editable: {
                                     $ref: "#/components/schemas/Editable",
                                   },
@@ -12764,7 +12769,19 @@
                   requestBody: {
                     content: {
                       "application/json": {
-                        schema: { $ref: "#/components/schemas/UserUpdate" },
+                        schema: {
+                          allOf: [
+                            { $ref: "#/components/schemas/UserDetails" },
+                            {
+                              type: "object",
+                              properties: {
+                                password: {
+                                  $ref: "#/components/schemas/UserPassword",
+                                },
+                              },
+                            },
+                          ],
+                        },
                       },
                     },
                   },
@@ -12808,23 +12825,12 @@
                         "application/json": {
                           schema: {
                             type: "array",
-                            items: {
-                              allOf: [
-                                { $ref: "#/components/schemas/Lab" },
-                                {
-                                  type: "object",
-                                  properties: {
-                                    editable: {
-                                      $ref: "#/components/schemas/Editable",
-                                    },
-                                  },
-                                },
-                              ],
-                            },
+                            items: { $ref: "#/components/schemas/Lab" },
                           },
                         },
                       },
                     },
+                    400: { $ref: "#/components/responses/BadRequest" },
                     404: { $ref: "#/components/responses/NotFound" },
                     500: { $ref: "#/components/responses/Unexpected" },
                   },
@@ -12853,7 +12859,7 @@
                     required: true,
                     content: {
                       "application/json": {
-                        schema: { $ref: "#/components/schemas/Lab" },
+                        schema: { $ref: "#/components/schemas/LabDetails" },
                       },
                     },
                   },
@@ -12870,19 +12876,7 @@
                       description: "The lab corresponding to the provided `id`",
                       content: {
                         "application/json": {
-                          schema: {
-                            allOf: [
-                              { $ref: "#/components/schemas/Lab" },
-                              {
-                                type: "object",
-                                properties: {
-                                  editable: {
-                                    $ref: "#/components/schemas/Editable",
-                                  },
-                                },
-                              },
-                            ],
-                          },
+                          schema: { $ref: "#/components/schemas/Lab" },
                         },
                       },
                     },
@@ -12909,7 +12903,7 @@
                   requestBody: {
                     content: {
                       "application/json": {
-                        schema: { $ref: "#/components/schemas/LabUpdate" },
+                        schema: { $ref: "#/components/schemas/LabDetails" },
                       },
                     },
                   },
@@ -12956,7 +12950,9 @@
                   requestBody: {
                     content: {
                       "application/json": {
-                        schema: { $ref: "#/components/schemas/Reservation" },
+                        schema: {
+                          $ref: "#/components/schemas/ReservationDetails",
+                        },
                       },
                     },
                   },
@@ -13139,56 +13135,31 @@
                     last: { type: "string", example: "Dela Cruz" },
                   },
                 },
-                UserDetails: {
-                  type: "object",
-                  properties: {
-                    name: { $ref: "#/components/schemas/UserName" },
-                    description: { type: "string", example: "Epic gamer" },
-                  },
-                },
                 UserPassword: {
                   type: "string",
                   format: "password",
                   example: "123456",
+                  writeOnly: true,
                 },
                 UserLogin: {
                   type: "object",
                   required: ["email", "password"],
                   properties: {
-                    email: {
-                      type: "string",
-                      format: "email",
-                      example: "juan_dela_cruz@dlsu.edu.ph",
-                    },
+                    email: { type: "string", format: "email" },
                     password: { $ref: "#/components/schemas/UserPassword" },
                   },
                 },
-                UserUpdate: {
-                  allOf: [
-                    { $ref: "#/components/schemas/UserDetails" },
-                    {
-                      type: "object",
-                      properties: {
-                        password: { $ref: "#/components/schemas/UserPassword" },
-                      },
-                    },
-                  ],
-                },
-                User: {
-                  allOf: [
-                    { $ref: "#/components/schemas/UserDetails" },
-                    {
-                      type: "object",
-                      required: ["id", "name", "description"],
-                      properties: {
-                        id: { $ref: "#/components/schemas/UserId" },
-                        admin: { type: "boolean" },
-                      },
-                    },
-                  ],
-                },
-                LabUpdate: {
+                UserDetails: {
                   type: "object",
+                  required: ["name", "description"],
+                  properties: {
+                    name: { $ref: "#/components/schemas/UserName" },
+                    description: { type: "string", example: "Epic gamer" },
+                  },
+                },
+                LabDetails: {
+                  type: "object",
+                  required: ["name", "weeklySchedule", "slots"],
                   properties: {
                     name: { type: "string", example: "GK403" },
                     weeklySchedule: {
@@ -13222,18 +13193,20 @@
                 },
                 Lab: {
                   allOf: [
-                    { $ref: "#/components/schemas/LabUpdate" },
+                    { $ref: "#/components/schemas/LabDetails" },
                     {
                       type: "object",
-                      required: ["id", "name", "weeklySchedule", "slots"],
+                      required: ["id"],
                       properties: {
                         id: { $ref: "#/components/schemas/LabId" },
+                        editable: { $ref: "#/components/schemas/Editable" },
                       },
                     },
                   ],
                 },
                 ReservationUpdate: {
                   type: "object",
+                  required: ["schedule", "slotIds"],
                   properties: {
                     anonymous: { type: "boolean" },
                     schedule: { $ref: "#/components/schemas/Interval" },
@@ -13243,22 +13216,28 @@
                     },
                   },
                 },
-                Reservation: {
+                ReservationDetails: {
                   allOf: [
                     { $ref: "#/components/schemas/ReservationUpdate" },
                     {
                       type: "object",
-                      required: [
-                        "id",
-                        "userId",
-                        "labId",
-                        "schedule",
-                        "slotIds",
-                      ],
+                      required: ["userId", "labId"],
                       properties: {
-                        id: { $ref: "#/components/schemas/ReservationId" },
                         userId: { $ref: "#/components/schemas/UserId" },
                         labId: { $ref: "#/components/schemas/LabId" },
+                      },
+                    },
+                  ],
+                },
+                Reservation: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ReservationDetails" },
+                    {
+                      type: "object",
+                      required: ["id"],
+                      properties: {
+                        id: { $ref: "#/components/schemas/ReservationId" },
+                        editable: { $ref: "#/components/schemas/Editable" },
                       },
                     },
                   ],
@@ -13335,7 +13314,7 @@
                   name: "page",
                   description: "Pagination query",
                   in: "query",
-                  schema: { type: "integer", minimum: 0 },
+                  schema: { type: "integer", minimum: 1, default: 1 },
                 },
               },
               securitySchemes: {

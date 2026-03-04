@@ -1,19 +1,16 @@
-import { getLab, getLabs } from "@/src/sample";
+import { ReadLabParams } from "@/src/api/endpoints/lab/lab.zod";
+import { getLab } from "@/src/sample";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: LayoutProps<"/lab/[id]">;
 }) {
-  const name = getLab(Number.parseInt((await params).id))?.name;
+  const name = getLab(ReadLabParams.parse(params).id)?.name;
 
   return {
     title: name,
   };
-}
-
-export function generateStaticParams() {
-  return getLabs().map(({ id }) => ({ id: String(id) }));
 }
 
 export default function LabLayout({ children }: { children: React.ReactNode }) {

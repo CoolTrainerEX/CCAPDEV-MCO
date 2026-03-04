@@ -16,18 +16,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
 import { ZodError } from "zod";
 
-const getLogger = pino().child({ operation: "get user" });
-const putLogger = pino().child({ operation: "update user" });
-const deleteLogger = pino().child({ operation: "delete user" });
+const logger = pino();
+const getLogger = logger.child({ operation: "get user" });
+const putLogger = logger.child({ operation: "update user" });
+const deleteLogger = logger.child({ operation: "delete user" });
 
 export async function GET(
   _: NextRequest,
   context: RouteContext<"/api/user/[id]">,
 ) {
   try {
-    const params = ReadUserParams.parse({
-      id: Number.parseInt((await context.params).id),
-    });
+    const params = ReadUserParams.parse(await context.params);
     const user = users.find(({ id }) => id === params.id);
 
     if (!user) {
@@ -78,9 +77,7 @@ export async function PUT(
   context: RouteContext<"/api/user/[id]">,
 ) {
   try {
-    const params = ReadUserParams.parse({
-      id: Number.parseInt((await context.params).id),
-    });
+    const params = ReadUserParams.parse(await context.params);
     const body = UpdateUserBody.parse(await request.json());
     const user = users.find(({ id }) => id === params.id);
 
@@ -137,9 +134,7 @@ export async function DELETE(
   context: RouteContext<"/api/user/[id]">,
 ) {
   try {
-    const params = ReadUserParams.parse({
-      id: Number.parseInt((await context.params).id),
-    });
+    const params = ReadUserParams.parse(await context.params);
     const user = users.find(({ id }) => id === params.id);
 
     if (!user) {

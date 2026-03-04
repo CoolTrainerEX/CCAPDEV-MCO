@@ -30,10 +30,8 @@ import type {
   ExistsResponse,
   Id,
   Lab,
-  LabUpdate,
+  LabDetails,
   NotFoundResponse,
-  ReadLab200,
-  ReadLabs200Item,
   ReadLabsParams,
   UnauthorizedResponse,
   UnexpectedResponse,
@@ -43,8 +41,13 @@ import type {
  * @summary Read all labs
  */
 export type readLabsResponse200 = {
-  data: ReadLabs200Item[];
+  data: Lab[];
   status: 200;
+};
+
+export type readLabsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type readLabsResponse404 = {
@@ -61,6 +64,7 @@ export type readLabsResponseSuccess = readLabsResponse200 & {
   headers: Headers;
 };
 export type readLabsResponseError = (
+  | readLabsResponse400
   | readLabsResponse404
   | readLabsResponse500
 ) & {
@@ -113,7 +117,7 @@ export const getReadLabsInfiniteQueryOptions = <
     Awaited<ReturnType<typeof readLabs>>,
     ReadLabsParams["page"]
   >,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -161,14 +165,17 @@ export const getReadLabsInfiniteQueryOptions = <
 export type ReadLabsInfiniteQueryResult = NonNullable<
   Awaited<ReturnType<typeof readLabs>>
 >;
-export type ReadLabsInfiniteQueryError = NotFoundResponse | UnexpectedResponse;
+export type ReadLabsInfiniteQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 export function useReadLabsInfinite<
   TData = InfiniteData<
     Awaited<ReturnType<typeof readLabs>>,
     ReadLabsParams["page"]
   >,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params: undefined | ReadLabsParams,
   options: {
@@ -201,7 +208,7 @@ export function useReadLabsInfinite<
     Awaited<ReturnType<typeof readLabs>>,
     ReadLabsParams["page"]
   >,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -234,7 +241,7 @@ export function useReadLabsInfinite<
     Awaited<ReturnType<typeof readLabs>>,
     ReadLabsParams["page"]
   >,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -262,7 +269,7 @@ export function useReadLabsInfinite<
     Awaited<ReturnType<typeof readLabs>>,
     ReadLabsParams["page"]
   >,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -295,7 +302,7 @@ export function useReadLabsInfinite<
 
 export const getReadLabsQueryOptions = <
   TData = Awaited<ReturnType<typeof readLabs>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -326,11 +333,14 @@ export const getReadLabsQueryOptions = <
 export type ReadLabsQueryResult = NonNullable<
   Awaited<ReturnType<typeof readLabs>>
 >;
-export type ReadLabsQueryError = NotFoundResponse | UnexpectedResponse;
+export type ReadLabsQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
 export function useReadLabs<
   TData = Awaited<ReturnType<typeof readLabs>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params: undefined | ReadLabsParams,
   options: {
@@ -353,7 +363,7 @@ export function useReadLabs<
 };
 export function useReadLabs<
   TData = Awaited<ReturnType<typeof readLabs>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -376,7 +386,7 @@ export function useReadLabs<
 };
 export function useReadLabs<
   TData = Awaited<ReturnType<typeof readLabs>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -395,7 +405,7 @@ export function useReadLabs<
 
 export function useReadLabs<
   TData = Awaited<ReturnType<typeof readLabs>>,
-  TError = NotFoundResponse | UnexpectedResponse,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   params?: ReadLabsParams,
   options?: {
@@ -467,14 +477,14 @@ export const getCreateLabUrl = () => {
 };
 
 export const createLab = async (
-  lab: Lab,
+  labDetails: LabDetails,
   options?: RequestInit,
 ): Promise<createLabResponse> => {
   const res = await fetch(getCreateLabUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(lab),
+    body: JSON.stringify(labDetails),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -498,14 +508,14 @@ export const getCreateLabMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createLab>>,
     TError,
-    { data: Lab },
+    { data: LabDetails },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createLab>>,
   TError,
-  { data: Lab },
+  { data: LabDetails },
   TContext
 > => {
   const mutationKey = ["createLab"];
@@ -519,7 +529,7 @@ export const getCreateLabMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createLab>>,
-    { data: Lab }
+    { data: LabDetails }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -532,7 +542,7 @@ export const getCreateLabMutationOptions = <
 export type CreateLabMutationResult = NonNullable<
   Awaited<ReturnType<typeof createLab>>
 >;
-export type CreateLabMutationBody = Lab;
+export type CreateLabMutationBody = LabDetails;
 export type CreateLabMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
@@ -554,7 +564,7 @@ export const useCreateLab = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createLab>>,
       TError,
-      { data: Lab },
+      { data: LabDetails },
       TContext
     >;
     fetch?: RequestInit;
@@ -563,7 +573,7 @@ export const useCreateLab = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof createLab>>,
   TError,
-  { data: Lab },
+  { data: LabDetails },
   TContext
 > => {
   return useMutation(getCreateLabMutationOptions(options), queryClient);
@@ -572,7 +582,7 @@ export const useCreateLab = <
  * @summary Read a lab
  */
 export type readLabResponse200 = {
-  data: ReadLab200;
+  data: Lab;
   status: 200;
 };
 
@@ -805,14 +815,14 @@ export const getUpdateLabUrl = (id: number) => {
 
 export const updateLab = async (
   id: number,
-  labUpdate: LabUpdate,
+  labDetails: LabDetails,
   options?: RequestInit,
 ): Promise<updateLabResponse> => {
   const res = await fetch(getUpdateLabUrl(id), {
     ...options,
     method: "PUT",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(labUpdate),
+    body: JSON.stringify(labDetails),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -836,14 +846,14 @@ export const getUpdateLabMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateLab>>,
     TError,
-    { id: number; data: LabUpdate },
+    { id: number; data: LabDetails },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateLab>>,
   TError,
-  { id: number; data: LabUpdate },
+  { id: number; data: LabDetails },
   TContext
 > => {
   const mutationKey = ["updateLab"];
@@ -857,7 +867,7 @@ export const getUpdateLabMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateLab>>,
-    { id: number; data: LabUpdate }
+    { id: number; data: LabDetails }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -870,7 +880,7 @@ export const getUpdateLabMutationOptions = <
 export type UpdateLabMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateLab>>
 >;
-export type UpdateLabMutationBody = LabUpdate;
+export type UpdateLabMutationBody = LabDetails;
 export type UpdateLabMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
@@ -892,7 +902,7 @@ export const useUpdateLab = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof updateLab>>,
       TError,
-      { id: number; data: LabUpdate },
+      { id: number; data: LabDetails },
       TContext
     >;
     fetch?: RequestInit;
@@ -901,7 +911,7 @@ export const useUpdateLab = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof updateLab>>,
   TError,
-  { id: number; data: LabUpdate },
+  { id: number; data: LabDetails },
   TContext
 > => {
   return useMutation(getUpdateLabMutationOptions(options), queryClient);

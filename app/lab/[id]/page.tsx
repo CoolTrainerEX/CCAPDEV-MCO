@@ -33,12 +33,12 @@ import { roundToNearestMinutes } from "date-fns/roundToNearestMinutes";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
+import { ReadLabParams } from "@/src/api/endpoints/lab/lab.zod";
 
 export default function Lab() {
   const loginId = useLogin(({ id }) => id);
   const { id, name, slots, weeklySchedule, editable } =
-    getLab(Number.parseInt(useParams<{ id: string }>().id), loginId) ??
-    notFound();
+    getLab(ReadLabParams.parse(useParams()).id, loginId) ?? notFound();
 
   const reservations = getReservationsFromLab(id, loginId);
 

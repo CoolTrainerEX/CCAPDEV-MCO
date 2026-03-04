@@ -56,7 +56,11 @@ paths:
         - user
       responses:
         "201":
-          description: Create session
+          description: The user created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserId"
         "400":
           $ref: "#/components/responses/BadRequest"
         "409":
@@ -110,9 +114,15 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/User"
+                  - $ref: "#/components/schemas/UserDetails"
                   - type: object
+                    required:
+                      - id
                     properties:
+                      id:
+                        $ref: "#/components/schemas/UserId"
+                      admin:
+                        type: boolean
                       editable:
                         $ref: "#/components/schemas/Editable"
         "400":
@@ -143,7 +153,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserUpdate"
+              allOf:
+                - $ref: "#/components/schemas/UserDetails"
+                - type: object
+                  properties:
+                    password:
+                      $ref: "#/components/schemas/UserPassword"
     delete:
       summary: Delete a user
       operationId: deleteUser
@@ -183,12 +198,9 @@ paths:
               schema:
                 type: array
                 items:
-                  allOf:
-                    - $ref: "#/components/schemas/Lab"
-                    - type: object
-                      properties:
-                        editable:
-                          $ref: "#/components/schemas/Editable"
+                  $ref: "#/components/schemas/Lab"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -221,7 +233,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Lab"
+              $ref: "#/components/schemas/LabDetails"
 
   /lab/{id}:
     parameters:
@@ -237,12 +249,7 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Lab"
-                  - type: object
-                    properties:
-                      editable:
-                        $ref: "#/components/schemas/Editable"
+                $ref: "#/components/schemas/Lab"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -271,7 +278,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LabUpdate"
+              $ref: "#/components/schemas/LabDetails"
     delete:
       summary: Delete a lab
       operationId: deleteLab
@@ -317,7 +324,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Reservation"
+              $ref: "#/components/schemas/ReservationDetails"
   /reservation/{id}:
     parameters:
       - name: id
@@ -472,18 +479,11 @@ components:
         last:
           type: string
           example: "Dela Cruz"
-    UserDetails:
-      type: object
-      properties:
-        name:
-          $ref: "#/components/schemas/UserName"
-        description:
-          type: string
-          example: "Epic gamer"
     UserPassword:
       type: string
       format: password
       example: "123456"
+      writeOnly: true
     UserLogin:
       type: object
       required:
@@ -493,31 +493,25 @@ components:
         email:
           type: string
           format: email
-          example: "juan_dela_cruz@dlsu.edu.ph"
         password:
           $ref: "#/components/schemas/UserPassword"
-    UserUpdate:
-      allOf:
-        - $ref: "#/components/schemas/UserDetails"
-        - type: object
-          properties:
-            password:
-              $ref: "#/components/schemas/UserPassword"
-    User:
-      allOf:
-        - $ref: "#/components/schemas/UserDetails"
-        - type: object
-          required:
-            - id
-            - name
-            - description
-          properties:
-            id:
-              $ref: "#/components/schemas/UserId"
-            admin:
-              type: boolean
-    LabUpdate:
+    UserDetails:
       type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          $ref: "#/components/schemas/UserName"
+        description:
+          type: string
+          example: "Epic gamer"
+    LabDetails:
+      type: object
+      required:
+        - name
+        - weeklySchedule
+        - slots
       properties:
         name:
           type: string
@@ -564,18 +558,20 @@ components:
               y: 0
     Lab:
       allOf:
-        - $ref: "#/components/schemas/LabUpdate"
+        - $ref: "#/components/schemas/LabDetails"
         - type: object
           required:
             - id
-            - name
-            - weeklySchedule
-            - slots
           properties:
             id:
               $ref: "#/components/schemas/LabId"
+            editable:
+              $ref: "#/components/schemas/Editable"
     ReservationUpdate:
       type: object
+      required:
+        - schedule
+        - slotIds
       properties:
         anonymous:
           type: boolean
@@ -585,23 +581,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Id"
-    Reservation:
+    ReservationDetails:
       allOf:
         - $ref: "#/components/schemas/ReservationUpdate"
         - type: object
           required:
-            - id
             - userId
             - labId
-            - schedule
-            - slotIds
           properties:
-            id:
-              $ref: "#/components/schemas/ReservationId"
             userId:
               $ref: "#/components/schemas/UserId"
             labId:
               $ref: "#/components/schemas/LabId"
+    Reservation:
+      allOf:
+        - $ref: "#/components/schemas/ReservationDetails"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/ReservationId"
+            editable:
+              $ref: "#/components/schemas/Editable"
     Error:
       type: object
       required:
@@ -662,7 +664,8 @@ components:
       in: query
       schema:
         type: integer
-        minimum: 0
+        minimum: 1
+        default: 1
   securitySchemes:
     Jwt:
       type: http

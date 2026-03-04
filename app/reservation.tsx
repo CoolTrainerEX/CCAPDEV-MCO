@@ -98,8 +98,8 @@ export default function Reservation({
   const [formSchedule, setFormSchedule] = useState<Interval>(
     reservation
       ? {
-          start: new Date(reservation.schedule!.start),
-          end: new Date(reservation.schedule!.end),
+          start: new Date(reservation.schedule.start),
+          end: new Date(reservation.schedule.end),
         }
       : { start: new Date(now), end: new Date(now) },
   );
@@ -130,14 +130,14 @@ export default function Reservation({
           "friday",
           "saturday",
         ] as (keyof typeof lab.weeklySchedule)[]
-      )[startOfDay(reservation.schedule!.start).getDay()]
+      )[startOfDay(reservation.schedule.start).getDay()]
     ];
 
   let schedule = rawSchedule && {
     start: max([
       setMinutes(
         setHours(
-          new Date(reservation.schedule!.start),
+          new Date(reservation.schedule.start),
           getHours(rawSchedule.start),
         ),
         getMinutes(rawSchedule.start),
@@ -145,7 +145,7 @@ export default function Reservation({
       roundToNearestMinutes(now, { nearestTo: 30, roundingMethod: "ceil" }),
     ]),
     end: setMinutes(
-      setHours(new Date(reservation.schedule!.end), getHours(rawSchedule.end)),
+      setHours(new Date(reservation.schedule.end), getHours(rawSchedule.end)),
       getMinutes(rawSchedule.end),
     ),
   };
@@ -294,7 +294,7 @@ export function ReservationContent({
             <div
               className={cn(
                 "h-full",
-                reservation.slotIds!.includes(id) ? "bg-primary" : "bg-muted",
+                reservation.slotIds.includes(id) ? "bg-primary" : "bg-muted",
               )}
             />
           )}
@@ -305,8 +305,8 @@ export function ReservationContent({
           dateStyle: "medium",
           timeStyle: "short",
         })?.formatRange(
-          toDate(reservation.schedule!.start),
-          toDate(reservation.schedule!.end),
+          toDate(reservation.schedule.start),
+          toDate(reservation.schedule.end),
         )}
       </CardFooter>
     </Card>

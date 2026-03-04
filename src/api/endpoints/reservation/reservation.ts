@@ -34,7 +34,7 @@ import type {
   ReadReservationLabParams,
   ReadReservationUser200Item,
   ReadReservationUserParams,
-  Reservation,
+  ReservationDetails,
   ReservationUpdate,
   UnauthorizedResponse,
   UnexpectedResponse,
@@ -89,14 +89,14 @@ export const getCreateReservationUrl = () => {
 };
 
 export const createReservation = async (
-  reservation: Reservation,
+  reservationDetails: ReservationDetails,
   options?: RequestInit,
 ): Promise<createReservationResponse> => {
   const res = await fetch(getCreateReservationUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(reservation),
+    body: JSON.stringify(reservationDetails),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -120,14 +120,14 @@ export const getCreateReservationMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createReservation>>,
     TError,
-    { data: Reservation },
+    { data: ReservationDetails },
     TContext
   >;
   fetch?: RequestInit;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createReservation>>,
   TError,
-  { data: Reservation },
+  { data: ReservationDetails },
   TContext
 > => {
   const mutationKey = ["createReservation"];
@@ -141,7 +141,7 @@ export const getCreateReservationMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createReservation>>,
-    { data: Reservation }
+    { data: ReservationDetails }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -154,7 +154,7 @@ export const getCreateReservationMutationOptions = <
 export type CreateReservationMutationResult = NonNullable<
   Awaited<ReturnType<typeof createReservation>>
 >;
-export type CreateReservationMutationBody = Reservation;
+export type CreateReservationMutationBody = ReservationDetails;
 export type CreateReservationMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
@@ -176,7 +176,7 @@ export const useCreateReservation = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createReservation>>,
       TError,
-      { data: Reservation },
+      { data: ReservationDetails },
       TContext
     >;
     fetch?: RequestInit;
@@ -185,7 +185,7 @@ export const useCreateReservation = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof createReservation>>,
   TError,
-  { data: Reservation },
+  { data: ReservationDetails },
   TContext
 > => {
   return useMutation(getCreateReservationMutationOptions(options), queryClient);

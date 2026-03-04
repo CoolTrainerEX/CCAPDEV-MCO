@@ -47,32 +47,26 @@ export const ReadCurrentUserResponse = zod
 export const readUserPathIdMin = 0;
 
 export const ReadUserParams = zod.object({
-  id: zod
+  id: zod.coerce
     .number()
     .min(readUserPathIdMin)
     .describe("The unique identifier of the user"),
 });
 
-export const readUserResponseOneTwoIdMin = 0;
+export const readUserResponseTwoIdMin = 0;
 
 export const ReadUserResponse = zod
   .object({
-    name: zod
-      .object({
-        first: zod.string(),
-        last: zod.string(),
-      })
-      .optional(),
-    description: zod.string().optional(),
+    name: zod.object({
+      first: zod.string(),
+      last: zod.string(),
+    }),
+    description: zod.string(),
   })
   .and(
     zod.object({
-      id: zod.number().min(readUserResponseOneTwoIdMin),
+      id: zod.number().min(readUserResponseTwoIdMin),
       admin: zod.boolean().optional(),
-    }),
-  )
-  .and(
-    zod.object({
       editable: zod.boolean().optional(),
     }),
   );
@@ -83,7 +77,7 @@ export const ReadUserResponse = zod
 export const updateUserPathIdMin = 0;
 
 export const UpdateUserParams = zod.object({
-  id: zod
+  id: zod.coerce
     .number()
     .min(updateUserPathIdMin)
     .describe("The unique identifier of the user"),
@@ -91,13 +85,11 @@ export const UpdateUserParams = zod.object({
 
 export const UpdateUserBody = zod
   .object({
-    name: zod
-      .object({
-        first: zod.string(),
-        last: zod.string(),
-      })
-      .optional(),
-    description: zod.string().optional(),
+    name: zod.object({
+      first: zod.string(),
+      last: zod.string(),
+    }),
+    description: zod.string(),
   })
   .and(
     zod.object({
@@ -111,7 +103,7 @@ export const UpdateUserBody = zod
 export const deleteUserPathIdMin = 0;
 
 export const DeleteUserParams = zod.object({
-  id: zod
+  id: zod.coerce
     .number()
     .min(deleteUserPathIdMin)
     .describe("The unique identifier of the user"),

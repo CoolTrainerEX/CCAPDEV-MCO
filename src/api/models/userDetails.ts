@@ -8,6 +8,6 @@
 import type { UserName } from "./userName";
 
 export interface UserDetails {
-  name?: UserName;
-  description?: string;
+  name: UserName;
+  description: string;
 }

@@ -6,11 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Id } from "./id";
+import type { ReservationUpdate } from "./reservationUpdate";
 
-export type LabUpdateSlotsItem = {
-  id: Id;
-  /** @minimum 0 */
-  x: number;
-  /** @minimum 0 */
-  y: number;
+export type ReservationDetails = ReservationUpdate & {
+  userId: Id;
+  labId: Id;
 };

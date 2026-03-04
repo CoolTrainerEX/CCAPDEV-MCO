@@ -1,19 +1,16 @@
-import { getUser, users } from "@/src/sample";
+import { ReadUserParams } from "@/src/api/endpoints/user/user.zod";
+import { getUser } from "@/src/sample";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: LayoutProps<"/user/[id]">;
 }) {
-  const name = getUser(Number.parseInt((await params).id))?.name;
+  const name = getUser(ReadUserParams.parse(params).id)?.name;
 
   return {
     title: name && `${name.first} ${name.last}`,
   };
-}
-
-export function generateStaticParams() {
-  return users.map(({ id }) => ({ id: String(id) }));
 }
 
 export default function UserLayout({
