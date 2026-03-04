@@ -13027,19 +13027,7 @@
                         "application/json": {
                           schema: {
                             type: "array",
-                            items: {
-                              allOf: [
-                                { $ref: "#/components/schemas/Reservation" },
-                                {
-                                  type: "object",
-                                  properties: {
-                                    editable: {
-                                      $ref: "#/components/schemas/Editable",
-                                    },
-                                  },
-                                },
-                              ],
-                            },
+                            items: { $ref: "#/components/schemas/Reservation" },
                           },
                         },
                       },
@@ -13067,19 +13055,7 @@
                         "application/json": {
                           schema: {
                             type: "array",
-                            items: {
-                              allOf: [
-                                { $ref: "#/components/schemas/Reservation" },
-                                {
-                                  type: "object",
-                                  properties: {
-                                    editable: {
-                                      $ref: "#/components/schemas/Editable",
-                                    },
-                                  },
-                                },
-                              ],
-                            },
+                            items: { $ref: "#/components/schemas/Reservation" },
                           },
                         },
                       },

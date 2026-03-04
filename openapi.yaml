@@ -391,12 +391,8 @@ paths:
               schema:
                 type: array
                 items:
-                  allOf:
-                    - $ref: "#/components/schemas/Reservation"
-                    - type: object
-                      properties:
-                        editable:
-                          $ref: "#/components/schemas/Editable"
+                  $ref: "#/components/schemas/Reservation"
+
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -420,12 +416,7 @@ paths:
               schema:
                 type: array
                 items:
-                  allOf:
-                    - $ref: "#/components/schemas/Reservation"
-                    - type: object
-                      properties:
-                        editable:
-                          $ref: "#/components/schemas/Editable"
+                  $ref: "#/components/schemas/Reservation"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":

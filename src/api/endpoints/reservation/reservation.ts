@@ -30,10 +30,9 @@ import type {
   ExistsResponse,
   Id,
   NotFoundResponse,
-  ReadReservationLab200Item,
   ReadReservationLabParams,
-  ReadReservationUser200Item,
   ReadReservationUserParams,
+  Reservation,
   ReservationDetails,
   ReservationUpdate,
   UnauthorizedResponse,
@@ -493,7 +492,7 @@ export const useDeleteReservation = <
  * @summary Read the reservations of the user
  */
 export type readReservationUserResponse200 = {
-  data: ReadReservationUser200Item[];
+  data: Reservation[];
   status: 200;
 };
 
@@ -945,7 +944,7 @@ export function useReadReservationUser<
  * @summary Read the reservations of the lab
  */
 export type readReservationLabResponse200 = {
-  data: ReadReservationLab200Item[];
+  data: Reservation[];
   status: 200;
 };
 

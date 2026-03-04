@@ -10,7 +10,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { User, users } from "@/src/sample";
+import { users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
@@ -69,19 +69,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user: User = {
-      id: Math.max(...users.map(({ id }) => id)) + 1,
+    const id = Math.max(...users.map(({ id }) => id)) + 1;
+
+    users.push({
+      id,
       description: "",
       ...body,
-    };
-
-    users.push(user);
-    await createSession(user.id);
+    });
+    await createSession(id);
     postLogger.info("Success");
 
-    return new NextResponse(undefined, {
-      status: 201,
-    });
+    return NextResponse.json(id, { status: 201 });
   } catch (e) {
     if (e instanceof ZodError) {
       postLogger.info({ issues: e.issues });

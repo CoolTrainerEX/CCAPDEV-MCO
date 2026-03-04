@@ -1,56 +1,54 @@
 import { decrypt } from "@/lib/session";
 import {
-  DeleteUserParams,
-  ReadUserParams,
-  ReadUserResponse,
-  UpdateUserBody,
-  UpdateUserParams,
-} from "@/src/api/endpoints/user/user.zod";
+  DeleteLabParams,
+  ReadLabParams,
+  ReadLabResponse,
+  UpdateLabBody,
+  UpdateLabParams,
+} from "@/src/api/endpoints/lab/lab.zod";
 import {
   BadRequestResponse,
   NotFoundResponse,
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { users } from "@/src/sample";
+import { labs, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { pino } from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
-const getLogger = logger.child({ operation: "get user" });
-const putLogger = logger.child({ operation: "update user" });
-const deleteLogger = logger.child({ operation: "delete user" });
+const getLogger = logger.child({ operation: "get lab" });
+const putLogger = logger.child({ operation: "update lab" });
+const deleteLogger = logger.child({ operation: "delete lab" });
 
 export async function GET(
   _: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/lab/[id]">,
 ) {
   try {
-    const params = ReadUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
+    const params = ReadLabParams.parse(await context.params);
+    const lab = labs.find(({ id }) => id === params.id);
 
-    if (!user) {
-      getLogger.info("User not found.");
+    if (!lab) {
+      getLogger.info("Lab not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Lab not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { email, password, ...filtered } = user;
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
     getLogger.info("Success");
 
     return NextResponse.json(
-      ReadUserResponse.parse({
-        editable:
-          sessionId === user.id ||
-          users.find(({ id }) => id === sessionId)?.admin,
-        ...filtered,
+      ReadLabResponse.parse({
+        editable: users.find(
+          async ({ id }) =>
+            id === (await decrypt((await cookies()).get("session")?.value)),
+        )?.admin,
+        ...lab,
       }),
     );
   } catch (e) {
@@ -76,20 +74,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/lab/[id]">,
 ) {
   try {
-    const params = UpdateUserParams.parse(await context.params);
-    const body = UpdateUserBody.parse(await request.json());
-    const user = users.find(({ id }) => id === params.id);
+    const params = UpdateLabParams.parse(await context.params);
+    const body = UpdateLabBody.parse(await request.json());
+    const lab = labs.find(({ id }) => id === params.id);
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
 
-    if (
-      user &&
-      sessionId !== user.id &&
-      !users.find(({ id }) => id === sessionId)?.admin
-    ) {
+    if (!users.find(({ id }) => id === sessionId)?.admin) {
       putLogger.info("Unauthorized.");
 
       return NextResponse.json(
@@ -97,16 +91,17 @@ export async function PUT(
         { status: 401 },
       );
     }
-    if (!user) {
-      putLogger.info("User not found.");
+
+    if (!lab) {
+      putLogger.info("Lab not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Lab not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    Object.assign(user, body);
+    Object.assign(lab, body);
     putLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
@@ -133,19 +128,15 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/lab/[id]">,
 ) {
   try {
-    const params = DeleteUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
+    const params = DeleteLabParams.parse(await context.params);
+    const lab = labs.find(({ id }) => id === params.id);
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
 
-    if (
-      user &&
-      sessionId !== user.id &&
-      !users.find(({ id }) => id === sessionId)?.admin
-    ) {
+    if (!users.find(({ id }) => id === sessionId)?.admin) {
       deleteLogger.info("Unauthorized.");
 
       return NextResponse.json(
@@ -154,17 +145,17 @@ export async function DELETE(
       );
     }
 
-    if (!user) {
-      deleteLogger.info("User not found.");
+    if (!lab) {
+      deleteLogger.info("Lab not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Lab not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    users.splice(
-      users.findIndex(({ id }) => id === user.id),
+    labs.splice(
+      labs.findIndex(({ id }) => id === lab.id),
       1,
     );
 
