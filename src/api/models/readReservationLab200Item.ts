@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Editable } from './editable';
-import type { Reservation } from './reservation';
+import type { Editable } from "./editable";
+import type { Reservation } from "./reservation";
 
 export type ReadReservationLab200Item = Reservation & {
   editable?: Editable;

@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { LabUpdateSlotsItem } from './labUpdateSlotsItem';
-import type { LabUpdateWeeklySchedule } from './labUpdateWeeklySchedule';
+import type { LabUpdateSlotsItem } from "./labUpdateSlotsItem";
+import type { LabUpdateWeeklySchedule } from "./labUpdateWeeklySchedule";
 
 export interface LabUpdate {
   name?: string;

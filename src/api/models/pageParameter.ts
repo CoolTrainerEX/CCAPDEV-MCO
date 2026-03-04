@@ -5,9 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Error } from "./error";
 
 /**
- * Unexpected error
+ * Pagination query
  */
-export type UnexpectedResponse = Error;
+export type PageParameter = number;

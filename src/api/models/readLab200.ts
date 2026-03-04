@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Editable } from './editable';
-import type { Lab } from './lab';
+import type { Editable } from "./editable";
+import type { Lab } from "./lab";
 
 export type ReadLab200 = Lab & {
   editable?: Editable;

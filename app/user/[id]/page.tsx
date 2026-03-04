@@ -1,6 +1,5 @@
 "use client";
-import { notFound, useParams, useRouter } from "next/navigation";
-import { deleteUser, getReservationsFromUser, getUser } from "@/src/sample";
+import { notFound, useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -60,7 +59,6 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 export default function User() {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data, isPending, isSuccess } = useReadUser(
@@ -433,33 +431,37 @@ export default function User() {
         } else notFound();
       })()}
       <Separator className="my-6" />
-      <div className="flex justify-around gap-6">
-        {(() => {
-          if (isReservationSuccess && reservations)
-            return reservations.map((value) => (
-              <Reservation key={value.id} reservation={value}>
-                <ReservationContent reservation={value} />
-              </Reservation>
-            ));
-          else if (isReservationSuccess && reservationData.status === 404)
-            return (
-              <p className="text-center leading-7 not-first:mt-6">
-                No reservations.
-              </p>
-            );
-          else if (isReservationPending && isReservationEnabled)
-            return (
-              <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
-                <Spinner />
-                Loading...
-              </p>
-            );
-          else
-            return (
-              <p className="flex text-center leading-7 not-first:mt-6">Error</p>
-            );
-        })()}
-      </div>
+      {
+        <div className="flex justify-around gap-6">
+          {(() => {
+            if (isReservationSuccess && reservations)
+              return reservations.map((value) => (
+                <Reservation key={value.id} reservation={value}>
+                  <ReservationContent reservation={value} />
+                </Reservation>
+              ));
+            else if (isReservationSuccess && reservationData.status === 404)
+              return (
+                <p className="text-center leading-7 not-first:mt-6">
+                  No reservations.
+                </p>
+              );
+            else if (isReservationPending && isReservationEnabled)
+              return (
+                <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
+                  <Spinner />
+                  Loading...
+                </p>
+              );
+            else
+              return (
+                <p className="flex text-center leading-7 not-first:mt-6">
+                  Error
+                </p>
+              );
+          })()}
+        </div>
+      }
     </>
   );
 }

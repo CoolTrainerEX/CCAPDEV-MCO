@@ -5,96 +5,114 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import * as zod from 'zod';
-
+import * as zod from "zod";
 
 /**
  * @summary Login
  */
 export const LoginBody = zod.object({
-  "email": zod.email(),
-  "password": zod.string()
-})
+  email: zod.email(),
+  password: zod.string(),
+});
 
 /**
  * @summary Create a user
  */
-export const CreateUserBody = zod.object({
-  "email": zod.email(),
-  "password": zod.string()
-}).and(zod.object({
-  "name": zod.object({
-  "first": zod.string(),
-  "last": zod.string()
-})
-}))
+export const CreateUserBody = zod
+  .object({
+    email: zod.email(),
+    password: zod.string(),
+  })
+  .and(
+    zod.object({
+      name: zod.object({
+        first: zod.string(),
+        last: zod.string(),
+      }),
+    }),
+  );
 
 /**
  * @summary Get current user ID
  */
 export const readCurrentUserResponseMin = 0;
 
-
-
-export const ReadCurrentUserResponse = zod.number().min(readCurrentUserResponseMin)
+export const ReadCurrentUserResponse = zod
+  .number()
+  .min(readCurrentUserResponseMin);
 
 /**
  * @summary Read a user
  */
 export const readUserPathIdMin = 0;
 
-
-
 export const ReadUserParams = zod.object({
-  "id": zod.number().min(readUserPathIdMin).describe('The unique identifier of the user')
-})
+  id: zod
+    .number()
+    .min(readUserPathIdMin)
+    .describe("The unique identifier of the user"),
+});
 
 export const readUserResponseOneTwoIdMin = 0;
 
-
-
-export const ReadUserResponse = zod.object({
-  "name": zod.object({
-  "first": zod.string(),
-  "last": zod.string()
-}).optional(),
-  "description": zod.string().optional()
-}).and(zod.object({
-  "id": zod.number().min(readUserResponseOneTwoIdMin),
-  "admin": zod.boolean().optional()
-})).and(zod.object({
-  "editable": zod.boolean().optional()
-}))
+export const ReadUserResponse = zod
+  .object({
+    name: zod
+      .object({
+        first: zod.string(),
+        last: zod.string(),
+      })
+      .optional(),
+    description: zod.string().optional(),
+  })
+  .and(
+    zod.object({
+      id: zod.number().min(readUserResponseOneTwoIdMin),
+      admin: zod.boolean().optional(),
+    }),
+  )
+  .and(
+    zod.object({
+      editable: zod.boolean().optional(),
+    }),
+  );
 
 /**
  * @summary Update a user
  */
 export const updateUserPathIdMin = 0;
 
-
-
 export const UpdateUserParams = zod.object({
-  "id": zod.number().min(updateUserPathIdMin).describe('The unique identifier of the user')
-})
+  id: zod
+    .number()
+    .min(updateUserPathIdMin)
+    .describe("The unique identifier of the user"),
+});
 
-export const UpdateUserBody = zod.object({
-  "name": zod.object({
-  "first": zod.string(),
-  "last": zod.string()
-}).optional(),
-  "description": zod.string().optional()
-}).and(zod.object({
-  "password": zod.string().optional()
-}))
+export const UpdateUserBody = zod
+  .object({
+    name: zod
+      .object({
+        first: zod.string(),
+        last: zod.string(),
+      })
+      .optional(),
+    description: zod.string().optional(),
+  })
+  .and(
+    zod.object({
+      password: zod.string().optional(),
+    }),
+  );
 
 /**
  * @summary Delete a user
  */
 export const deleteUserPathIdMin = 0;
 
-
-
 export const DeleteUserParams = zod.object({
-  "id": zod.number().min(deleteUserPathIdMin).describe('The unique identifier of the user')
-})
-
+  id: zod
+    .number()
+    .min(deleteUserPathIdMin)
+    .describe("The unique identifier of the user"),
+});

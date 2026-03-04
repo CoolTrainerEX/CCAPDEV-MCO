@@ -7,11 +7,7 @@
  */
 import type { PageParameter } from "./pageParameter";
 
-export type ReadLabsParams = {
-  /**
-   * The search query to filter labs
-   */
-  q?: string;
+export type ReadReservationUserParams = {
   /**
    * Pagination query
    * @minimum 0

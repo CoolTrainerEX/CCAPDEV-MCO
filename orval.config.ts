@@ -13,6 +13,37 @@ export default defineConfig({
       schemas: "src/api/models",
       // mock: true,
       baseUrl: "/api",
+      override: {
+        operations: {
+          readLabs: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "page",
+              options: {
+                staleTime: 10000,
+              },
+            },
+          },
+          readReservationUser: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "page",
+              options: {
+                staleTime: 10000,
+              },
+            },
+          },
+          readReservationLab: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "page",
+              options: {
+                staleTime: 10000,
+              },
+            },
+          },
+        },
+      },
     },
   },
   // Zod schema generation
