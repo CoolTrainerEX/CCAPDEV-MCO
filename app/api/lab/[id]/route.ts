@@ -23,6 +23,7 @@ const getLogger = logger.child({ operation: "get lab" });
 const putLogger = logger.child({ operation: "update lab" });
 const deleteLogger = logger.child({ operation: "delete lab" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET(
   _: NextRequest,
   context: RouteContext<"/api/lab/[id]">,
@@ -42,12 +43,11 @@ export async function GET(
 
     getLogger.info("Success");
 
+    const sessionId = await decrypt((await cookies()).get("session")?.value);
+
     return NextResponse.json(
       ReadLabResponse.parse({
-        editable: users.find(
-          async ({ id }) =>
-            id === (await decrypt((await cookies()).get("session")?.value)),
-        )?.admin,
+        editable: users.find(({ id }) => id === sessionId)?.admin,
         ...lab,
       }),
     );
@@ -72,6 +72,7 @@ export async function GET(
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function PUT(
   request: NextRequest,
   context: RouteContext<"/api/lab/[id]">,
@@ -126,6 +127,7 @@ export async function PUT(
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function DELETE(
   request: NextRequest,
   context: RouteContext<"/api/lab/[id]">,

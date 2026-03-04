@@ -20,6 +20,7 @@ const logger = pino();
 const getLogger = logger.child({ operation: "get current user" });
 const postLogger = logger.child({ operation: "create user" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET() {
   try {
     const sessionId = await decrypt((await cookies()).get("session")?.value);
@@ -57,6 +58,7 @@ export async function GET() {
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function POST(request: NextRequest) {
   try {
     const body = CreateUserBody.parse(await request.json());

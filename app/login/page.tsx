@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Login() {
   const router = useRouter();
   const queryClient = useQueryClient();

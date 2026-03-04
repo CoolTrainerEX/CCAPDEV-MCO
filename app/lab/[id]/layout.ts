@@ -1,6 +1,7 @@
 import { ReadLabParams } from "@/src/api/endpoints/lab/lab.zod";
 import { getLab } from "@/src/sample";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function generateMetadata({
   params,
 }: {
@@ -13,6 +14,7 @@ export async function generateMetadata({
   };
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function LabLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

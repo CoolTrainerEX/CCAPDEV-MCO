@@ -22,6 +22,7 @@ const logger = pino();
 const getLogger = logger.child({ operation: "get labs" });
 const postLogger = logger.child({ operation: "create lab" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function GET(request: NextRequest) {
   try {
     const queryParams = ReadLabsQueryParams.parse(
@@ -72,6 +73,7 @@ export function GET(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function POST(request: NextRequest) {
   try {
     const body = CreateLabBody.parse(await request.json());

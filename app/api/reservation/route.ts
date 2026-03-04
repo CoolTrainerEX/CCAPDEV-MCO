@@ -15,6 +15,7 @@ import { ZodError } from "zod";
 
 const postLogger = pino().child({ operation: "create reservation" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function POST(request: NextRequest) {
   try {
     const body = CreateReservationBody.parse(await request.json());

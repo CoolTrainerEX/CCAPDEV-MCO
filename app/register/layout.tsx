@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Register",
 };
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function RegisterLayout({
   children,
 }: {

@@ -5,10 +5,7 @@ import { getLab, getReservationsFromLab } from "@/src/sample";
 import Slots from "@/app/slots";
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
-import { startOfDay } from "date-fns";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { addDays } from "date-fns";
-import { max } from "date-fns";
 import {
   Tooltip,
   TooltipContent,
@@ -23,18 +20,25 @@ import { cn } from "@/lib/utils";
 import { Toggle } from "@/components/ui/toggle";
 import Form from "next/form";
 import TimeRangeInput from "@/app/time-range-input";
-import { getHours } from "date-fns";
-import { getMinutes } from "date-fns";
-import { Interval, isAfter } from "date-fns";
-import { areIntervalsOverlapping } from "date-fns";
-import { setMinutes } from "date-fns";
-import { setHours } from "date-fns";
-import { roundToNearestMinutes } from "date-fns";
+import {
+  startOfDay,
+  addDays,
+  max,
+  getHours,
+  isAfter,
+  Interval,
+  areIntervalsOverlapping,
+  getMinutes,
+  setMinutes,
+  setHours,
+  roundToNearestMinutes,
+} from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { ReadLabParams } from "@/src/api/endpoints/lab/lab.zod";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Lab() {
   const loginId = useLogin(({ id }) => id);
   const { id, name, slots, weeklySchedule, editable } =

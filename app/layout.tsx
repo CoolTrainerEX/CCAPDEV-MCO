@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   description: "DLSU Lab Reservations",
 };
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -30,8 +30,8 @@ import {
   setMinutes,
   startOfDay,
   toDate,
+  areIntervalsOverlapping,
 } from "date-fns";
-import { areIntervalsOverlapping } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,7 +105,7 @@ export default function Reservation({
   );
 
   const [selected, setSelected] = useState(
-    reservation ? reservation.slotIds! : [],
+    reservation ? reservation.slotIds : [],
   );
 
   if (!reservation) return children;

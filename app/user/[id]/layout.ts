@@ -1,6 +1,7 @@
 import { ReadUserParams } from "@/src/api/endpoints/user/user.zod";
 import { getUser } from "@/src/sample";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function generateMetadata({
   params,
 }: {
@@ -13,6 +14,7 @@ export async function generateMetadata({
   };
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function UserLayout({
   children,
 }: {

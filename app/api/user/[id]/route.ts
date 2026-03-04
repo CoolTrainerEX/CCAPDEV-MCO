@@ -23,6 +23,7 @@ const getLogger = logger.child({ operation: "get user" });
 const putLogger = logger.child({ operation: "update user" });
 const deleteLogger = logger.child({ operation: "delete user" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET(
   _: NextRequest,
   context: RouteContext<"/api/user/[id]">,
@@ -74,6 +75,7 @@ export async function GET(
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function PUT(
   request: NextRequest,
   context: RouteContext<"/api/user/[id]">,
@@ -131,6 +133,7 @@ export async function PUT(
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function DELETE(
   request: NextRequest,
   context: RouteContext<"/api/user/[id]">,

@@ -6,6 +6,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Loading() {
   return (
     <Empty>

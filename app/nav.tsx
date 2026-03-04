@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { Spinner } from "@/components/ui/spinner";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Nav() {
   const { data: currentUserData, isSuccess: isCurrentUserSuccess } =
     useReadCurrentUser();

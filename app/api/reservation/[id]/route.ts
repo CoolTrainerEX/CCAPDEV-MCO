@@ -20,6 +20,7 @@ const logger = pino();
 const putLogger = logger.child({ operation: "update user" });
 const deleteLogger = logger.child({ operation: "delete user" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function PUT(
   request: NextRequest,
   context: RouteContext<"/api/reservation/[id]">,

@@ -23,6 +23,7 @@ import { CreateUserBody } from "@/src/api/endpoints/user/user.zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Register() {
   const router = useRouter();
   const queryClient = useQueryClient();

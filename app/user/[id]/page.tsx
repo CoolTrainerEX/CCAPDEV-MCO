@@ -58,6 +58,7 @@ import {
 } from "@/src/api/endpoints/reservation/reservation.zod";
 import { Spinner } from "@/components/ui/spinner";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function User() {
   const queryClient = useQueryClient();
 

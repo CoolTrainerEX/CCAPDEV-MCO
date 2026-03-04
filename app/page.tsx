@@ -17,12 +17,11 @@ import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { startOfDay } from "date-fns";
 import { cn } from "../lib/utils";
-import { isWithinInterval } from "date-fns";
-import { toDate } from "date-fns";
+import { startOfDay, isWithinInterval, toDate } from "date-fns";
 import useLogin from "@/src/store/user";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function Home() {
   const admin = getUser(useLogin(({ id }) => id))?.admin;
   const labs = getLabs(useSearchParams().get("q") ?? undefined);

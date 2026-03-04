@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FlaskConicalOff, Home } from "lucide-react";
 import Link from "next/link";
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default function NotFound() {
   return (
     <Empty>

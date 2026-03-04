@@ -16,6 +16,7 @@ const logger = pino();
 const postLogger = logger.child({ operation: "login" });
 const deleteLogger = logger.child({ operation: "logout" });
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function POST(request: NextRequest) {
   try {
     const body = LoginBody.parse(await request.json());
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function DELETE() {
   try {
     const cookieStore = await cookies();

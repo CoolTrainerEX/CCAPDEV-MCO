@@ -1,5 +1,3 @@
-import { differenceInMinutes } from "date-fns";
-import { startOfDay } from "date-fns";
 import { Clock2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -9,14 +7,18 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
-import { format } from "date-fns";
 import React, { Dispatch, SetStateAction } from "react";
-import { Interval } from "date-fns";
-import { parse } from "date-fns";
-import { getHours } from "date-fns";
-import { setMinutes } from "date-fns";
-import { getMinutes } from "date-fns";
-import { setHours } from "date-fns";
+import {
+  startOfDay,
+  differenceInMinutes,
+  setHours,
+  Interval,
+  format,
+  parse,
+  getHours,
+  getMinutes,
+  setMinutes,
+} from "date-fns";
 import { cn } from "@/lib/utils";
 
 // eslint-disable-next-line jsdoc/require-returns
