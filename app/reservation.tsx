@@ -31,7 +31,7 @@ import {
   startOfDay,
   toDate,
 } from "date-fns";
-import { areIntervalsOverlapping } from "date-fns/areIntervalsOverlapping";
+import { areIntervalsOverlapping } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,

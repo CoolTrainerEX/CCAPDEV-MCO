@@ -1,7 +1,7 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { pino } from "pino";
+import pino from "pino";
 import { users } from "@/src/sample";
 
 const encodedKey = new TextEncoder().encode(process.env.SESSION_SECRET);

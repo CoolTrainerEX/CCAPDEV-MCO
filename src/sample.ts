@@ -1,6 +1,6 @@
 import { Interval } from "date-fns";
-import { isAfter } from "date-fns/isAfter";
-import { parse } from "date-fns/parse";
+import { isAfter } from "date-fns";
+import { parse } from "date-fns";
 
 export type User = {
   id: number;
@@ -33,7 +33,7 @@ type Reservation = {
   id: number;
   userId: number;
   labId: number;
-  anonymous?: true;
+  anonymous?: boolean;
   schedule: Interval;
   slotIds: number[];
 };
@@ -421,7 +421,7 @@ export const labs: Lab[] = [
   },
 ];
 
-const reservations: Reservation[] = [
+export const reservations: Reservation[] = [
   {
     id: 1,
     userId: 1,

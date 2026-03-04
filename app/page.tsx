@@ -17,10 +17,10 @@ import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { startOfDay } from "date-fns/startOfDay";
+import { startOfDay } from "date-fns";
 import { cn } from "../lib/utils";
-import { isWithinInterval } from "date-fns/isWithinInterval";
-import { toDate } from "date-fns/toDate";
+import { isWithinInterval } from "date-fns";
+import { toDate } from "date-fns";
 import useLogin from "@/src/store/user";
 
 export default function Home() {

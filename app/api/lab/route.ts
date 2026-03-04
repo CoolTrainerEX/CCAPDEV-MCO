@@ -14,7 +14,7 @@ import {
 import { labs as labList, labs, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { pino } from "pino";
+import pino from "pino";
 import { ZodError } from "zod";
 
 const PAGE_LIMIT = Number.parseInt(process.env.PAGE_LIMIT ?? "10");

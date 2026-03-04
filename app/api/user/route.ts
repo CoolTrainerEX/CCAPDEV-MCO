@@ -13,7 +13,7 @@ import {
 import { users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { pino } from "pino";
+import pino from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
@@ -23,7 +23,8 @@ const postLogger = logger.child({ operation: "create user" });
 export async function GET() {
   try {
     const sessionId = await decrypt((await cookies()).get("session")?.value);
-    if (sessionId === undefined) {
+
+    if (!sessionId) {
       getLogger.info("Unauthorized.");
 
       return NextResponse.json(

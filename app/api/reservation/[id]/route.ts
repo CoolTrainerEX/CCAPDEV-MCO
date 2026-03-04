@@ -1,93 +1,39 @@
 import { decrypt } from "@/lib/session";
 import {
-  DeleteUserParams,
-  ReadUserParams,
-  ReadUserResponse,
-  UpdateUserBody,
-  UpdateUserParams,
-} from "@/src/api/endpoints/user/user.zod";
+  DeleteReservationParams,
+  UpdateReservationBody,
+  UpdateReservationParams,
+} from "@/src/api/endpoints/reservation/reservation.zod";
 import {
   BadRequestResponse,
   NotFoundResponse,
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { users } from "@/src/sample";
+import { reservations, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
-const getLogger = logger.child({ operation: "get user" });
 const putLogger = logger.child({ operation: "update user" });
 const deleteLogger = logger.child({ operation: "delete user" });
 
-export async function GET(
-  _: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
-) {
-  try {
-    const params = ReadUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
-
-    if (!user) {
-      getLogger.info("User not found.");
-
-      return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
-        { status: 404 },
-      );
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { email, password, ...filtered } = user;
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
-    getLogger.info("Success");
-
-    return NextResponse.json(
-      ReadUserResponse.parse({
-        editable:
-          sessionId === user.id ||
-          users.find(({ id }) => id === sessionId)?.admin,
-        ...filtered,
-      }),
-    );
-  } catch (e) {
-    if (e instanceof ZodError) {
-      getLogger.info({ issues: e.issues });
-
-      return NextResponse.json(
-        { message: "Bad request." } as BadRequestResponse,
-        { status: 400 },
-      );
-    }
-
-    getLogger.error(e);
-
-    return NextResponse.json(
-      {
-        message: "Unexpected error.",
-      } as UnexpectedResponse,
-      { status: 500 },
-    );
-  }
-}
-
 export async function PUT(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/reservation/[id]">,
 ) {
   try {
-    const params = UpdateUserParams.parse(await context.params);
-    const body = UpdateUserBody.parse(await request.json());
-    const user = users.find(({ id }) => id === params.id);
+    const params = UpdateReservationParams.parse(await context.params);
+    const body = UpdateReservationBody.parse(await request.json());
+    const reservation = reservations.find(({ id }) => id === params.id);
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
 
     if (
       !sessionId ||
-      (sessionId !== user?.id &&
+      (sessionId !== reservation?.userId &&
         !users.find(({ id }) => id === sessionId)?.admin)
     ) {
       putLogger.info("Unauthorized.");
@@ -97,16 +43,16 @@ export async function PUT(
         { status: 401 },
       );
     }
-    if (!user) {
-      putLogger.info("User not found.");
+    if (!reservation) {
+      putLogger.info("Reservation not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Reservation not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    Object.assign(user, body);
+    Object.assign(reservation, body);
     putLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
@@ -133,17 +79,17 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/reservation/[id]">,
 ) {
   try {
-    const params = DeleteUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
+    const params = DeleteReservationParams.parse(await context.params);
+    const reservation = reservations.find(({ id }) => id === params.id);
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
 
     if (
       !sessionId ||
-      (sessionId !== user?.id &&
+      (sessionId !== reservation?.userId &&
         !users.find(({ id }) => id === sessionId)?.admin)
     ) {
       deleteLogger.info("Unauthorized.");
@@ -154,17 +100,17 @@ export async function DELETE(
       );
     }
 
-    if (!user) {
-      deleteLogger.info("User not found.");
+    if (!reservation) {
+      deleteLogger.info("Reservation not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Reservation not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    users.splice(
-      users.findIndex(({ id }) => id === user.id),
+    reservations.splice(
+      reservations.findIndex(({ id }) => id === reservation.id),
       1,
     );
 

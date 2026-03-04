@@ -57,6 +57,11 @@ export type createReservationResponse401 = {
   status: 401;
 };
 
+export type createReservationResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
 export type createReservationResponse409 = {
   data: ExistsResponse;
   status: 409;
@@ -73,6 +78,7 @@ export type createReservationResponseSuccess = createReservationResponse201 & {
 export type createReservationResponseError = (
   | createReservationResponse400
   | createReservationResponse401
+  | createReservationResponse404
   | createReservationResponse409
   | createReservationResponse500
 ) & {
@@ -112,6 +118,7 @@ export const getCreateReservationMutationOptions = <
   TError =
     | BadRequestResponse
     | UnauthorizedResponse
+    | NotFoundResponse
     | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,
@@ -157,6 +164,7 @@ export type CreateReservationMutationBody = ReservationDetails;
 export type CreateReservationMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
+  | NotFoundResponse
   | ExistsResponse
   | UnexpectedResponse;
 
@@ -167,6 +175,7 @@ export const useCreateReservation = <
   TError =
     | BadRequestResponse
     | UnauthorizedResponse
+    | NotFoundResponse
     | ExistsResponse
     | UnexpectedResponse,
   TContext = unknown,

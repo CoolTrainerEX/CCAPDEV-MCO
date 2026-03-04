@@ -9,7 +9,7 @@ import {
 import { users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { pino } from "pino";
+import pino from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
