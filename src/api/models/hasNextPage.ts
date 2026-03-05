@@ -6,7 +6,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * Pagination query
- */
-export type PageParameter = number;
+export type HasNextPage = boolean;

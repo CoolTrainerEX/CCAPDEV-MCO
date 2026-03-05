@@ -78,6 +78,7 @@ export async function PUT(
   }
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export async function DELETE(
   request: NextRequest,
   context: RouteContext<"/api/reservation/[id]">,

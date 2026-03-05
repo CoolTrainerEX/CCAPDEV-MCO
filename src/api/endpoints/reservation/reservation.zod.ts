@@ -85,16 +85,6 @@ export const ReadReservationUserParams = zod.object({
     .describe("The unique identifier of the user"),
 });
 
-export const readReservationUserQueryPageDefault = 1;
-
-export const ReadReservationUserQueryParams = zod.object({
-  page: zod.coerce
-    .number()
-    .min(1)
-    .default(readReservationUserQueryPageDefault)
-    .describe("Pagination query"),
-});
-
 export const readReservationUserResponseOneOneSlotIdsItemMin = 0;
 
 export const readReservationUserResponseOneTwoUserIdMin = 0;
@@ -142,16 +132,6 @@ export const ReadReservationLabParams = zod.object({
     .number()
     .min(readReservationLabPathIdMin)
     .describe("The unique identifier of the lab"),
-});
-
-export const readReservationLabQueryPageDefault = 1;
-
-export const ReadReservationLabQueryParams = zod.object({
-  page: zod.coerce
-    .number()
-    .min(1)
-    .default(readReservationLabQueryPageDefault)
-    .describe("Pagination query"),
 });
 
 export const readReservationLabResponseOneOneSlotIdsItemMin = 0;

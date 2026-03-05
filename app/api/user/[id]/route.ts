@@ -16,7 +16,7 @@ import { users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 
 const logger = pino();
 const getLogger = logger.child({ operation: "get user" });
@@ -44,15 +44,16 @@ export async function GET(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password, ...filtered } = user;
     const sessionId = await decrypt((await cookies()).get("session")?.value);
+
     getLogger.info("Success");
 
     return NextResponse.json(
       ReadUserResponse.parse({
         editable:
-          sessionId === user.id ||
+          user.id === sessionId ||
           users.find(({ id }) => id === sessionId)?.admin,
         ...filtered,
-      }),
+      } as z.infer<typeof ReadUserResponse>),
     );
   } catch (e) {
     if (e instanceof ZodError) {

@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     template: "%s | ArchersLab",
   },
   description: "DLSU Lab Reservations",
+  appleWebApp: {
+    title: "ArchersLab",
+  },
 };
 
 // eslint-disable-next-line jsdoc/require-jsdoc

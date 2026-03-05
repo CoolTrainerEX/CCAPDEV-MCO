@@ -5,7 +5,6 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { PageParameter } from "./pageParameter";
 
 export type ReadLabsParams = {
   /**
@@ -16,5 +15,5 @@ export type ReadLabsParams = {
    * Pagination query
    * @minimum 1
    */
-  page?: PageParameter;
+  page?: number;
 };

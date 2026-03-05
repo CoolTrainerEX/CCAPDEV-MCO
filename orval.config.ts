@@ -24,24 +24,6 @@ export default defineConfig({
               },
             },
           },
-          readReservationUser: {
-            query: {
-              useInfinite: true,
-              useInfiniteQueryParam: "page",
-              options: {
-                staleTime: 10000,
-              },
-            },
-          },
-          readReservationLab: {
-            query: {
-              useInfinite: true,
-              useInfiniteQueryParam: "page",
-              options: {
-                staleTime: 10000,
-              },
-            },
-          },
         },
       },
     },

@@ -1,0 +1,11 @@
+<OpenSearchDescription
+    xmlns="http://a9.com/-/spec/opensearch/1.1/"
+    xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+    <ShortName>ArchersLab</ShortName>
+    <Description>Search for labs in ArchersLab</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Image width="32" height="32" type="image/svg+xml">/icon.svg</Image>
+    <Url type="text/html" template="http://localhost:3000/?q={searchTerms}" />
+    <!-- <Url type="application/x-suggestions+json"
+        template="http://localhost:3000/api/lab?q={searchTerms}" /> -->
+</OpenSearchDescription>

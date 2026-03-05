@@ -8,7 +8,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import icon from "./icon.svg";
+import icon from "./icon0.svg";
 import { useReadCurrentUser, useReadUser } from "@/src/api/endpoints/user/user";
 import {
   ReadCurrentUserResponse,
@@ -21,16 +21,17 @@ import { Spinner } from "@/components/ui/spinner";
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function Nav() {
-  const { data: currentUserData, isSuccess: isCurrentUserSuccess } =
-    useReadCurrentUser();
+  const currentUserQuery = useReadCurrentUser();
 
-  let currentUserId = Number.NaN;
+  let currentUser = Number.NaN;
 
-  if (isCurrentUserSuccess)
-    switch (currentUserData.status) {
+  if (currentUserQuery.isSuccess)
+    switch (currentUserQuery.data.status) {
       case 200:
         try {
-          currentUserId = ReadCurrentUserResponse.parse(currentUserData.data);
+          currentUser = ReadCurrentUserResponse.parse(
+            currentUserQuery.data.data,
+          );
         } catch {
           toast.warning("Bad response.");
         }
@@ -39,11 +40,11 @@ export default function Nav() {
       case 401:
         break;
       case 404:
-        toast.error(currentUserData.data.message);
+        toast.error(currentUserQuery.data.data.message);
         break;
 
       case 500:
-        toast.warning(currentUserData.data.message);
+        toast.warning(currentUserQuery.data.data.message);
         break;
 
       default:
@@ -52,10 +53,11 @@ export default function Nav() {
     }
 
   const { data, isPending, isSuccess, isEnabled } = useReadUser(
-    ReadUserParams.safeParse({ id: currentUserId }).data?.id ?? Number.NaN,
+    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? Number.NaN,
     {
       query: {
-        enabled: isCurrentUserSuccess && currentUserData.status === 200,
+        enabled:
+          currentUserQuery.isSuccess && currentUserQuery.data.status === 200,
       },
     },
   );

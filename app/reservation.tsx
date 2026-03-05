@@ -57,7 +57,10 @@ import { cn } from "@/lib/utils";
 import Slots from "./slots";
 import { useRouter } from "next/navigation";
 import { Toggle } from "@/components/ui/toggle";
-import { ReadReservationLabResponse } from "@/src/api/endpoints/reservation/reservation.zod";
+import {
+  ReadReservationLabResponse,
+  ReadReservationLabResponseItem,
+} from "@/src/api/endpoints/reservation/reservation.zod";
 import z from "zod";
 
 /**
@@ -81,7 +84,7 @@ export function onPressedChange(
 /**
  * Reservation wrapper for {@link Drawer} functionality.
  * @param {Parameters<typeof Drawer>[0]} param0 props
- * @param {z.infer<typeof ReadReservationLabResponse>[number] | undefined} param0.reservation Reservation to display
+ * @param {z.infer<typeof ReadReservationLabResponseItem> | undefined} param0.reservation Reservation to display
  * @author Justin Ryan Uy
  */
 export default function Reservation({
@@ -89,7 +92,7 @@ export default function Reservation({
   reservation,
   ...props
 }: Parameters<typeof Drawer>[0] & {
-  reservation?: z.infer<typeof ReadReservationLabResponse>[number];
+  reservation?: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
   const router = useRouter();
   const loginId = useLogin(({ id }) => id);
@@ -250,7 +253,7 @@ export default function Reservation({
 /**
  * Reservation display
  * @param {React.ComponentProps<"div">} param0 props
- * @param {z.infer<typeof ReadReservationLabResponse>[number] | undefined} param0.reservation Reservation to display
+ * @param {z.infer<typeof ReadReservationLabResponseItem> | undefined} param0.reservation Reservation to display
  * @author Justin Ryan Uy
  */
 export function ReservationContent({
@@ -258,7 +261,7 @@ export function ReservationContent({
   reservation,
   ...props
 }: React.ComponentProps<"div"> & {
-  reservation: z.infer<typeof ReadReservationLabResponse>[number];
+  reservation: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
   const user = reservation.anonymous
     ? { name: { first: "Anonymous", last: "" } }

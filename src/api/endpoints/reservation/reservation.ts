@@ -5,20 +5,16 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
-  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
-  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -30,10 +26,8 @@ import type {
   ExistsResponse,
   Id,
   NotFoundResponse,
-  ReadReservationLabParams,
-  ReadReservationUserParams,
-  Reservation,
   ReservationDetails,
+  ReservationList,
   ReservationUpdate,
   UnauthorizedResponse,
   UnexpectedResponse,
@@ -501,7 +495,7 @@ export const useDeleteReservation = <
  * @summary Read the reservations of the user
  */
 export type readReservationUserResponse200 = {
-  data: Reservation[];
+  data: ReservationList;
   status: 200;
 };
 
@@ -536,27 +530,15 @@ export type readReservationUserResponse =
   | readReservationUserResponseSuccess
   | readReservationUserResponseError;
 
-export const getReadReservationUserUrl = (
-  id: number,
-  params?: ReadReservationUserParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {});
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `/api/reservation/user/${id}?${stringifiedParams}`
-    : `/api/reservation/user/${id}`;
+export const getReadReservationUserUrl = (id: number) => {
+  return `/api/reservation/user/${id}`;
 };
 
 export const readReservationUser = async (
   id: number,
-  params?: ReadReservationUserParams,
   options?: RequestInit,
 ): Promise<readReservationUserResponse> => {
-  const res = await fetch(getReadReservationUserUrl(id, params), {
+  const res = await fetch(getReadReservationUserUrl(id), {
     ...options,
     method: "GET",
   });
@@ -573,230 +555,15 @@ export const readReservationUser = async (
   } as readReservationUserResponse;
 };
 
-export const getReadReservationUserInfiniteQueryKey = (
-  id: number,
-  params?: ReadReservationUserParams,
-) => {
-  return [
-    "infinite",
-    `/api/reservation/user/${id}`,
-    ...(params ? [params] : []),
-  ] as const;
+export const getReadReservationUserQueryKey = (id: number) => {
+  return [`/api/reservation/user/${id}`] as const;
 };
-
-export const getReadReservationUserQueryKey = (
-  id: number,
-  params?: ReadReservationUserParams,
-) => {
-  return [`/api/reservation/user/${id}`, ...(params ? [params] : [])] as const;
-};
-
-export const getReadReservationUserInfiniteQueryOptions = <
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    ReadReservationUserParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationUserParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationUser>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationUserParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ??
-    getReadReservationUserInfiniteQueryKey(id, params);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    QueryKey,
-    ReadReservationUserParams["page"]
-  > = ({ signal, pageParam }) =>
-    readReservationUser(
-      id,
-      { ...params, page: pageParam || params?.["page"] },
-      { signal, ...fetchOptions },
-    );
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    staleTime: 10000,
-    ...queryOptions,
-  } as UseInfiniteQueryOptions<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    TError,
-    TData,
-    QueryKey,
-    ReadReservationUserParams["page"]
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ReadReservationUserInfiniteQueryResult = NonNullable<
-  Awaited<ReturnType<typeof readReservationUser>>
->;
-export type ReadReservationUserInfiniteQueryError =
-  | BadRequestResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
-
-export function useReadReservationUserInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    ReadReservationUserParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params: undefined | ReadReservationUserParams,
-  options: {
-    query: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationUser>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationUserParams["page"]
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readReservationUser>>,
-          TError,
-          Awaited<ReturnType<typeof readReservationUser>>,
-          QueryKey
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): DefinedUseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadReservationUserInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    ReadReservationUserParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationUserParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationUser>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationUserParams["page"]
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readReservationUser>>,
-          TError,
-          Awaited<ReturnType<typeof readReservationUser>>,
-          QueryKey
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadReservationUserInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    ReadReservationUserParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationUserParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationUser>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationUserParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-/**
- * @summary Read the reservations of the user
- */
-
-export function useReadReservationUserInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationUser>>,
-    ReadReservationUserParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationUserParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationUser>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationUserParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getReadReservationUserInfiniteQueryOptions(
-    id,
-    params,
-    options,
-  );
-
-  const query = useInfiniteQuery(
-    queryOptions,
-    queryClient,
-  ) as UseInfiniteQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
 
 export const getReadReservationUserQueryOptions = <
   TData = Awaited<ReturnType<typeof readReservationUser>>,
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationUserParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -810,19 +577,16 @@ export const getReadReservationUserQueryOptions = <
 ) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getReadReservationUserQueryKey(id, params);
+  const queryKey = queryOptions?.queryKey ?? getReadReservationUserQueryKey(id);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof readReservationUser>>
-  > = ({ signal }) =>
-    readReservationUser(id, params, { signal, ...fetchOptions });
+  > = ({ signal }) => readReservationUser(id, { signal, ...fetchOptions });
 
   return {
     queryKey,
     queryFn,
     enabled: !!id,
-    staleTime: 10000,
     ...queryOptions,
   } as UseQueryOptions<
     Awaited<ReturnType<typeof readReservationUser>>,
@@ -844,7 +608,6 @@ export function useReadReservationUser<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params: undefined | ReadReservationUserParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -872,7 +635,6 @@ export function useReadReservationUser<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationUserParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -900,7 +662,6 @@ export function useReadReservationUser<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationUserParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -924,7 +685,6 @@ export function useReadReservationUser<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationUserParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -939,7 +699,7 @@ export function useReadReservationUser<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getReadReservationUserQueryOptions(id, params, options);
+  const queryOptions = getReadReservationUserQueryOptions(id, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -953,7 +713,7 @@ export function useReadReservationUser<
  * @summary Read the reservations of the lab
  */
 export type readReservationLabResponse200 = {
-  data: Reservation[];
+  data: ReservationList;
   status: 200;
 };
 
@@ -988,27 +748,15 @@ export type readReservationLabResponse =
   | readReservationLabResponseSuccess
   | readReservationLabResponseError;
 
-export const getReadReservationLabUrl = (
-  id: number,
-  params?: ReadReservationLabParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {});
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `/api/reservation/lab/${id}?${stringifiedParams}`
-    : `/api/reservation/lab/${id}`;
+export const getReadReservationLabUrl = (id: number) => {
+  return `/api/reservation/lab/${id}`;
 };
 
 export const readReservationLab = async (
   id: number,
-  params?: ReadReservationLabParams,
   options?: RequestInit,
 ): Promise<readReservationLabResponse> => {
-  const res = await fetch(getReadReservationLabUrl(id, params), {
+  const res = await fetch(getReadReservationLabUrl(id), {
     ...options,
     method: "GET",
   });
@@ -1023,229 +771,15 @@ export const readReservationLab = async (
   } as readReservationLabResponse;
 };
 
-export const getReadReservationLabInfiniteQueryKey = (
-  id: number,
-  params?: ReadReservationLabParams,
-) => {
-  return [
-    "infinite",
-    `/api/reservation/lab/${id}`,
-    ...(params ? [params] : []),
-  ] as const;
+export const getReadReservationLabQueryKey = (id: number) => {
+  return [`/api/reservation/lab/${id}`] as const;
 };
-
-export const getReadReservationLabQueryKey = (
-  id: number,
-  params?: ReadReservationLabParams,
-) => {
-  return [`/api/reservation/lab/${id}`, ...(params ? [params] : [])] as const;
-};
-
-export const getReadReservationLabInfiniteQueryOptions = <
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    ReadReservationLabParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationLabParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationLab>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationLabParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ?? getReadReservationLabInfiniteQueryKey(id, params);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    QueryKey,
-    ReadReservationLabParams["page"]
-  > = ({ signal, pageParam }) =>
-    readReservationLab(
-      id,
-      { ...params, page: pageParam || params?.["page"] },
-      { signal, ...fetchOptions },
-    );
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    staleTime: 10000,
-    ...queryOptions,
-  } as UseInfiniteQueryOptions<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    TError,
-    TData,
-    QueryKey,
-    ReadReservationLabParams["page"]
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ReadReservationLabInfiniteQueryResult = NonNullable<
-  Awaited<ReturnType<typeof readReservationLab>>
->;
-export type ReadReservationLabInfiniteQueryError =
-  | BadRequestResponse
-  | NotFoundResponse
-  | UnexpectedResponse;
-
-export function useReadReservationLabInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    ReadReservationLabParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params: undefined | ReadReservationLabParams,
-  options: {
-    query: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationLab>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationLabParams["page"]
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readReservationLab>>,
-          TError,
-          Awaited<ReturnType<typeof readReservationLab>>,
-          QueryKey
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): DefinedUseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadReservationLabInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    ReadReservationLabParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationLabParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationLab>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationLabParams["page"]
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof readReservationLab>>,
-          TError,
-          Awaited<ReturnType<typeof readReservationLab>>,
-          QueryKey
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useReadReservationLabInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    ReadReservationLabParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationLabParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationLab>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationLabParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-/**
- * @summary Read the reservations of the lab
- */
-
-export function useReadReservationLabInfinite<
-  TData = InfiniteData<
-    Awaited<ReturnType<typeof readReservationLab>>,
-    ReadReservationLabParams["page"]
-  >,
-  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
->(
-  id: number,
-  params?: ReadReservationLabParams,
-  options?: {
-    query?: Partial<
-      UseInfiniteQueryOptions<
-        Awaited<ReturnType<typeof readReservationLab>>,
-        TError,
-        TData,
-        QueryKey,
-        ReadReservationLabParams["page"]
-      >
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseInfiniteQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getReadReservationLabInfiniteQueryOptions(
-    id,
-    params,
-    options,
-  );
-
-  const query = useInfiniteQuery(
-    queryOptions,
-    queryClient,
-  ) as UseInfiniteQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
 
 export const getReadReservationLabQueryOptions = <
   TData = Awaited<ReturnType<typeof readReservationLab>>,
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationLabParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1259,19 +793,16 @@ export const getReadReservationLabQueryOptions = <
 ) => {
   const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getReadReservationLabQueryKey(id, params);
+  const queryKey = queryOptions?.queryKey ?? getReadReservationLabQueryKey(id);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof readReservationLab>>
-  > = ({ signal }) =>
-    readReservationLab(id, params, { signal, ...fetchOptions });
+  > = ({ signal }) => readReservationLab(id, { signal, ...fetchOptions });
 
   return {
     queryKey,
     queryFn,
     enabled: !!id,
-    staleTime: 10000,
     ...queryOptions,
   } as UseQueryOptions<
     Awaited<ReturnType<typeof readReservationLab>>,
@@ -1293,7 +824,6 @@ export function useReadReservationLab<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params: undefined | ReadReservationLabParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -1321,7 +851,6 @@ export function useReadReservationLab<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationLabParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1349,7 +878,6 @@ export function useReadReservationLab<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationLabParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1373,7 +901,6 @@ export function useReadReservationLab<
   TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
 >(
   id: number,
-  params?: ReadReservationLabParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1388,7 +915,7 @@ export function useReadReservationLab<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getReadReservationLabQueryOptions(id, params, options);
+  const queryOptions = getReadReservationLabQueryOptions(id, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

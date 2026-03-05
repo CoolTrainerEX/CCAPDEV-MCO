@@ -9,7 +9,7 @@ import type { Editable } from "./editable";
 import type { Id } from "./id";
 import type { ReservationDetails } from "./reservationDetails";
 
-export type Reservation = ReservationDetails & {
+export type ReservationListItem = ReservationDetails & {
   id: Id;
   editable?: Editable;
 };

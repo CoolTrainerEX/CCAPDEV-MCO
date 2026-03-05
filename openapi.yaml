@@ -189,16 +189,29 @@ paths:
           in: query
           schema:
             type: string
-        - $ref: "#/components/parameters/page"
+        - name: page
+          description: Pagination query
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
       responses:
         "200":
           description: The labs containing the provided `q` in name
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Lab"
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Lab"
+                  hasNextPage:
+                    $ref: "#/components/schemas/HasNextPage"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -379,7 +392,6 @@ paths:
   /reservation/user/{id}:
     parameters:
       - $ref: "#/components/parameters/userId"
-      - $ref: "#/components/parameters/page"
     get:
       summary: Read the reservations of the user
       operationId: readReservationUser
@@ -391,9 +403,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Reservation"
+                $ref: "#/components/schemas/ReservationList"
 
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -404,7 +414,6 @@ paths:
   /reservation/lab/{id}:
     parameters:
       - $ref: "#/components/parameters/labId"
-      - $ref: "#/components/parameters/page"
     get:
       summary: Read the reservations of the lab
       operationId: readReservationLab
@@ -416,9 +425,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Reservation"
+                $ref: "#/components/schemas/ReservationList"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -432,6 +439,8 @@ components:
       type: integer
       minimum: 0
     Editable:
+      type: boolean
+    HasNextPage:
       type: boolean
     Interval:
       description: Time interval
@@ -586,17 +595,19 @@ components:
               $ref: "#/components/schemas/UserId"
             labId:
               $ref: "#/components/schemas/LabId"
-    Reservation:
-      allOf:
-        - $ref: "#/components/schemas/ReservationDetails"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "#/components/schemas/ReservationId"
-            editable:
-              $ref: "#/components/schemas/Editable"
+    ReservationList:
+      type: array
+      items:
+        allOf:
+          - $ref: "#/components/schemas/ReservationDetails"
+          - type: object
+            required:
+              - id
+            properties:
+              id:
+                $ref: "#/components/schemas/ReservationId"
+              editable:
+                $ref: "#/components/schemas/Editable"
     Error:
       type: object
       required:
@@ -651,14 +662,6 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/LabId"
-    page:
-      name: page
-      description: Pagination query
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
   securitySchemes:
     Jwt:
       type: http

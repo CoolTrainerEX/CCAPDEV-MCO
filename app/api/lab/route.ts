@@ -15,7 +15,7 @@ import { labs as labList, labs, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 
 const PAGE_LIMIT = Number.parseInt(process.env.PAGE_LIMIT ?? "10");
 const logger = pino();
@@ -23,22 +23,22 @@ const getLogger = logger.child({ operation: "get labs" });
 const postLogger = logger.child({ operation: "create lab" });
 
 // eslint-disable-next-line jsdoc/require-jsdoc
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const queryParams = ReadLabsQueryParams.parse(
       Object.fromEntries(request.nextUrl.searchParams.entries()),
     );
     // Typescript cannot infer defined value
+    const lastIndex = queryParams.page * PAGE_LIMIT;
     const q = queryParams.q;
-    const labs = (
-      q
+    const labs = q
         ? labList.filter(({ name }) =>
             name.toLowerCase().includes(q.toLowerCase()),
           )
-        : labList
-    ).slice((queryParams.page - 1) * PAGE_LIMIT, queryParams.page * PAGE_LIMIT);
+        : labList,
+      page = labs.slice((queryParams.page - 1) * PAGE_LIMIT, lastIndex);
 
-    if (!labs.length) {
+    if (!page.length) {
       getLogger.info("Labs not found.");
 
       return NextResponse.json(
@@ -46,10 +46,20 @@ export function GET(request: NextRequest) {
         { status: 404 },
       );
     }
+    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const editable = users.find(({ id }) => id === sessionId)?.admin;
 
     getLogger.info("Success");
 
-    return NextResponse.json(ReadLabsResponse.parse(labs));
+    return NextResponse.json(
+      ReadLabsResponse.parse({
+        data: page.map((value) => ({
+          editable,
+          ...value,
+        })),
+        hasNextPage: lastIndex < labs.length,
+      } as z.infer<typeof ReadLabsResponse>),
+    );
   } catch (e) {
     if (e instanceof ZodError) {
       getLogger.info({ issues: e.issues });

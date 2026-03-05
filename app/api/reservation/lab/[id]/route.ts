@@ -1,19 +1,21 @@
+import { decrypt } from "@/lib/session";
 import {
   ReadReservationLabParams,
-  ReadReservationLabQueryParams,
   ReadReservationLabResponse,
+  ReadReservationLabResponseItem,
 } from "@/src/api/endpoints/reservation/reservation.zod";
 import {
   BadRequestResponse,
   NotFoundResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations as reservationList } from "@/src/sample";
+import { reservations as reservationList, users } from "@/src/sample";
+import { isAfter } from "date-fns";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 
-const PAGE_LIMIT = Number.parseInt(process.env.PAGE_LIMIT ?? "10");
 const getLogger = pino().child({ operation: "get reservations from lab" });
 
 // eslint-disable-next-line jsdoc/require-jsdoc
@@ -21,17 +23,14 @@ export async function GET(
   request: NextRequest,
   context: RouteContext<"/api/reservation/lab/[id]">,
 ) {
+  const now = new Date();
+
   try {
-    const queryParams = ReadReservationLabQueryParams.parse(
-      Object.fromEntries(request.nextUrl.searchParams.entries()),
-    );
     const params = ReadReservationLabParams.parse(await context.params);
-    const reservations = reservationList
-      .filter(({ labId }) => labId === params.id)
-      .slice(
-        (queryParams.page - 1) * PAGE_LIMIT,
-        queryParams.page * PAGE_LIMIT,
-      );
+    const reservations = reservationList.filter(
+      ({ labId, schedule: { end } }) =>
+        labId === params.id && isAfter(end, now),
+    );
 
     if (!reservations.length) {
       getLogger.info("Reservations not found.");
@@ -42,9 +41,23 @@ export async function GET(
       );
     }
 
+    const sessionId = await decrypt((await cookies()).get("session")?.value);
+
     getLogger.info("Success");
 
-    return NextResponse.json(ReadReservationLabResponse.parse(reservations));
+    return NextResponse.json(
+      ReadReservationLabResponse.parse(
+        reservations.map(
+          (value) =>
+            ({
+              editable:
+                value.userId === sessionId ||
+                users.find(({ id }) => id === sessionId)?.admin,
+              ...value,
+            }) as z.infer<typeof ReadReservationLabResponseItem>,
+        ),
+      ),
+    );
   } catch (e) {
     if (e instanceof ZodError) {
       getLogger.info({ issues: e.issues });

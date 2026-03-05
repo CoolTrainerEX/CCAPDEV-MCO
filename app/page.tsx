@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getLabs, getReservationsFromLab, getUser } from "@/src/sample";
 import Slots from "./slots";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -19,13 +18,195 @@ import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "../lib/utils";
 import { startOfDay, isWithinInterval, toDate } from "date-fns";
-import useLogin from "@/src/store/user";
+import {
+  readCurrentUserResponse,
+  readUserResponse,
+  useReadCurrentUser,
+  useReadUser,
+} from "@/src/api/endpoints/user/user";
+import {
+  ReadCurrentUserResponse,
+  ReadUserParams,
+  ReadUserResponse,
+} from "@/src/api/endpoints/user/user.zod";
+import { toast } from "sonner";
+import { useReadLabsInfinite } from "@/src/api/endpoints/lab/lab";
+import {
+  ReadLabsQueryParams,
+  ReadLabsResponse,
+} from "@/src/api/endpoints/lab/lab.zod";
+import z from "zod";
+import { Spinner } from "@/components/ui/spinner";
+import { useQueries } from "@tanstack/react-query";
+import {
+  getReadReservationLabQueryOptions,
+  useReadReservationLab,
+} from "@/src/api/endpoints/reservation/reservation";
+import {
+  ReadReservationLabParams,
+  ReadReservationLabResponse,
+} from "@/src/api/endpoints/reservation/reservation.zod";
+
+/**
+ * Parses the current user ID from the query.
+ * @param {ReturnType<typeof useReadCurrentUser>} currentUserQuery Current user query
+ * @returns {z.infer<typeof ReadCurrentUserResponse> | undefined} Parsed current user ID
+ */
+function getCurrentUser(
+  currentUserQuery: ReturnType<
+    typeof useReadCurrentUser<readCurrentUserResponse>
+  >,
+) {
+  if (currentUserQuery.isSuccess)
+    switch (currentUserQuery.data.status) {
+      case 200:
+        try {
+          return ReadCurrentUserResponse.parse(currentUserQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 401:
+        break;
+      case 404:
+        toast.error(currentUserQuery.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(currentUserQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+}
+
+/**
+ * Parses the user from the query.
+ * @param {ReturnType<typeof useReadUser>} user User query
+ * @returns {z.infer<typeof ReadUserResponse> | undefined} Parsed user
+ */
+function getUser(user: ReturnType<typeof useReadUser<readUserResponse>>) {
+  if (user.isSuccess)
+    switch (user.data.status) {
+      case 200:
+        try {
+          return ReadUserResponse.parse(user.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(user.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(user.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+}
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function Home() {
-  const admin = getUser(useLogin(({ id }) => id))?.admin;
-  const labs = getLabs(useSearchParams().get("q") ?? undefined);
+  const currentUserQuery = useReadCurrentUser();
+  const currentUser = getCurrentUser(currentUserQuery) ?? Number.NaN;
+
+  const user = useReadUser(
+    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? Number.NaN,
+    {
+      query: {
+        enabled:
+          currentUserQuery.isSuccess && currentUserQuery.data.status === 200,
+      },
+    },
+  );
+
+  const admin = getUser(user)?.admin;
+
+  const { data, hasNextPage, fetchNextPage, isPending, isSuccess } =
+    useReadLabsInfinite(
+      ReadLabsQueryParams.safeParse(
+        Object.fromEntries(useSearchParams().entries()),
+      ).data,
+      {
+        query: {
+          initialPageParam: 1,
+          getNextPageParam(lastPage, _, lastPageParam) {
+            if (
+              lastPage.status === 200 &&
+              lastPage.data.hasNextPage &&
+              lastPageParam
+            )
+              return lastPageParam + 1;
+          },
+        },
+      },
+    );
+
+  const labs: z.infer<typeof ReadLabsResponse>["data"] = [];
+  let is200 = true;
+
+  if (isSuccess)
+    for (const page of data.pages) {
+      switch (page.status) {
+        case 200:
+          try {
+            labs.push(...ReadLabsResponse.parse(page.data).data);
+          } catch {
+            toast.warning("Bad response.");
+          }
+          break;
+
+        case 400:
+        case 404:
+          is200 = false;
+          toast.error(page.data.message);
+          break;
+
+        case 500:
+          is200 = false;
+          toast.warning(page.data.message);
+          break;
+
+        default:
+          is200 = false;
+          toast.warning("Unexpected error.");
+          break;
+      }
+    }
+
+  const reservationsQueries = useQueries({
+    queries: labs.map(({ id }) =>
+      getReadReservationLabQueryOptions(
+        ReadReservationLabParams.safeParse({ id }).data?.id ?? Number.NaN,
+        { query: { enabled: isSuccess && is200 } },
+      ),
+    ),
+  });
+
   const now = new Date();
+
+  /**
+   * Gets the reservation query of the specified lab.
+   * @param {number} id Lab ID
+   * @returns {ReturnType<typeof useReadReservationLab>} Reservation query
+   */
+  function getReservationQuery(id: number) {
+    return reservationsQueries.find(
+      ({ data, isSuccess }) =>
+        isSuccess &&
+        data.status === 200 &&
+        data.data.some(({ labId }) => labId === id),
+    );
+  }
 
   return (
     <>
@@ -46,66 +227,115 @@ export default function Home() {
       </Form>
       <Separator className="my-6" />
       <div className="container m-auto flex flex-wrap justify-around gap-6">
-        {labs.length ? (
-          labs.map(({ id, name, weeklySchedule: weeklySched, slots }) => {
-            const reserved = getReservationsFromLab(id)
-              ?.filter(({ schedule }) => isWithinInterval(now, schedule))
-              .flatMap(({ slotIds }) => slotIds);
+        {(() => {
+          if (labs.length)
+            return labs.map(({ id, name, weeklySchedule, slots }) => {
+              const reservationsQuery = getReservationQuery(id);
 
-            const schedule =
-              weeklySched[
-                (
-                  [
-                    "sunday",
-                    "monday",
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday",
-                    "saturday",
-                  ] as (keyof typeof weeklySched)[]
-                )[startOfDay(now).getDay()]
-              ];
+              let reservations;
 
+              if (reservationsQuery?.isSuccess)
+                switch (reservationsQuery.data.status) {
+                  case 200:
+                    try {
+                      reservations = ReadReservationLabResponse.parse(
+                        reservationsQuery.data.data,
+                      );
+                    } catch {
+                      toast.warning("Bad response.");
+                    }
+                    break;
+
+                  case 400:
+                  case 404:
+                    toast.error(reservationsQuery.data.data.message);
+                    break;
+
+                  case 500:
+                    toast.warning(reservationsQuery.data.data.message);
+                    break;
+
+                  default:
+                    toast.warning("Unexpected error.");
+                    break;
+                }
+
+              const reserved = reservations
+                ?.filter(({ schedule }) => isWithinInterval(now, schedule))
+                .flatMap(({ slotIds }) => slotIds);
+
+              const schedule =
+                weeklySchedule[
+                  (
+                    [
+                      "sunday",
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                      "saturday",
+                    ] as (keyof typeof weeklySchedule)[]
+                  )[startOfDay(now).getDay()]
+                ];
+
+              return (
+                <Card key={id} className="w-full max-w-sm">
+                  <CardHeader>
+                    <CardTitle>{name}</CardTitle>
+                    <CardAction>
+                      <Button variant="link" asChild>
+                        <Link href={`/lab/${id}`}>Reserve</Link>
+                      </Button>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <Slots className="aspect-video" slots={slots}>
+                      {({ id }) => (
+                        <div
+                          className={cn(
+                            "h-full w-full",
+                            reserved?.includes(id) ? "bg-primary" : "bg-muted",
+                          )}
+                        />
+                      )}
+                    </Slots>
+                  </CardContent>
+                  <CardFooter>
+                    {schedule
+                      ? Intl.DateTimeFormat(undefined, {
+                          timeStyle: "short",
+                        })?.formatRange(
+                          toDate(schedule.start),
+                          toDate(schedule.end),
+                        )
+                      : "Closed today"}
+                  </CardFooter>
+                </Card>
+              );
+            });
+          else if (isPending)
             return (
-              <Card key={id} className="w-full max-w-sm">
-                <CardHeader>
-                  <CardTitle>{name}</CardTitle>
-                  <CardAction>
-                    <Button variant="link" asChild>
-                      <Link href={`/lab/${id}`}>Reserve</Link>
-                    </Button>
-                  </CardAction>
-                </CardHeader>
-                <CardContent>
-                  <Slots className="aspect-video" slots={slots}>
-                    {({ id }) => (
-                      <div
-                        className={cn(
-                          "h-full w-full",
-                          reserved?.includes(id) ? "bg-primary" : "bg-muted",
-                        )}
-                      />
-                    )}
-                  </Slots>
-                </CardContent>
-                <CardFooter>
-                  {schedule
-                    ? Intl.DateTimeFormat(undefined, {
-                        timeStyle: "short",
-                      })?.formatRange(
-                        toDate(schedule.start),
-                        toDate(schedule.end),
-                      )
-                    : "Closed today"}
-                </CardFooter>
-              </Card>
+              <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
+                <Spinner />
+                Loading...
+              </p>
             );
-          })
-        ) : (
-          <p className="text-center leading-7 not-first:mt-6">No labs.</p>
-        )}
+          else
+            return (
+              <p className="text-center leading-7 not-first:mt-6">No labs.</p>
+            );
+        })()}
       </div>
+      {hasNextPage && (
+        <Button
+          className="mx-auto my-6 block"
+          variant="outline"
+          onClick={() => fetchNextPage()}
+        >
+          View more
+        </Button>
+      )}
     </>
   );
 }

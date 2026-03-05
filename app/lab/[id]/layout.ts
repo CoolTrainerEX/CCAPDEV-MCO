@@ -2,15 +2,11 @@ import { ReadLabParams } from "@/src/api/endpoints/lab/lab.zod";
 import { getLab } from "@/src/sample";
 
 // eslint-disable-next-line jsdoc/require-jsdoc
-export async function generateMetadata({
-  params,
-}: {
-  params: LayoutProps<"/lab/[id]">;
-}) {
-  const name = getLab(ReadLabParams.parse(params).id)?.name;
+export async function generateMetadata(props: LayoutProps<"/lab/[id]">) {
+  const params = ReadLabParams.parse(await props.params);
 
   return {
-    title: name,
+    title: getLab(params.id)?.name,
   };
 }
 

@@ -79,8 +79,10 @@ export default function User() {
         break;
 
       case 400:
-      case 404:
         toast.error(data.data.message);
+        break;
+
+      case 404:
         break;
 
       case 500:
@@ -92,12 +94,7 @@ export default function User() {
         break;
     }
 
-  const {
-    data: reservationData,
-    isPending: isReservationPending,
-    isSuccess: isReservationSuccess,
-    isEnabled: isReservationEnabled,
-  } = useReadReservationUser(
+  const reservationsQuery = useReadReservationUser(
     ReadReservationUserParams.safeParse(user).data?.id ?? Number.NaN,
     {
       query: { enabled: isSuccess && data.status === 200 },
@@ -106,24 +103,26 @@ export default function User() {
 
   let reservations: z.infer<typeof ReadReservationUserResponse> | undefined;
 
-  if (isReservationSuccess)
-    switch (reservationData.status) {
+  if (reservationsQuery.isSuccess)
+    switch (reservationsQuery.data.status) {
       case 200:
         try {
-          user = ReadUserResponse.parse(reservationData.data);
+          reservations = ReadReservationUserResponse.parse(
+            reservationsQuery.data.data,
+          );
         } catch {
           toast.warning("Bad response.");
         }
         break;
 
       case 400:
-        toast.error(reservationData.data.message);
+        toast.error(reservationsQuery.data.data.message);
         break;
       case 404:
         break;
 
       case 500:
-        toast.warning(reservationData.data.message);
+        toast.warning(reservationsQuery.data.data.message);
         break;
 
       default:
@@ -424,19 +423,22 @@ export default function User() {
       {
         <div className="flex justify-around gap-6">
           {(() => {
-            if (isReservationSuccess && reservations)
+            if (reservationsQuery.isSuccess && reservations)
               return reservations.map((value) => (
                 <Reservation key={value.id} reservation={value}>
                   <ReservationContent reservation={value} />
                 </Reservation>
               ));
-            else if (isReservationSuccess && reservationData.status === 404)
+            else if (
+              reservationsQuery.isSuccess &&
+              reservationsQuery.data.status === 404
+            )
               return (
                 <p className="text-center leading-7 not-first:mt-6">
                   No reservations.
                 </p>
               );
-            else if (isReservationPending && isReservationEnabled)
+            else if (reservationsQuery.isPending && reservationsQuery.isEnabled)
               return (
                 <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
                   <Spinner />
@@ -446,7 +448,7 @@ export default function User() {
             else
               return (
                 <p className="flex text-center leading-7 not-first:mt-6">
-                  Error
+                  Error fetching reservations.
                 </p>
               );
           })()}

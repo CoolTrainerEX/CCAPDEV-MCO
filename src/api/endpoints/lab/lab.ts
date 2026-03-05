@@ -32,6 +32,7 @@ import type {
   Lab,
   LabDetails,
   NotFoundResponse,
+  ReadLabs200,
   ReadLabsParams,
   UnauthorizedResponse,
   UnexpectedResponse,
@@ -41,7 +42,7 @@ import type {
  * @summary Read all labs
  */
 export type readLabsResponse200 = {
-  data: Lab[];
+  data: ReadLabs200;
   status: 200;
 };
 
