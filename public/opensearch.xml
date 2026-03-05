@@ -4,8 +4,6 @@
     <ShortName>ArchersLab</ShortName>
     <Description>Search for labs in ArchersLab</Description>
     <InputEncoding>UTF-8</InputEncoding>
-    <Image width="32" height="32" type="image/svg+xml">/icon.svg</Image>
-    <Url type="text/html" template="http://localhost:3000/?q={searchTerms}" />
-    <!-- <Url type="application/x-suggestions+json"
-        template="http://localhost:3000/api/lab?q={searchTerms}" /> -->
+    <Image type="image/png">https://localhost:3000/icon.png</Image>
+    <Url type="text/html" template="https://localhost:3000/?q={searchTerms}" />
 </OpenSearchDescription>

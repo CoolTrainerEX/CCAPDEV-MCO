@@ -11,5 +11,6 @@ import type { ReservationDetails } from "./reservationDetails";
 
 export type ReservationListItem = ReservationDetails & {
   id: Id;
+  userId?: Id;
   editable?: Editable;
 };

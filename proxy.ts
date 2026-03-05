@@ -3,6 +3,7 @@ import { decrypt } from "./lib/session";
 
 const publicRoutes = new Set(["/login", "/register", "/api/login"]);
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.has(path);
@@ -30,5 +31,5 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$|manifest.json).*)"],
 };

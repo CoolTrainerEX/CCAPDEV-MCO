@@ -36,6 +36,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="search"
+          type="application/opensearchdescription+xml"
+          title="ArchersLab"
+          href="/opensearch.xml"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

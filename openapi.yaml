@@ -588,11 +588,8 @@ components:
         - $ref: "#/components/schemas/ReservationUpdate"
         - type: object
           required:
-            - userId
             - labId
           properties:
-            userId:
-              $ref: "#/components/schemas/UserId"
             labId:
               $ref: "#/components/schemas/LabId"
     ReservationList:
@@ -606,6 +603,8 @@ components:
             properties:
               id:
                 $ref: "#/components/schemas/ReservationId"
+              userId:
+                $ref: "#/components/schemas/UserId"
               editable:
                 $ref: "#/components/schemas/Editable"
     Error:

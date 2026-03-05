@@ -42,6 +42,7 @@ export async function GET(
     }
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const isAdmin = users.find(({ id }) => id === sessionId)?.admin;
 
     getLogger.info("Success");
 
@@ -50,10 +51,9 @@ export async function GET(
         reservations.map(
           (value) =>
             ({
-              editable:
-                value.userId === sessionId ||
-                users.find(({ id }) => id === sessionId)?.admin,
+              editable: value.userId === sessionId || isAdmin,
               ...value,
+              userId: value.anonymous && !isAdmin ? undefined : value.userId,
             }) as z.infer<typeof ReadReservationUserResponseItem>,
         ),
       ),

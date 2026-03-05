@@ -30,7 +30,10 @@ import {
   ReadUserResponse,
 } from "@/src/api/endpoints/user/user.zod";
 import { toast } from "sonner";
-import { useReadLabsInfinite } from "@/src/api/endpoints/lab/lab";
+import {
+  readLabsResponse,
+  useReadLabsInfinite,
+} from "@/src/api/endpoints/lab/lab";
 import {
   ReadLabsQueryParams,
   ReadLabsResponse,
@@ -152,7 +155,7 @@ export default function Home() {
     );
 
   const labs: z.infer<typeof ReadLabsResponse>["data"] = [];
-  let is200 = true;
+  let status: readLabsResponse["status"] | undefined;
 
   if (isSuccess)
     for (const page of data.pages) {
@@ -166,28 +169,30 @@ export default function Home() {
           break;
 
         case 400:
-        case 404:
-          is200 = false;
           toast.error(page.data.message);
+          break;
+        case 404:
           break;
 
         case 500:
-          is200 = false;
           toast.warning(page.data.message);
           break;
 
         default:
-          is200 = false;
           toast.warning("Unexpected error.");
           break;
       }
+
+      status = page.status;
+
+      if (page.status !== 200) break;
     }
 
   const reservationsQueries = useQueries({
     queries: labs.map(({ id }) =>
       getReadReservationLabQueryOptions(
         ReadReservationLabParams.safeParse({ id }).data?.id ?? Number.NaN,
-        { query: { enabled: isSuccess && is200 } },
+        { query: { enabled: isSuccess && status === 200 } },
       ),
     ),
   });
@@ -200,12 +205,7 @@ export default function Home() {
    * @returns {ReturnType<typeof useReadReservationLab>} Reservation query
    */
   function getReservationQuery(id: number) {
-    return reservationsQueries.find(
-      ({ data, isSuccess }) =>
-        isSuccess &&
-        data.status === 200 &&
-        data.data.some(({ labId }) => labId === id),
-    );
+    return reservationsQueries[labs.findIndex((value) => value.id === id)];
   }
 
   return (
@@ -228,13 +228,13 @@ export default function Home() {
       <Separator className="my-6" />
       <div className="container m-auto flex flex-wrap justify-around gap-6">
         {(() => {
-          if (labs.length)
+          if (isSuccess && status === 200)
             return labs.map(({ id, name, weeklySchedule, slots }) => {
               const reservationsQuery = getReservationQuery(id);
 
               let reservations;
 
-              if (reservationsQuery?.isSuccess)
+              if (reservationsQuery.isSuccess)
                 switch (reservationsQuery.data.status) {
                   case 200:
                     try {
@@ -247,8 +247,9 @@ export default function Home() {
                     break;
 
                   case 400:
-                  case 404:
                     toast.error(reservationsQuery.data.data.message);
+                    break;
+                  case 404:
                     break;
 
                   case 500:
@@ -279,6 +280,25 @@ export default function Home() {
                   )[startOfDay(now).getDay()]
                 ];
 
+              // eslint-disable-next-line jsdoc/require-returns
+              /**
+               * Function to render slots.
+               * @param {Parameters<Parameters<typeof Slots>[0]["children"]>[0]} param0 Slot
+               * @param {number} param0.id Slot ID
+               */
+              function slotFunc({
+                id,
+              }: Parameters<Parameters<typeof Slots>[0]["children"]>[0]) {
+                return (
+                  <div
+                    className={cn(
+                      "h-full w-full",
+                      reserved?.includes(id) ? "bg-primary" : "bg-muted",
+                    )}
+                  />
+                );
+              }
+
               return (
                 <Card key={id} className="w-full max-w-sm">
                   <CardHeader>
@@ -290,22 +310,32 @@ export default function Home() {
                     </CardAction>
                   </CardHeader>
                   <CardContent>
-                    <Slots className="aspect-video" slots={slots}>
-                      {({ id }) => (
-                        <div
-                          className={cn(
-                            "h-full w-full",
-                            reserved?.includes(id) ? "bg-primary" : "bg-muted",
-                          )}
-                        />
-                      )}
-                    </Slots>
+                    {(() => {
+                      if (
+                        reservationsQuery.isSuccess &&
+                        (reservationsQuery.data.status === 200 ||
+                          reservationsQuery.data.status === 404)
+                      )
+                        return (
+                          <Slots className="aspect-video" slots={slots}>
+                            {slotFunc}
+                          </Slots>
+                        );
+                      else if (reservationsQuery.isPending)
+                        return (
+                          <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
+                            <Spinner />
+                            Loading...
+                          </p>
+                        );
+                      else return "Error fetching reservations.";
+                    })()}
                   </CardContent>
                   <CardFooter>
                     {schedule
                       ? Intl.DateTimeFormat(undefined, {
                           timeStyle: "short",
-                        })?.formatRange(
+                        }).formatRange(
                           toDate(schedule.start),
                           toDate(schedule.end),
                         )
@@ -314,6 +344,10 @@ export default function Home() {
                 </Card>
               );
             });
+          else if (isSuccess && status === 404)
+            return (
+              <p className="text-center leading-7 not-first:mt-6">No labs.</p>
+            );
           else if (isPending)
             return (
               <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
@@ -323,7 +357,9 @@ export default function Home() {
             );
           else
             return (
-              <p className="text-center leading-7 not-first:mt-6">No labs.</p>
+              <p className="text-center leading-7 not-first:mt-6">
+                Error fetching labs.
+              </p>
             );
         })()}
       </div>

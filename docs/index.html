@@ -10006,46 +10006,6 @@
                         </div>
                       </td>
                     </tr>
-                    <tr class="">
-                      <td
-                        kind="field"
-                        title="userId"
-                        class="sc-hAtEya sc-fGFwA-d kddqHa eIujjv"
-                      >
-                        <span class="sc-ieZDjf bEKmDE"></span
-                        ><span class="property-name">userId</span>
-                        <div class="sc-gUrTyB sc-eKYjSU bPAaet boAHLn">
-                          required
-                        </div>
-                      </td>
-                      <td class="sc-blLsxE bmauLr">
-                        <div>
-                          <div>
-                            <span
-                              class="sc-gUrTyB sc-kZGvTq bPAaet UMvzF"
-                            ></span
-                            ><span class="sc-gUrTyB sc-iMfspz bPAaet fEQrHJ"
-                              >integer</span
-                            ><span class="sc-gUrTyB sc-jfSnVt bPAaet kEFcTG">
-                              (<!-- -->UserId<!-- -->) </span
-                            ><span>
-                              <span class="sc-gUrTyB sc-cmEaii bPAaet iWTprB">
-                                <!-- -->&gt;= 0<!-- -->
-                              </span></span
-                            >
-                          </div>
-                          <div>
-                            <div
-                              html="&lt;p&gt;The unique identifier of a user&lt;/p&gt;
-"
-                              class="sc-iKGpAq sc-cCYyou dXXcln cFvDiF"
-                            >
-                              <p>The unique identifier of a user</p>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
                     <tr class="last">
                       <td
                         kind="field"
@@ -10397,16 +10357,6 @@
                                           </li>
                                         </ul>
                                         <span class="token punctuation">]</span
-                                        ><span class="token punctuation"
-                                          >,</span
-                                        >
-                                      </div>
-                                    </li>
-                                    <li>
-                                      <div class="hoverable">
-                                        <span class="property token string"
-                                          >"userId"</span
-                                        >: <span class="token number">0</span
                                         ><span class="token punctuation"
                                           >,</span
                                         >
@@ -12024,18 +11974,6 @@
                                             <div class="hoverable collapsed">
                                               <span
                                                 class="property token string"
-                                                >"userId"</span
-                                              >:
-                                              <span class="token number">0</span
-                                              ><span class="token punctuation"
-                                                >,</span
-                                              >
-                                            </div>
-                                          </li>
-                                          <li>
-                                            <div class="hoverable collapsed">
-                                              <span
-                                                class="property token string"
                                                 >"labId"</span
                                               >:
                                               <span class="token number">0</span
@@ -12049,6 +11987,18 @@
                                               <span
                                                 class="property token string"
                                                 >"id"</span
+                                              >:
+                                              <span class="token number">0</span
+                                              ><span class="token punctuation"
+                                                >,</span
+                                              >
+                                            </div>
+                                          </li>
+                                          <li>
+                                            <div class="hoverable collapsed">
+                                              <span
+                                                class="property token string"
+                                                >"userId"</span
                                               >:
                                               <span class="token number">0</span
                                               ><span class="token punctuation"
@@ -12535,18 +12485,6 @@
                                             <div class="hoverable collapsed">
                                               <span
                                                 class="property token string"
-                                                >"userId"</span
-                                              >:
-                                              <span class="token number">0</span
-                                              ><span class="token punctuation"
-                                                >,</span
-                                              >
-                                            </div>
-                                          </li>
-                                          <li>
-                                            <div class="hoverable collapsed">
-                                              <span
-                                                class="property token string"
                                                 >"labId"</span
                                               >:
                                               <span class="token number">0</span
@@ -12560,6 +12498,18 @@
                                               <span
                                                 class="property token string"
                                                 >"id"</span
+                                              >:
+                                              <span class="token number">0</span
+                                              ><span class="token punctuation"
+                                                >,</span
+                                              >
+                                            </div>
+                                          </li>
+                                          <li>
+                                            <div class="hoverable collapsed">
+                                              <span
+                                                class="property token string"
+                                                >"userId"</span
                                               >:
                                               <span class="token number">0</span
                                               ><span class="token punctuation"
@@ -13211,9 +13161,8 @@
                     { $ref: "#/components/schemas/ReservationUpdate" },
                     {
                       type: "object",
-                      required: ["userId", "labId"],
+                      required: ["labId"],
                       properties: {
-                        userId: { $ref: "#/components/schemas/UserId" },
                         labId: { $ref: "#/components/schemas/LabId" },
                       },
                     },
@@ -13229,6 +13178,7 @@
                         required: ["id"],
                         properties: {
                           id: { $ref: "#/components/schemas/ReservationId" },
+                          userId: { $ref: "#/components/schemas/UserId" },
                           editable: { $ref: "#/components/schemas/Editable" },
                         },
                       },

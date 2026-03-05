@@ -12,8 +12,6 @@ import * as zod from "zod";
  */
 export const createReservationBodyOneSlotIdsItemMin = 0;
 
-export const createReservationBodyTwoUserIdMin = 0;
-
 export const createReservationBodyTwoLabIdMin = 0;
 
 export const CreateReservationBody = zod
@@ -31,7 +29,6 @@ export const CreateReservationBody = zod
   })
   .and(
     zod.object({
-      userId: zod.number().min(createReservationBodyTwoUserIdMin),
       labId: zod.number().min(createReservationBodyTwoLabIdMin),
     }),
   );
@@ -87,11 +84,11 @@ export const ReadReservationUserParams = zod.object({
 
 export const readReservationUserResponseOneOneSlotIdsItemMin = 0;
 
-export const readReservationUserResponseOneTwoUserIdMin = 0;
-
 export const readReservationUserResponseOneTwoLabIdMin = 0;
 
 export const readReservationUserResponseTwoIdMin = 0;
+
+export const readReservationUserResponseTwoUserIdMin = 0;
 
 export const ReadReservationUserResponseItem = zod
   .object({
@@ -108,13 +105,16 @@ export const ReadReservationUserResponseItem = zod
   })
   .and(
     zod.object({
-      userId: zod.number().min(readReservationUserResponseOneTwoUserIdMin),
       labId: zod.number().min(readReservationUserResponseOneTwoLabIdMin),
     }),
   )
   .and(
     zod.object({
       id: zod.number().min(readReservationUserResponseTwoIdMin),
+      userId: zod
+        .number()
+        .min(readReservationUserResponseTwoUserIdMin)
+        .optional(),
       editable: zod.boolean().optional(),
     }),
   );
@@ -136,11 +136,11 @@ export const ReadReservationLabParams = zod.object({
 
 export const readReservationLabResponseOneOneSlotIdsItemMin = 0;
 
-export const readReservationLabResponseOneTwoUserIdMin = 0;
-
 export const readReservationLabResponseOneTwoLabIdMin = 0;
 
 export const readReservationLabResponseTwoIdMin = 0;
+
+export const readReservationLabResponseTwoUserIdMin = 0;
 
 export const ReadReservationLabResponseItem = zod
   .object({
@@ -157,13 +157,16 @@ export const ReadReservationLabResponseItem = zod
   })
   .and(
     zod.object({
-      userId: zod.number().min(readReservationLabResponseOneTwoUserIdMin),
       labId: zod.number().min(readReservationLabResponseOneTwoLabIdMin),
     }),
   )
   .and(
     zod.object({
       id: zod.number().min(readReservationLabResponseTwoIdMin),
+      userId: zod
+        .number()
+        .min(readReservationLabResponseTwoUserIdMin)
+        .optional(),
       editable: zod.boolean().optional(),
     }),
   );

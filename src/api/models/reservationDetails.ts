@@ -9,6 +9,5 @@ import type { Id } from "./id";
 import type { ReservationUpdate } from "./reservationUpdate";
 
 export type ReservationDetails = ReservationUpdate & {
-  userId: Id;
   labId: Id;
 };

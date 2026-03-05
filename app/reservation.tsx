@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/drawer";
 import Form from "next/form";
 import TimeRangeInput from "./time-range-input";
-import {
-  deleteReservation,
-  getLab,
-  getReservationsFromLab,
-  getUser,
-} from "@/src/sample";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   getHours,
@@ -43,7 +37,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import useLogin from "@/src/store/user";
 import {
   Card,
   CardAction,
@@ -55,13 +48,36 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Slots from "./slots";
-import { useRouter } from "next/navigation";
 import { Toggle } from "@/components/ui/toggle";
 import {
+  DeleteReservationParams,
+  ReadReservationLabParams,
   ReadReservationLabResponse,
   ReadReservationLabResponseItem,
+  UpdateReservationBody,
+  UpdateReservationParams,
 } from "@/src/api/endpoints/reservation/reservation.zod";
 import z from "zod";
+import {
+  useDeleteReservation,
+  useReadReservationLab,
+  useUpdateReservation,
+} from "@/src/api/endpoints/reservation/reservation";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { readLabResponse, useReadLab } from "@/src/api/endpoints/lab/lab";
+import {
+  ReadLabParams,
+  ReadLabResponse,
+} from "@/src/api/endpoints/lab/lab.zod";
+import { useReadUser } from "@/src/api/endpoints/user/user";
+import {
+  ReadUserParams,
+  ReadUserResponse,
+} from "@/src/api/endpoints/user/user.zod";
+import { Spinner } from "@/components/ui/spinner";
 
 /**
  * Modify selected on toggle.
@@ -80,6 +96,37 @@ export function onPressedChange(
     );
 }
 
+/**
+ * Parses the lab from the query.
+ * @param {ReturnType<typeof useReadLab>} labQuery Lab query
+ * @returns {z.infer<typeof ReadLabResponse> | undefined} Parsed lab
+ */
+function getLab(labQuery: ReturnType<typeof useReadLab<readLabResponse>>) {
+  if (labQuery.isSuccess)
+    switch (labQuery.data.status) {
+      case 200:
+        try {
+          return ReadLabResponse.parse(labQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(labQuery.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(labQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+}
+
 // eslint-disable-next-line jsdoc/require-returns
 /**
  * Reservation wrapper for {@link Drawer} functionality.
@@ -92,10 +139,105 @@ export default function Reservation({
   reservation,
   ...props
 }: Parameters<typeof Drawer>[0] & {
-  reservation?: z.infer<typeof ReadReservationLabResponseItem>;
+  reservation: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
-  const router = useRouter();
-  const loginId = useLogin(({ id }) => id);
+  const queryClient = useQueryClient();
+
+  const labQuery = useReadLab(
+    ReadLabParams.safeParse(reservation.labId).data?.id ?? Number.NaN,
+  );
+
+  const lab = getLab(labQuery);
+
+  const { data, isSuccess } = useReadReservationLab(
+    ReadReservationLabParams.safeParse(lab).data?.id ?? Number.NaN,
+    { query: { enabled: labQuery.isSuccess && labQuery.data.status === 200 } },
+  );
+
+  let reservations: z.infer<typeof ReadReservationLabResponse> | undefined;
+
+  if (isSuccess)
+    switch (data.status) {
+      case 200:
+        try {
+          reservations = ReadReservationLabResponse.parse(data.data).filter(
+            ({ id }) => id !== reservation.id,
+          );
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(data.data.message);
+        break;
+
+      case 500:
+        toast.warning(data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+
+  const { mutate: mutateUpdateReservation } = useUpdateReservation({
+    mutation: {
+      onSuccess(data) {
+        switch (data.status) {
+          case 204:
+            toast.success("Updated reservation.");
+            break;
+
+          case 400:
+          case 401:
+          case 404:
+            toast.error(data.data.message);
+            break;
+
+          case 500:
+            toast.warning(data.data.message);
+            break;
+
+          default:
+            toast.warning("Unexpected error.");
+            break;
+        }
+
+        queryClient.invalidateQueries();
+      },
+    },
+  });
+
+  const { mutate: mutateDeleteReservation } = useDeleteReservation({
+    mutation: {
+      onSuccess(data) {
+        switch (data.status) {
+          case 204:
+            toast.success("Deleted reservation.");
+            break;
+
+          case 400:
+          case 401:
+          case 404:
+            toast.error(data.data.message);
+            break;
+
+          case 500:
+            toast.warning(data.data.message);
+            break;
+
+          default:
+            toast.warning("Unexpected error.");
+            break;
+        }
+
+        queryClient.invalidateQueries();
+      },
+    },
+  });
+
   const now = new Date();
 
   const [formSchedule, setFormSchedule] = useState<Interval>(
@@ -107,21 +249,11 @@ export default function Reservation({
       : { start: new Date(now), end: new Date(now) },
   );
 
-  const [selected, setSelected] = useState(
-    reservation ? reservation.slotIds : [],
-  );
-
-  if (!reservation) return children;
-
-  const lab = getLab(reservation.labId);
-
-  if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
-
-  const reservations = getReservationsFromLab(lab.id)?.filter(
-    ({ id }) => id !== reservation.id,
-  );
+  const [selected, setSelected] = useState(reservation.slotIds ?? []);
+  const [anonymous, setAnonymous] = useState(reservation.anonymous ?? false);
 
   const rawSchedule =
+    lab &&
     lab.weeklySchedule[
       (
         [
@@ -155,98 +287,131 @@ export default function Reservation({
 
   if (schedule && isAfter(schedule.start, schedule.end)) schedule = undefined;
 
-  return (
-    <Drawer {...props}>
-      {children}
-      <DrawerContent>
-        <div className="mx-auto w-full">
-          <DrawerHeader>
-            <DrawerTitle>Edit Reservation</DrawerTitle>
-            <DrawerDescription>
-              <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
-            </DrawerDescription>
-          </DrawerHeader>
-          <Form action="/" formMethod="post">
-            <div className="flex flex-wrap gap-6 p-4 pb-0">
-              <Slots className="flex-1" slots={lab.slots}>
-                {({ id }) => {
-                  const reservation = reservations
-                    ?.filter(({ schedule }) =>
-                      areIntervalsOverlapping(schedule, formSchedule),
-                    )
-                    .find(({ slotIds }) => slotIds.includes(id));
-
-                  return (
-                    <Toggle
-                      disabled={!!reservation}
-                      className={cn(
-                        "h-full w-full",
-                        reservation
-                          ? "bg-destructive text-destructive-foreground"
-                          : "bg-muted text-muted-foreground",
-                      )}
-                      pressed={selected.includes(id)}
-                      onPressedChange={onPressedChange(setSelected, id)}
-                      aria-label="Toggle Slot"
-                    />
-                  );
-                }}
-              </Slots>
-              <TimeRangeInput
-                schedule={schedule}
-                value={formSchedule}
-                setValue={setFormSchedule}
-                valid={
-                  !reservations
-                    ?.filter(({ slotIds }) =>
-                      slotIds.some((value) => selected.includes(value)),
-                    )
-                    .some(({ schedule }) =>
-                      areIntervalsOverlapping(schedule, formSchedule),
-                    )
+  if (isSuccess && lab && reservations)
+    return (
+      <Drawer {...props}>
+        {children}
+        <DrawerContent>
+          <div className="mx-auto w-full">
+            <DrawerHeader>
+              <DrawerTitle>Edit Reservation</DrawerTitle>
+              <DrawerDescription>
+                <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
+              </DrawerDescription>
+            </DrawerHeader>
+            <Form
+              action={() => {
+                try {
+                  mutateUpdateReservation({
+                    ...UpdateReservationParams.parse(reservation),
+                    data: UpdateReservationBody.parse({
+                      schedule: {
+                        start: new Date(formSchedule.start).toISOString(),
+                        end: new Date(formSchedule.end).toISOString(),
+                      },
+                      slotIds: selected,
+                      anonymous,
+                    } as z.infer<typeof UpdateReservationBody>),
+                  });
+                } catch {
+                  toast.error("Invalid fields.");
                 }
-                className="w-sm"
-              />
-            </div>
-            <DrawerFooter className="mx-auto max-w-sm">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your reservation from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        deleteReservation(reservation.id, loginId);
-                        router.refresh();
-                      }}
-                    >
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              <DrawerClose asChild>
-                <Button variant="outline" type="reset">
-                  Cancel
-                </Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </Form>
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
+              }}
+            >
+              <div className="flex flex-wrap gap-6 p-4 pb-0">
+                <Slots className="flex-1" slots={lab.slots}>
+                  {({ id }) => {
+                    const reservation = reservations
+                      .filter(({ schedule }) =>
+                        areIntervalsOverlapping(schedule, formSchedule),
+                      )
+                      .find(({ slotIds }) => slotIds.includes(id));
+
+                    return (
+                      <Toggle
+                        disabled={!!reservation}
+                        className={cn(
+                          "h-full w-full",
+                          reservation
+                            ? "bg-destructive text-destructive-foreground"
+                            : "bg-muted text-muted-foreground",
+                        )}
+                        pressed={selected.includes(id)}
+                        onPressedChange={onPressedChange(setSelected, id)}
+                        aria-label="Toggle Slot"
+                      />
+                    );
+                  }}
+                </Slots>
+                <div className="flex w-sm flex-col gap-2">
+                  <TimeRangeInput
+                    schedule={schedule}
+                    value={formSchedule}
+                    setValue={setFormSchedule}
+                    valid={reservations
+                      .filter(({ slotIds }) =>
+                        slotIds.some((value) => selected.includes(value)),
+                      )
+                      .some(({ schedule }) =>
+                        areIntervalsOverlapping(schedule, formSchedule),
+                      )}
+                  />
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="anonymous"
+                      checked={anonymous}
+                      onCheckedChange={(checked) =>
+                        checked !== "indeterminate" && setAnonymous(checked)
+                      }
+                    />
+                    <FieldLabel htmlFor="anonymous">Anonymous</FieldLabel>
+                  </Field>
+                </div>
+              </div>
+              <DrawerFooter className="mx-auto max-w-sm">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">Delete</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your reservation from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          try {
+                            mutateDeleteReservation(
+                              DeleteReservationParams.parse(reservation),
+                            );
+                          } catch {
+                            toast.error("Invalid request.");
+                          }
+                        }}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <DrawerClose asChild>
+                  <Button variant="outline" type="reset">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </Form>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
 }
 
 // eslint-disable-next-line jsdoc/require-returns
@@ -263,55 +428,141 @@ export function ReservationContent({
 }: React.ComponentProps<"div"> & {
   reservation: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
-  const user = reservation.anonymous
-    ? { name: { first: "Anonymous", last: "" } }
-    : getUser(reservation.userId);
+  const userQuery = useReadUser(
+    ReadUserParams.safeParse({ id: reservation.userId }).data?.id ?? Number.NaN,
+    { query: { enabled: !reservation.anonymous } },
+  );
 
-  const lab = getLab(reservation.labId);
+  let user: z.infer<typeof ReadUserResponse> | undefined;
 
-  if (!user) throw new Error(`Invalid user ID ${reservation.userId}.`);
-  if (!lab) throw new Error(`Invalid Lab ID ${reservation.labId}`);
+  if (userQuery.isSuccess)
+    switch (userQuery.data.status) {
+      case 200:
+        try {
+          user = ReadUserResponse.parse(userQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(userQuery.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(userQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+
+  const labQuery = useReadLab(
+    ReadLabParams.safeParse({ id: reservation.labId }).data?.id ?? Number.NaN,
+  );
+
+  let lab: z.infer<typeof ReadLabResponse> | undefined;
+
+  if (labQuery.isSuccess)
+    switch (labQuery.data.status) {
+      case 200:
+        try {
+          lab = ReadLabResponse.parse(labQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+      case 404:
+        toast.error(labQuery.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(labQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
 
   return (
     <Card className={cn("w-full max-w-sm", className)} {...props}>
-      <CardHeader>
-        <CardTitle>
-          <Link href={`/user/${reservation.userId}`}>
-            {[user.name.first, user.name.last].join(" ")}
-          </Link>
-        </CardTitle>
-        <CardDescription>
-          <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
-        </CardDescription>
-        {reservation.editable && (
-          <CardAction>
-            <DrawerTrigger asChild>
-              <Button variant="link">Edit</Button>
-            </DrawerTrigger>
-          </CardAction>
-        )}
-      </CardHeader>
-      <CardContent>
-        <Slots className="aspect-video" slots={lab.slots}>
-          {({ id }) => (
-            <div
-              className={cn(
-                "h-full",
-                reservation.slotIds.includes(id) ? "bg-primary" : "bg-muted",
-              )}
-            />
-          )}
-        </Slots>
-      </CardContent>
-      <CardFooter>
-        {Intl.DateTimeFormat(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })?.formatRange(
-          toDate(reservation.schedule.start),
-          toDate(reservation.schedule.end),
-        )}
-      </CardFooter>
+      {(() => {
+        if (
+          ((userQuery.isSuccess && user) || reservation.anonymous) &&
+          labQuery.isSuccess &&
+          lab
+        )
+          return (
+            <>
+              <CardHeader>
+                <CardTitle>
+                  {reservation.anonymous
+                    ? "Anonymous"
+                    : user && (
+                        <Link href={`/user/${user.id}`}>
+                          {[user.name.first, user.name.last].join(" ")}
+                        </Link>
+                      )}
+                </CardTitle>
+                <CardDescription>
+                  <Link href={`/lab/${lab.id}`}>{lab.name}</Link>
+                </CardDescription>
+                {reservation.editable && (
+                  <CardAction>
+                    <DrawerTrigger asChild>
+                      <Button variant="link">Edit</Button>
+                    </DrawerTrigger>
+                  </CardAction>
+                )}
+              </CardHeader>
+              <CardContent>
+                <Slots className="aspect-video" slots={lab.slots}>
+                  {({ id }) => (
+                    <div
+                      className={cn(
+                        "h-full",
+                        reservation.slotIds.includes(id)
+                          ? "bg-primary"
+                          : "bg-muted",
+                      )}
+                    />
+                  )}
+                </Slots>
+              </CardContent>
+              <CardFooter>
+                {Intl.DateTimeFormat(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).formatRange(
+                  toDate(reservation.schedule.start),
+                  toDate(reservation.schedule.end),
+                )}
+              </CardFooter>
+            </>
+          );
+        else if (userQuery.isPending || labQuery.isPending)
+          return (
+            <CardContent>
+              <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
+                <Spinner />
+                Loading...
+              </p>
+            </CardContent>
+          );
+        else
+          return (
+            <CardContent>
+              <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
+                Error fetching reservation details.
+              </p>
+            </CardContent>
+          );
+      })()}
     </Card>
   );
 }

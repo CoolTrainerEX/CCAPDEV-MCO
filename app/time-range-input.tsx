@@ -45,7 +45,7 @@ export default function TimeRangeInput({
 }) {
   return (
     <FieldGroup {...props}>
-      <Field>
+      <Field data-invalid={!valid}>
         <FieldLabel htmlFor="start">Start</FieldLabel>
         <InputGroup>
           <InputGroupInput
@@ -65,13 +65,14 @@ export default function TimeRangeInput({
               }))
             }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            aria-invalid={!valid}
           />
           <InputGroupAddon>
             <Clock2 className="text-muted-foreground" />
           </InputGroupAddon>
         </InputGroup>
       </Field>
-      <Field>
+      <Field data-invalid={!valid}>
         <FieldLabel htmlFor="end">End</FieldLabel>
         <InputGroup>
           <InputGroupInput
@@ -91,6 +92,7 @@ export default function TimeRangeInput({
               }))
             }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            aria-invalid={!valid}
           />
           <InputGroupAddon>
             <Clock2 className="text-muted-foreground" />

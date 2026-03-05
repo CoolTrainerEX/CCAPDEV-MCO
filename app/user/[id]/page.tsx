@@ -60,11 +60,9 @@ import { Spinner } from "@/components/ui/spinner";
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function User() {
+  const params = ReadUserParams.safeParse(useParams()).data;
   const queryClient = useQueryClient();
-
-  const { data, isPending, isSuccess } = useReadUser(
-    ReadUserParams.safeParse(useParams()).data?.id ?? Number.NaN,
-  );
+  const { data, isPending, isSuccess } = useReadUser(params?.id ?? Number.NaN);
 
   let user: z.infer<typeof ReadUserResponse> | undefined;
 
@@ -260,9 +258,7 @@ export default function User() {
 
                               try {
                                 mutateUpdateUser({
-                                  ...UpdateUserParams.parse({
-                                    id: user.id,
-                                  }),
+                                  ...UpdateUserParams.parse(user),
                                   data: UpdateUserBody.parse({
                                     name: {
                                       first: data["firstname"],
@@ -270,7 +266,7 @@ export default function User() {
                                     },
                                     ...data,
                                     password: data["password"] || undefined,
-                                  }),
+                                  } as z.infer<typeof UpdateUserBody>),
                                 });
                               } catch {
                                 toast.error("Invalid fields.");
@@ -372,9 +368,7 @@ export default function User() {
                                       onClick={() => {
                                         try {
                                           mutateDeleteUser(
-                                            DeleteUserParams.parse({
-                                              id: user.id,
-                                            }),
+                                            DeleteUserParams.parse(user),
                                           );
                                         } catch {
                                           toast.error("Invalid request.");
@@ -438,7 +432,7 @@ export default function User() {
                   No reservations.
                 </p>
               );
-            else if (reservationsQuery.isPending && reservationsQuery.isEnabled)
+            else if (reservationsQuery.isPending)
               return (
                 <p className="flex items-center justify-center gap-2 text-center leading-7 not-first:mt-6">
                   <Spinner />

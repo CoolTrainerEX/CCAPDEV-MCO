@@ -6,7 +6,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations, users } from "@/src/sample";
+import { reservations } from "@/src/sample";
 import { areIntervalsOverlapping } from "date-fns";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,10 +22,7 @@ export async function POST(request: NextRequest) {
 
     const sessionId = await decrypt((await cookies()).get("session")?.value);
 
-    if (
-      sessionId !== body.userId &&
-      !users.find(({ id }) => id === sessionId)?.admin
-    ) {
+    if (!sessionId) {
       postLogger.info("Unauthorized.");
 
       return NextResponse.json(
@@ -49,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     const id = Math.max(...reservations.map(({ id }) => id)) + 1;
 
-    reservations.push({ id, ...body });
+    reservations.push({ id, userId: sessionId, ...body });
     postLogger.info("Success");
 
     return NextResponse.json(id, { status: 201 });
