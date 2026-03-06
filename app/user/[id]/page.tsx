@@ -63,7 +63,6 @@ export default function User() {
   const params = ReadUserParams.safeParse(useParams()).data;
   const queryClient = useQueryClient();
   const { data, isPending, isSuccess } = useReadUser(params?.id ?? Number.NaN);
-
   let user: z.infer<typeof ReadUserResponse> | undefined;
 
   if (isSuccess)
@@ -402,7 +401,7 @@ export default function User() {
               <p className="mx-auto mt-6 w-fit italic">{user.description}</p>
             </>
           );
-        else if (isPending) {
+        else if (isPending)
           return (
             <div className="container m-auto flex items-center justify-center gap-6">
               <Spinner className="size-8" />
@@ -411,7 +410,7 @@ export default function User() {
               </h1>
             </div>
           );
-        } else notFound();
+        else notFound();
       })()}
       <Separator className="my-6" />
       {

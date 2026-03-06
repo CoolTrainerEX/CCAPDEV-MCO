@@ -50,7 +50,6 @@ export default function TimeRangeInput({
         <InputGroup>
           <InputGroupInput
             id="start"
-            name="start"
             type="time"
             step={30 * 60}
             disabled={!schedule}
@@ -77,7 +76,6 @@ export default function TimeRangeInput({
         <InputGroup>
           <InputGroupInput
             id="end"
-            name="end"
             type="time"
             step={30 * 60}
             disabled={!schedule}

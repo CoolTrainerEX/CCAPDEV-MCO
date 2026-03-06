@@ -3,7 +3,7 @@ import {
   ReadUserResponse,
 } from "@/src/api/endpoints/user/user.zod";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function generateMetadata(props: LayoutProps<"/user/[id]">) {
@@ -13,9 +13,9 @@ export async function generateMetadata(props: LayoutProps<"/user/[id]">) {
   );
 
   if (userQuery.ok && userQuery.status === 200) {
-    const user = ReadUserResponse.parse(await userQuery.json());
+    const user = ReadUserResponse.safeParse(await userQuery.json()).data;
     return {
-      title: user.name && `${user.name.first} ${user.name.last}`,
+      title: user?.name && `${user.name.first} ${user.name.last}`,
     };
   }
 }

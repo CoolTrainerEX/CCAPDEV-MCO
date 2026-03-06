@@ -139,12 +139,13 @@ export default function Reservation({
   reservation,
   ...props
 }: Parameters<typeof Drawer>[0] & {
-  reservation: z.infer<typeof ReadReservationLabResponseItem>;
+  reservation?: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
   const queryClient = useQueryClient();
 
   const labQuery = useReadLab(
-    ReadLabParams.safeParse(reservation.labId).data?.id ?? Number.NaN,
+    ReadLabParams.safeParse({ id: reservation?.labId }).data?.id ?? Number.NaN,
+    { query: { enabled: !!reservation } },
   );
 
   const lab = getLab(labQuery);
@@ -161,7 +162,7 @@ export default function Reservation({
       case 200:
         try {
           reservations = ReadReservationLabResponse.parse(data.data).filter(
-            ({ id }) => id !== reservation.id,
+            ({ id }) => id !== reservation?.id,
           );
         } catch {
           toast.warning("Bad response.");
@@ -249,8 +250,10 @@ export default function Reservation({
       : { start: new Date(now), end: new Date(now) },
   );
 
-  const [selected, setSelected] = useState(reservation.slotIds ?? []);
-  const [anonymous, setAnonymous] = useState(reservation.anonymous ?? false);
+  const [selected, setSelected] = useState(reservation?.slotIds ?? []);
+  const [anonymous, setAnonymous] = useState(reservation?.anonymous ?? false);
+
+  if (!reservation) return children;
 
   const rawSchedule =
     lab &&

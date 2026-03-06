@@ -7,13 +7,13 @@
  */
 
 export type ReadLabsParams = {
-  /**
-   * The search query to filter labs
-   */
-  q?: string;
-  /**
-   * Pagination query
-   * @minimum 1
-   */
-  page?: number;
+/**
+ * The search query to filter labs
+ */
+q?: string;
+/**
+ * Pagination query
+ * @minimum 1
+ */
+page?: number;
 };

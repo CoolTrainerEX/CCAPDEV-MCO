@@ -4,7 +4,7 @@ export default defineConfig({
   // HTTP client generation
   api: {
     input: {
-      target: "./openapi.yaml",
+      target: "./public/openapi.yaml",
     },
     output: {
       mode: "tags-split",
@@ -31,7 +31,7 @@ export default defineConfig({
   // Zod schema generation
   apiZod: {
     input: {
-      target: "./openapi.yaml",
+      target: "./public/openapi.yaml",
     },
     output: {
       mode: "tags-split",

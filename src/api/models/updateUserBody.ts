@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { UserDetails } from "./userDetails";
-import type { UserPassword } from "./userPassword";
+import type { UserDetails } from './userDetails';
+import type { UserPassword } from './userPassword';
 
 export type UpdateUserBody = UserDetails & {
   password?: UserPassword;
