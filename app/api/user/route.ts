@@ -11,6 +11,7 @@ import {
   UnexpectedResponse,
 } from "@/src/api/models";
 import { users } from "@/src/sample";
+import { hash } from "argon2";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
       id,
       description: "",
       ...body,
+      password: await hash(body.password),
     });
     await createSession(id);
     postLogger.info("Success");

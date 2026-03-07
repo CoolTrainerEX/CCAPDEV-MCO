@@ -1,8 +1,7 @@
-import { Interval } from "date-fns";
-import { isAfter } from "date-fns";
-import { parse } from "date-fns";
+import { Interval, parse } from "date-fns";
+import { hash } from "argon2";
 
-export type User = {
+type User = {
   id: number;
   email: string;
   name: { first: string; last: string };
@@ -46,7 +45,7 @@ export const users: User[] = [
       first: "Juan",
       last: "Dela Cruz",
     },
-    password: "12345678",
+    password: await hash("12345678"),
     description: "Student of DLSU",
   },
   {
@@ -56,7 +55,7 @@ export const users: User[] = [
       first: "Joe",
       last: "Dela Cruz",
     },
-    password: "password",
+    password: await hash("password"),
     description: "IT Employee",
     admin: true,
   },
@@ -67,7 +66,7 @@ export const users: User[] = [
       first: "Paityn",
       last: "Orr",
     },
-    password: "123456",
+    password: await hash("123456789"),
     description: "Proud CCS Student",
   },
   {
@@ -77,7 +76,7 @@ export const users: User[] = [
       first: "Benicio",
       last: "McLean",
     },
-    password: "000000",
+    password: await hash("00000000"),
     description: "ADSO Officer",
     admin: true,
   },
@@ -88,7 +87,7 @@ export const users: User[] = [
       first: "Amirah",
       last: "Colon",
     },
-    password: "654321",
+    password: await hash("87654321"),
     description: "Epic gamer",
   },
 ];
@@ -474,118 +473,3 @@ export const reservations: Reservation[] = [
     slotIds: [14, 15, 17, 18],
   },
 ];
-
-export function login() {
-  return getUser(1)!.id;
-}
-
-export function getUser(
-  id: number,
-  loginId?: number,
-):
-  | (Omit<User, "password" | "email"> & Partial<Record<"editable", true>>)
-  | undefined {
-  const user = users.find((value) => value.id === id);
-
-  if (!user) return undefined;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password, ...filtered } = user;
-  return {
-    editable:
-      filtered.id === loginId ||
-      (loginId && getUser(loginId)?.admin) ||
-      undefined,
-    ...filtered,
-  };
-}
-
-export function deleteUser(id: number, loginId: number) {
-  const user = users.find((value) => value.id === id);
-
-  if (user && (getUser(loginId)?.admin || getUser(user.id)?.id === loginId)) {
-    users.splice(users.findIndex((value) => value.id === user.id));
-  }
-}
-
-export function getLabs(
-  name?: string,
-  loginId?: number,
-): (Lab & Partial<Record<"editable", true>>)[] {
-  return labs
-    .filter(
-      (value) =>
-        !name ||
-        value.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
-    )
-    .map((value) => ({
-      editable: (loginId && getUser(loginId)?.admin) || undefined,
-      ...value,
-    }));
-}
-
-export function getLab(
-  id: number,
-  loginId?: number,
-): (Lab & Partial<Record<"editable", true>>) | undefined {
-  const lab = labs.find((value) => value.id === id);
-
-  if (!lab) return undefined;
-
-  return {
-    editable: (loginId && getUser(loginId)?.admin) || undefined,
-    ...lab,
-  };
-}
-
-export function getReservationsFromLab(
-  labId: number,
-  loginId?: number,
-): (Reservation & Partial<Record<"editable", true>>)[] | undefined {
-  return reservations
-    .filter(
-      (value) =>
-        value.labId === labId && isAfter(value.schedule.end, new Date()),
-    )
-    .map((value) => ({
-      editable:
-        value.userId === loginId ||
-        (loginId && getUser(loginId)?.admin) ||
-        undefined,
-      ...value,
-      userId: value.anonymous ? 0 : value.userId,
-    }));
-}
-
-export function getReservationsFromUser(
-  userId: number,
-  loginId?: number,
-): (Reservation & Partial<Record<"editable", true>>)[] | undefined {
-  const isAdmin = !!(loginId && getUser(loginId)?.admin);
-
-  return reservations
-    .filter(
-      (value) =>
-        value.userId === userId &&
-        (!value.anonymous || value.userId === loginId || isAdmin) &&
-        isAfter(value.schedule.end, new Date()),
-    )
-    .map((value) => ({
-      editable: value.userId === loginId || isAdmin || undefined,
-      ...value,
-      userId: value.anonymous ? 0 : value.userId,
-    }));
-}
-
-export function deleteReservation(id: number, loginId: number) {
-  const reservation = reservations.find((value) => value.id === id);
-
-  if (
-    reservation &&
-    (getUser(loginId)?.admin || getUser(reservation.userId)?.id === loginId)
-  ) {
-    reservations.splice(
-      reservations.findIndex((value) => value.id === reservation.id),
-    );
-  }
-}
