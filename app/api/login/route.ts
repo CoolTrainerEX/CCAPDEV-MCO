@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body = LoginBody.parse(await request.json());
     const user = users.find(({ email }) => email === body.email);
 
-    if (!user || (await verify(user.password, body.password))) {
+    if (!user || !(await verify(user.password, body.password))) {
       postLogger.info("User not found.");
 
       return NextResponse.json(
