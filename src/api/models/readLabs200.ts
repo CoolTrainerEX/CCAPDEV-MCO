@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { HasNextPage } from './hasNextPage';
-import type { Lab } from './lab';
+import type { HasNextPage } from "./hasNextPage";
+import type { Lab } from "./lab";
 
 export type ReadLabs200 = {
   data: Lab[];

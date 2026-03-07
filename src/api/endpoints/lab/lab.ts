@@ -5,11 +5,7 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -26,8 +22,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   BadRequestResponse,
@@ -39,685 +35,1033 @@ import type {
   ReadLabs200,
   ReadLabsParams,
   UnauthorizedResponse,
-  UnexpectedResponse
-} from '../../models';
-
-
-
-
+  UnexpectedResponse,
+} from "../../models";
 
 /**
  * @summary Read all labs
  */
 export type readLabsResponse200 = {
-  data: ReadLabs200
-  status: 200
-}
+  data: ReadLabs200;
+  status: 200;
+};
 
 export type readLabsResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type readLabsResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+  data: NotFoundResponse;
+  status: 404;
+};
 
 export type readLabsResponse500 = {
-  data: UnexpectedResponse
-  status: 500
-}
-    
-export type readLabsResponseSuccess = (readLabsResponse200) & {
+  data: UnexpectedResponse;
+  status: 500;
+};
+
+export type readLabsResponseSuccess = readLabsResponse200 & {
   headers: Headers;
 };
-export type readLabsResponseError = (readLabsResponse400 | readLabsResponse404 | readLabsResponse500) & {
+export type readLabsResponseError = (
+  | readLabsResponse400
+  | readLabsResponse404
+  | readLabsResponse500
+) & {
   headers: Headers;
 };
 
-export type readLabsResponse = (readLabsResponseSuccess | readLabsResponseError)
+export type readLabsResponse = readLabsResponseSuccess | readLabsResponseError;
 
-export const getReadLabsUrl = (params?: ReadLabsParams,) => {
+export const getReadLabsUrl = (params?: ReadLabsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/lab?${stringifiedParams}` : `/api/lab`
-}
+  return stringifiedParams.length > 0
+    ? `/api/lab?${stringifiedParams}`
+    : `/api/lab`;
+};
 
-export const readLabs = async (params?: ReadLabsParams, options?: RequestInit): Promise<readLabsResponse> => {
-  
-  const res = await fetch(getReadLabsUrl(params),
-  {      
+export const readLabs = async (
+  params?: ReadLabsParams,
+  options?: RequestInit,
+): Promise<readLabsResponse> => {
+  const res = await fetch(getReadLabsUrl(params), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-)
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: readLabsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as readLabsResponse
-}
 
+  const data: readLabsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as readLabsResponse;
+};
 
+export const getReadLabsInfiniteQueryKey = (params?: ReadLabsParams) => {
+  return ["infinite", `/api/lab`, ...(params ? [params] : [])] as const;
+};
 
+export const getReadLabsQueryKey = (params?: ReadLabsParams) => {
+  return [`/api/lab`, ...(params ? [params] : [])] as const;
+};
 
-
-export const getReadLabsInfiniteQueryKey = (params?: ReadLabsParams,) => {
-    return [
-    'infinite', `/api/lab`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-export const getReadLabsQueryKey = (params?: ReadLabsParams,) => {
-    return [
-    `/api/lab`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getReadLabsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof readLabs>>, ReadLabsParams['page']>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(params?: ReadLabsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']>>, fetch?: RequestInit}
+export const getReadLabsInfiniteQueryOptions = <
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof readLabs>>,
+    ReadLabsParams["page"]
+  >,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof readLabs>>,
+        TError,
+        TData,
+        QueryKey,
+        ReadLabsParams["page"]
+      >
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getReadLabsInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getReadLabsInfiniteQueryKey(params);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof readLabs>>,
+    QueryKey,
+    ReadLabsParams["page"]
+  > = ({ signal, pageParam }) =>
+    readLabs(
+      { ...params, page: pageParam || params?.["page"] },
+      { signal, ...fetchOptions },
+    );
 
-  
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    ...queryOptions,
+  } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof readLabs>>,
+    TError,
+    TData,
+    QueryKey,
+    ReadLabsParams["page"]
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readLabs>>, QueryKey, ReadLabsParams['page']> = ({ signal, pageParam }) => readLabs({...params, 'page': pageParam || params?.['page']}, { signal, ...fetchOptions });
+export type ReadLabsInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof readLabs>>
+>;
+export type ReadLabsInfiniteQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn,   staleTime: 10000,  ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ReadLabsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof readLabs>>>
-export type ReadLabsInfiniteQueryError = BadRequestResponse | NotFoundResponse | UnexpectedResponse
-
-
-export function useReadLabsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readLabs>>, ReadLabsParams['page']>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params: undefined |  ReadLabsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']>> & Pick<
+export function useReadLabsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof readLabs>>,
+    ReadLabsParams["page"]
+  >,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params: undefined | ReadLabsParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof readLabs>>,
+        TError,
+        TData,
+        QueryKey,
+        ReadLabsParams["page"]
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLabs>>,
           TError,
-          Awaited<ReturnType<typeof readLabs>>, QueryKey
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLabsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readLabs>>, ReadLabsParams['page']>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']>> & Pick<
+          Awaited<ReturnType<typeof readLabs>>,
+          QueryKey
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLabsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof readLabs>>,
+    ReadLabsParams["page"]
+  >,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof readLabs>>,
+        TError,
+        TData,
+        QueryKey,
+        ReadLabsParams["page"]
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLabs>>,
           TError,
-          Awaited<ReturnType<typeof readLabs>>, QueryKey
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLabsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readLabs>>, ReadLabsParams['page']>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+          Awaited<ReturnType<typeof readLabs>>,
+          QueryKey
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLabsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof readLabs>>,
+    ReadLabsParams["page"]
+  >,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof readLabs>>,
+        TError,
+        TData,
+        QueryKey,
+        ReadLabsParams["page"]
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Read all labs
  */
 
-export function useReadLabsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof readLabs>>, ReadLabsParams['page']>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData, QueryKey, ReadLabsParams['page']>>, fetch?: RequestInit}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useReadLabsInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof readLabs>>,
+    ReadLabsParams["page"]
+  >,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof readLabs>>,
+        TError,
+        TData,
+        QueryKey,
+        ReadLabsParams["page"]
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getReadLabsInfiniteQueryOptions(params, options);
 
-  const queryOptions = getReadLabsInfiniteQueryOptions(params,options)
-
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useInfiniteQuery(
+    queryOptions,
+    queryClient,
+  ) as UseInfiniteQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-export const getReadLabsQueryOptions = <TData = Awaited<ReturnType<typeof readLabs>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(params?: ReadLabsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>>, fetch?: RequestInit}
+export const getReadLabsQueryOptions = <
+  TData = Awaited<ReturnType<typeof readLabs>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getReadLabsQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getReadLabsQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof readLabs>>> = ({
+    signal,
+  }) => readLabs(params, { signal, ...fetchOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readLabs>>> = ({ signal }) => readLabs(params, { signal, ...fetchOptions });
+export type ReadLabsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof readLabs>>
+>;
+export type ReadLabsQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn,   staleTime: 10000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ReadLabsQueryResult = NonNullable<Awaited<ReturnType<typeof readLabs>>>
-export type ReadLabsQueryError = BadRequestResponse | NotFoundResponse | UnexpectedResponse
-
-
-export function useReadLabs<TData = Awaited<ReturnType<typeof readLabs>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params: undefined |  ReadLabsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>> & Pick<
+export function useReadLabs<
+  TData = Awaited<ReturnType<typeof readLabs>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params: undefined | ReadLabsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLabs>>,
           TError,
           Awaited<ReturnType<typeof readLabs>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLabs<TData = Awaited<ReturnType<typeof readLabs>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLabs<
+  TData = Awaited<ReturnType<typeof readLabs>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLabs>>,
           TError,
           Awaited<ReturnType<typeof readLabs>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLabs<TData = Awaited<ReturnType<typeof readLabs>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLabs<
+  TData = Awaited<ReturnType<typeof readLabs>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Read all labs
  */
 
-export function useReadLabs<TData = Awaited<ReturnType<typeof readLabs>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- params?: ReadLabsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useReadLabs<
+  TData = Awaited<ReturnType<typeof readLabs>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  params?: ReadLabsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLabs>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getReadLabsQueryOptions(params, options);
 
-  const queryOptions = getReadLabsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * @summary Create a lab
  */
 export type createLabResponse201 = {
-  data: Id
-  status: 201
-}
+  data: Id;
+  status: 201;
+};
 
 export type createLabResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type createLabResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
 export type createLabResponse409 = {
-  data: ExistsResponse
-  status: 409
-}
+  data: ExistsResponse;
+  status: 409;
+};
 
 export type createLabResponse500 = {
-  data: UnexpectedResponse
-  status: 500
-}
-    
-export type createLabResponseSuccess = (createLabResponse201) & {
+  data: UnexpectedResponse;
+  status: 500;
+};
+
+export type createLabResponseSuccess = createLabResponse201 & {
   headers: Headers;
 };
-export type createLabResponseError = (createLabResponse400 | createLabResponse401 | createLabResponse409 | createLabResponse500) & {
+export type createLabResponseError = (
+  | createLabResponse400
+  | createLabResponse401
+  | createLabResponse409
+  | createLabResponse500
+) & {
   headers: Headers;
 };
 
-export type createLabResponse = (createLabResponseSuccess | createLabResponseError)
+export type createLabResponse =
+  | createLabResponseSuccess
+  | createLabResponseError;
 
 export const getCreateLabUrl = () => {
+  return `/api/lab`;
+};
 
-
-  
-
-  return `/api/lab`
-}
-
-export const createLab = async (labDetails: LabDetails, options?: RequestInit): Promise<createLabResponse> => {
-  
-  const res = await fetch(getCreateLabUrl(),
-  {      
+export const createLab = async (
+  labDetails: LabDetails,
+  options?: RequestInit,
+): Promise<createLabResponse> => {
+  const res = await fetch(getCreateLabUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      labDetails,)
-  }
-)
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(labDetails),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: createLabResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createLabResponse
-}
 
+  const data: createLabResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createLabResponse;
+};
 
+export const getCreateLabMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createLab>>,
+    TError,
+    { data: LabDetails },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createLab>>,
+  TError,
+  { data: LabDetails },
+  TContext
+> => {
+  const mutationKey = ["createLab"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createLab>>,
+    { data: LabDetails }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getCreateLabMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLab>>, TError,{data: LabDetails}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createLab>>, TError,{data: LabDetails}, TContext> => {
+    return createLab(data, fetchOptions);
+  };
 
-const mutationKey = ['createLab'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type CreateLabMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createLab>>
+>;
+export type CreateLabMutationBody = LabDetails;
+export type CreateLabMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ExistsResponse
+  | UnexpectedResponse;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createLab>>, {data: LabDetails}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createLab(data,fetchOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateLabMutationResult = NonNullable<Awaited<ReturnType<typeof createLab>>>
-    export type CreateLabMutationBody = LabDetails
-    export type CreateLabMutationError = BadRequestResponse | UnauthorizedResponse | ExistsResponse | UnexpectedResponse
-
-    /**
+/**
  * @summary Create a lab
  */
-export const useCreateLab = <TError = BadRequestResponse | UnauthorizedResponse | ExistsResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLab>>, TError,{data: LabDetails}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createLab>>,
-        TError,
-        {data: LabDetails},
-        TContext
-      > => {
-      return useMutation(getCreateLabMutationOptions(options), queryClient);
-    }
-    /**
+export const useCreateLab = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ExistsResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createLab>>,
+      TError,
+      { data: LabDetails },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createLab>>,
+  TError,
+  { data: LabDetails },
+  TContext
+> => {
+  return useMutation(getCreateLabMutationOptions(options), queryClient);
+};
+/**
  * @summary Read a lab
  */
 export type readLabResponse200 = {
-  data: Lab
-  status: 200
-}
+  data: Lab;
+  status: 200;
+};
 
 export type readLabResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type readLabResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+  data: NotFoundResponse;
+  status: 404;
+};
 
 export type readLabResponse500 = {
-  data: UnexpectedResponse
-  status: 500
-}
-    
-export type readLabResponseSuccess = (readLabResponse200) & {
-  headers: Headers;
-};
-export type readLabResponseError = (readLabResponse400 | readLabResponse404 | readLabResponse500) & {
-  headers: Headers;
+  data: UnexpectedResponse;
+  status: 500;
 };
 
-export type readLabResponse = (readLabResponseSuccess | readLabResponseError)
+export type readLabResponseSuccess = readLabResponse200 & {
+  headers: Headers;
+};
+export type readLabResponseError = (
+  | readLabResponse400
+  | readLabResponse404
+  | readLabResponse500
+) & {
+  headers: Headers;
+};
 
-export const getReadLabUrl = (id: number,) => {
+export type readLabResponse = readLabResponseSuccess | readLabResponseError;
 
+export const getReadLabUrl = (id: number) => {
+  return `/api/lab/${id}`;
+};
 
-  
-
-  return `/api/lab/${id}`
-}
-
-export const readLab = async (id: number, options?: RequestInit): Promise<readLabResponse> => {
-  
-  const res = await fetch(getReadLabUrl(id),
-  {      
+export const readLab = async (
+  id: number,
+  options?: RequestInit,
+): Promise<readLabResponse> => {
+  const res = await fetch(getReadLabUrl(id), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-)
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: readLabResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as readLabResponse
-}
 
+  const data: readLabResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as readLabResponse;
+};
 
+export const getReadLabQueryKey = (id: number) => {
+  return [`/api/lab/${id}`] as const;
+};
 
-
-
-export const getReadLabQueryKey = (id: number,) => {
-    return [
-    `/api/lab/${id}`
-    ] as const;
-    }
-
-    
-export const getReadLabQueryOptions = <TData = Awaited<ReturnType<typeof readLab>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>>, fetch?: RequestInit}
+export const getReadLabQueryOptions = <
+  TData = Awaited<ReturnType<typeof readLab>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getReadLabQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getReadLabQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof readLab>>> = ({
+    signal,
+  }) => readLab(id, { signal, ...fetchOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readLab>>> = ({ signal }) => readLab(id, { signal, ...fetchOptions });
+export type ReadLabQueryResult = NonNullable<
+  Awaited<ReturnType<typeof readLab>>
+>;
+export type ReadLabQueryError =
+  | BadRequestResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ReadLabQueryResult = NonNullable<Awaited<ReturnType<typeof readLab>>>
-export type ReadLabQueryError = BadRequestResponse | NotFoundResponse | UnexpectedResponse
-
-
-export function useReadLab<TData = Awaited<ReturnType<typeof readLab>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>> & Pick<
+export function useReadLab<
+  TData = Awaited<ReturnType<typeof readLab>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  id: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLab>>,
           TError,
           Awaited<ReturnType<typeof readLab>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLab<TData = Awaited<ReturnType<typeof readLab>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLab<
+  TData = Awaited<ReturnType<typeof readLab>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof readLab>>,
           TError,
           Awaited<ReturnType<typeof readLab>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReadLab<TData = Awaited<ReturnType<typeof readLab>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadLab<
+  TData = Awaited<ReturnType<typeof readLab>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Read a lab
  */
 
-export function useReadLab<TData = Awaited<ReturnType<typeof readLab>>, TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useReadLab<
+  TData = Awaited<ReturnType<typeof readLab>>,
+  TError = BadRequestResponse | NotFoundResponse | UnexpectedResponse,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof readLab>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getReadLabQueryOptions(id, options);
 
-  const queryOptions = getReadLabQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
 
 /**
  * @summary Update a lab
  */
 export type updateLabResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type updateLabResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type updateLabResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
 export type updateLabResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+  data: NotFoundResponse;
+  status: 404;
+};
 
 export type updateLabResponse500 = {
-  data: UnexpectedResponse
-  status: 500
-}
-    
-export type updateLabResponseSuccess = (updateLabResponse204) & {
-  headers: Headers;
-};
-export type updateLabResponseError = (updateLabResponse400 | updateLabResponse401 | updateLabResponse404 | updateLabResponse500) & {
-  headers: Headers;
+  data: UnexpectedResponse;
+  status: 500;
 };
 
-export type updateLabResponse = (updateLabResponseSuccess | updateLabResponseError)
+export type updateLabResponseSuccess = updateLabResponse204 & {
+  headers: Headers;
+};
+export type updateLabResponseError = (
+  | updateLabResponse400
+  | updateLabResponse401
+  | updateLabResponse404
+  | updateLabResponse500
+) & {
+  headers: Headers;
+};
 
-export const getUpdateLabUrl = (id: number,) => {
+export type updateLabResponse =
+  | updateLabResponseSuccess
+  | updateLabResponseError;
 
+export const getUpdateLabUrl = (id: number) => {
+  return `/api/lab/${id}`;
+};
 
-  
-
-  return `/api/lab/${id}`
-}
-
-export const updateLab = async (id: number,
-    labDetails: LabDetails, options?: RequestInit): Promise<updateLabResponse> => {
-  
-  const res = await fetch(getUpdateLabUrl(id),
-  {      
+export const updateLab = async (
+  id: number,
+  labDetails: LabDetails,
+  options?: RequestInit,
+): Promise<updateLabResponse> => {
+  const res = await fetch(getUpdateLabUrl(id), {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      labDetails,)
-  }
-)
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(labDetails),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: updateLabResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateLabResponse
-}
 
+  const data: updateLabResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateLabResponse;
+};
 
+export const getUpdateLabMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateLab>>,
+    TError,
+    { id: number; data: LabDetails },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateLab>>,
+  TError,
+  { id: number; data: LabDetails },
+  TContext
+> => {
+  const mutationKey = ["updateLab"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateLab>>,
+    { id: number; data: LabDetails }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
-export const getUpdateLabMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLab>>, TError,{id: number;data: LabDetails}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof updateLab>>, TError,{id: number;data: LabDetails}, TContext> => {
+    return updateLab(id, data, fetchOptions);
+  };
 
-const mutationKey = ['updateLab'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type UpdateLabMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateLab>>
+>;
+export type UpdateLabMutationBody = LabDetails;
+export type UpdateLabMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateLab>>, {id: number;data: LabDetails}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateLab(id,data,fetchOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateLabMutationResult = NonNullable<Awaited<ReturnType<typeof updateLab>>>
-    export type UpdateLabMutationBody = LabDetails
-    export type UpdateLabMutationError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse
-
-    /**
+/**
  * @summary Update a lab
  */
-export const useUpdateLab = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLab>>, TError,{id: number;data: LabDetails}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateLab>>,
-        TError,
-        {id: number;data: LabDetails},
-        TContext
-      > => {
-      return useMutation(getUpdateLabMutationOptions(options), queryClient);
-    }
-    /**
+export const useUpdateLab = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateLab>>,
+      TError,
+      { id: number; data: LabDetails },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateLab>>,
+  TError,
+  { id: number; data: LabDetails },
+  TContext
+> => {
+  return useMutation(getUpdateLabMutationOptions(options), queryClient);
+};
+/**
  * @summary Delete a lab
  */
 export type deleteLabResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type deleteLabResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type deleteLabResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
 export type deleteLabResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+  data: NotFoundResponse;
+  status: 404;
+};
 
 export type deleteLabResponse500 = {
-  data: UnexpectedResponse
-  status: 500
-}
-    
-export type deleteLabResponseSuccess = (deleteLabResponse204) & {
-  headers: Headers;
-};
-export type deleteLabResponseError = (deleteLabResponse400 | deleteLabResponse401 | deleteLabResponse404 | deleteLabResponse500) & {
-  headers: Headers;
+  data: UnexpectedResponse;
+  status: 500;
 };
 
-export type deleteLabResponse = (deleteLabResponseSuccess | deleteLabResponseError)
+export type deleteLabResponseSuccess = deleteLabResponse204 & {
+  headers: Headers;
+};
+export type deleteLabResponseError = (
+  | deleteLabResponse400
+  | deleteLabResponse401
+  | deleteLabResponse404
+  | deleteLabResponse500
+) & {
+  headers: Headers;
+};
 
-export const getDeleteLabUrl = (id: number,) => {
+export type deleteLabResponse =
+  | deleteLabResponseSuccess
+  | deleteLabResponseError;
 
+export const getDeleteLabUrl = (id: number) => {
+  return `/api/lab/${id}`;
+};
 
-  
-
-  return `/api/lab/${id}`
-}
-
-export const deleteLab = async (id: number, options?: RequestInit): Promise<deleteLabResponse> => {
-  
-  const res = await fetch(getDeleteLabUrl(id),
-  {      
+export const deleteLab = async (
+  id: number,
+  options?: RequestInit,
+): Promise<deleteLabResponse> => {
+  const res = await fetch(getDeleteLabUrl(id), {
     ...options,
-    method: 'DELETE'
-    
-    
-  }
-)
+    method: "DELETE",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: deleteLabResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as deleteLabResponse
-}
 
+  const data: deleteLabResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteLabResponse;
+};
 
+export const getDeleteLabMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLab>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteLab>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteLab"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteLab>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
 
-export const getDeleteLabMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLab>>, TError,{id: number}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteLab>>, TError,{id: number}, TContext> => {
+    return deleteLab(id, fetchOptions);
+  };
 
-const mutationKey = ['deleteLab'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type DeleteLabMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteLab>>
+>;
 
+export type DeleteLabMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | NotFoundResponse
+  | UnexpectedResponse;
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteLab>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
-
-          return  deleteLab(id,fetchOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteLabMutationResult = NonNullable<Awaited<ReturnType<typeof deleteLab>>>
-    
-    export type DeleteLabMutationError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse
-
-    /**
+/**
  * @summary Delete a lab
  */
-export const useDeleteLab = <TError = BadRequestResponse | UnauthorizedResponse | NotFoundResponse | UnexpectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLab>>, TError,{id: number}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteLab>>,
-        TError,
-        {id: number},
-        TContext
-      > => {
-      return useMutation(getDeleteLabMutationOptions(options), queryClient);
-    }
-    
+export const useDeleteLab = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | NotFoundResponse
+    | UnexpectedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteLab>>,
+      TError,
+      { id: number },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteLab>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteLabMutationOptions(options), queryClient);
+};

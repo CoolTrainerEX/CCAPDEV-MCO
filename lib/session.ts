@@ -10,7 +10,7 @@ const logger = pino().child({ operation: "session" });
 /**
  * Decrypt JWT into payload object.
  * @param {string} session Session string
- * @returns {number | null | undefined} User ID (`null` if user not found; `undefined` if no session)
+ * @returns {Promise<{id: number, admin: true | undefined} | null | undefined>} User ID (`null` if user not found; `undefined` if no session)
  * @author Justin Ryan Uy
  */
 export async function decrypt(session: string = "") {
@@ -22,8 +22,9 @@ export async function decrypt(session: string = "") {
         })
       ).payload as { id: number }
     ).id;
+    const user = users.find(({ id }) => id === sessionId);
 
-    return users.find(({ id }) => id === sessionId)?.id ?? null;
+    return (user && { id: user.id, admin: user.admin }) ?? null;
   } catch {
     logger.info("Unable to decrypt.");
   }

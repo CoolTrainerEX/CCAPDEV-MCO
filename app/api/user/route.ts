@@ -23,7 +23,8 @@ const postLogger = logger.child({ operation: "create user" });
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET() {
   try {
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (!sessionId) {
       getLogger.info("Unauthorized.");

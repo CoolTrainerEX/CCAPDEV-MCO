@@ -5,7 +5,7 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Error } from './error';
+import type { Error } from "./error";
 
 /**
  * Data already Exists

@@ -5,7 +5,7 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Interval } from './interval';
+import type { Interval } from "./interval";
 
 /**
  * Weekly schedule of the lab

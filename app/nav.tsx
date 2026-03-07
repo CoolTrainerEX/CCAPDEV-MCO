@@ -89,7 +89,7 @@ export default function Nav() {
     }
 
   return (
-    <NavigationMenu className="bg-card text-card-foreground sticky top-0 max-w-full p-4 [&>div]:w-full">
+    <NavigationMenu className="bg-card text-card-foreground sticky top-0 z-50 max-w-full p-4 [&>div]:w-full">
       <NavigationMenuList className="justify-between">
         <NavigationMenuItem>
           <NavigationMenuLink asChild>

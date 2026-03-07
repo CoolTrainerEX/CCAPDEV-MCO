@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = CreateReservationBody.parse(await request.json());
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (!sessionId) {
       postLogger.info("Unauthorized.");

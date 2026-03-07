@@ -30,7 +30,8 @@ export async function PUT(
     const body = UpdateReservationBody.parse(await request.json());
     const reservation = reservations.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (
       !sessionId ||
@@ -87,7 +88,8 @@ export async function DELETE(
     const params = DeleteReservationParams.parse(await context.params);
     const reservation = reservations.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (
       !sessionId ||

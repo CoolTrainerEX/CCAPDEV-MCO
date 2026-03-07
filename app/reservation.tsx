@@ -358,6 +358,7 @@ export default function Reservation({
                       .some(({ schedule }) =>
                         areIntervalsOverlapping(schedule, formSchedule),
                       )}
+                    submitValue="Reserve"
                   />
                   <Field orientation="horizontal">
                     <Checkbox

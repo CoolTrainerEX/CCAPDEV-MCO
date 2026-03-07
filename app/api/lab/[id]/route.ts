@@ -43,7 +43,8 @@ export async function GET(
 
     getLogger.info("Success");
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     return NextResponse.json(
       ReadLabResponse.parse({
@@ -82,7 +83,8 @@ export async function PUT(
     const body = UpdateLabBody.parse(await request.json());
     const lab = labs.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (!users.find(({ id }) => id === sessionId)?.admin) {
       putLogger.info("Unauthorized.");
@@ -136,7 +138,8 @@ export async function DELETE(
     const params = DeleteLabParams.parse(await context.params);
     const lab = labs.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (!users.find(({ id }) => id === sessionId)?.admin) {
       deleteLogger.info("Unauthorized.");

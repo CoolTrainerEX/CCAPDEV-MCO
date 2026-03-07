@@ -5,6 +5,6 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { ReservationListItem } from './reservationListItem';
+import type { ReservationListItem } from "./reservationListItem";
 
 export type ReservationList = ReservationListItem[];

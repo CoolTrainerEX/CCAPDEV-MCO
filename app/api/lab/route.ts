@@ -11,7 +11,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { labs as labList, labs, users } from "@/src/sample";
+import { labs as labList, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -46,7 +46,8 @@ export async function GET(request: NextRequest) {
         { status: 404 },
       );
     }
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
     const editable = users.find(({ id }) => id === sessionId)?.admin;
 
     getLogger.info("Success");
@@ -88,7 +89,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = CreateLabBody.parse(await request.json());
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (!users.find(({ id }) => id === sessionId)?.admin) {
       postLogger.info("Unauthorized.");
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (labs.some(({ name }) => name === body.name)) {
+    if (labList.some(({ name }) => name === body.name)) {
       postLogger.info("Lab already exists.");
 
       return NextResponse.json(
@@ -108,9 +110,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const id = Math.max(...labs.map(({ id }) => id)) + 1;
+    const id = Math.max(...labList.map(({ id }) => id)) + 1;
 
-    labs.push({ id, ...body });
+    labList.push({ id, ...body });
     postLogger.info("Success");
 
     return NextResponse.json(id, { status: 201 });

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
-    const sessionId = await decrypt(cookieStore.get("session")?.value);
+    const sessionId = (await decrypt(cookieStore.get("session")?.value))?.id;
 
     if (!sessionId) {
       deleteLogger.info("Unauthorized.");

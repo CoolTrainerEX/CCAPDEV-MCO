@@ -43,7 +43,8 @@ export async function GET(
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password, ...filtered } = user;
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     getLogger.info("Success");
 
@@ -86,7 +87,8 @@ export async function PUT(
     const body = UpdateUserBody.parse(await request.json());
     const user = users.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (
       !sessionId ||
@@ -143,7 +145,8 @@ export async function DELETE(
     const params = DeleteUserParams.parse(await context.params);
     const user = users.find(({ id }) => id === params.id);
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
     if (
       !sessionId ||

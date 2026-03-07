@@ -1,5 +1,5 @@
 "use client";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -61,6 +61,7 @@ import { Spinner } from "@/components/ui/spinner";
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function User() {
   const params = ReadUserParams.safeParse(useParams()).data;
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data, isPending, isSuccess } = useReadUser(params?.id ?? Number.NaN);
   let user: z.infer<typeof ReadUserResponse> | undefined;
@@ -179,6 +180,7 @@ export default function User() {
         }
 
         queryClient.invalidateQueries();
+        router.refresh();
       },
     },
   });
@@ -205,6 +207,7 @@ export default function User() {
         }
 
         queryClient.invalidateQueries();
+        router.refresh();
       },
     },
   });

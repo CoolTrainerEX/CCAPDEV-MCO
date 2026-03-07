@@ -40,7 +40,7 @@ import {
   ReadLabParams,
   ReadLabResponse,
 } from "@/src/api/endpoints/lab/lab.zod";
-import { useReadLab } from "@/src/api/endpoints/lab/lab";
+import { readLabResponse, useReadLab } from "@/src/api/endpoints/lab/lab";
 import { toast } from "sonner";
 import z from "zod";
 import {
@@ -57,6 +57,39 @@ import { Spinner } from "@/components/ui/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useQueryClient } from "@tanstack/react-query";
+
+/**
+ * Parses the lab from the query.
+ * @param {ReturnType<typeof useReadLab>} labQuery Lab query
+ * @returns {z.infer<typeof ReadLabResponse> | undefined} Parsed lab
+ */
+function getLab(labQuery: ReturnType<typeof useReadLab<readLabResponse>>) {
+  if (labQuery.isSuccess)
+    switch (labQuery.data.status) {
+      case 200:
+        try {
+          return ReadLabResponse.parse(labQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 400:
+        toast.error(labQuery.data.data.message);
+        break;
+
+      case 404:
+        break;
+
+      case 500:
+        toast.warning(labQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+}
 
 /**
  * Parses the reservations from the query.
@@ -98,34 +131,9 @@ function getReservations(
 export default function Lab() {
   const queryClient = useQueryClient();
   const params = ReadLabParams.safeParse(useParams()).data;
-  const { data, isSuccess } = useReadLab(params?.id ?? Number.NaN);
-  let lab: z.infer<typeof ReadLabResponse> | undefined;
-
-  if (isSuccess)
-    switch (data.status) {
-      case 200:
-        try {
-          lab = ReadLabResponse.parse(data.data);
-        } catch {
-          toast.warning("Bad response.");
-        }
-        break;
-
-      case 400:
-        toast.error(data.data.message);
-        break;
-
-      case 404:
-        break;
-
-      case 500:
-        toast.warning(data.data.message);
-        break;
-
-      default:
-        toast.warning("Unexpected error.");
-        break;
-    }
+  const labQuery = useReadLab(params?.id ?? Number.NaN);
+  const { data, isSuccess, isPending } = labQuery;
+  const lab = getLab(labQuery);
 
   const reservationsQuery = useReadReservationLab(
     ReadReservationLabParams.safeParse(lab).data?.id ?? Number.NaN,
@@ -337,6 +345,7 @@ export default function Lab() {
                         areIntervalsOverlapping(schedule, formSchedule),
                       )
                   }
+                  submitValue="Reserve"
                 />
                 <Field orientation="horizontal">
                   <Checkbox
@@ -354,7 +363,10 @@ export default function Lab() {
         </div>
       </>
     );
-  else if (reservationsQuery.isPending) {
+  else if (
+    isPending ||
+    (reservationsQuery.isEnabled && reservationsQuery.isPending)
+  ) {
     return (
       <div className="container m-auto flex items-center justify-center gap-6">
         <Spinner className="size-8" />

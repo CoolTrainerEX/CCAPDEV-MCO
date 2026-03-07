@@ -41,7 +41,8 @@ export async function GET(
       );
     }
 
-    const sessionId = await decrypt((await cookies()).get("session")?.value);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
     const isAdmin = users.find(({ id }) => id === sessionId)?.admin;
 
     getLogger.info("Success");

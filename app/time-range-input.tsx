@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
  * @param {boolean | undefined} param0.valid Toggle validity style
  * @param {Interval} param0.value Value state
  * @param {Dispatch<SetStateAction<Interval>>} param0.setValue Value state set
+ * @param {string} param0.submitValue Submit button text
  * @author Justin Ryan Uy
  */
 export default function TimeRangeInput({
@@ -36,12 +37,14 @@ export default function TimeRangeInput({
   valid,
   value,
   setValue,
+  submitValue,
   ...props
 }: React.ComponentProps<"div"> & {
   schedule?: Interval;
   valid?: boolean;
   value: Interval;
   setValue: Dispatch<SetStateAction<Interval>>;
+  submitValue: string;
 }) {
   return (
     <FieldGroup {...props}>
@@ -128,7 +131,7 @@ export default function TimeRangeInput({
         className={cn(!valid && "**:data-[slot=slider-range]:bg-destructive")}
       />
       <Button type="submit" disabled={!schedule || !valid}>
-        Reserve
+        {submitValue}
       </Button>
     </FieldGroup>
   );
