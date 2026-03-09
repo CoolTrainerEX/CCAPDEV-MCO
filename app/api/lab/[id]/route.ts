@@ -104,6 +104,15 @@ export async function PUT(
       );
     }
 
+    if (new Set(body.slots.map(({ id }) => id)).size !== body.slots.length) {
+      putLogger.info("Duplicate slot IDs.");
+
+      return NextResponse.json(
+        { message: "Duplicate slot IDs." } as BadRequestResponse,
+        { status: 400 },
+      );
+    }
+
     Object.assign(lab, body);
     putLogger.info("Success");
 

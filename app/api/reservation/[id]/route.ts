@@ -10,7 +10,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations, users } from "@/src/sample";
+import { labs, reservations, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -53,6 +53,17 @@ export async function PUT(
         { status: 404 },
       );
     }
+    const lab = labs.find(({ id }) => id === reservation.labId);
+
+    for (const slotId of body.slotIds)
+      if (!lab?.slots.map(({ id }) => id).includes(slotId)) {
+        putLogger.info("Invalid slots.");
+
+        return NextResponse.json(
+          { message: "Invalid slots." } as BadRequestResponse,
+          { status: 400 },
+        );
+      }
 
     Object.assign(reservation, body);
     putLogger.info("Success");

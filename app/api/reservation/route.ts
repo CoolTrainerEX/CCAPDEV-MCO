@@ -3,10 +3,11 @@ import { CreateReservationBody } from "@/src/api/endpoints/reservation/reservati
 import {
   BadRequestResponse,
   ExistsResponse,
+  NotFoundResponse,
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations } from "@/src/sample";
+import { labs, reservations } from "@/src/sample";
 import { areIntervalsOverlapping } from "date-fns";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -31,6 +32,27 @@ export async function POST(request: NextRequest) {
         { status: 401 },
       );
     }
+
+    const lab = labs.find(({ id }) => id === body.labId);
+
+    if (!lab) {
+      postLogger.info("Lab not found.");
+
+      return NextResponse.json(
+        { message: "Lab not found." } as NotFoundResponse,
+        { status: 404 },
+      );
+    }
+
+    for (const slotId of body.slotIds)
+      if (!lab.slots.map(({ id }) => id).includes(slotId)) {
+        postLogger.info("Invalid slots.");
+
+        return NextResponse.json(
+          { message: "Invalid slots." } as BadRequestResponse,
+          { status: 400 },
+        );
+      }
 
     if (
       reservations.some(({ schedule }) =>
