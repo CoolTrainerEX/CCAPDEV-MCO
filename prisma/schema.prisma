@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Name {
+  first String
+  last  String
+}
+
+model User {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  email        String        @unique
+  name         Name
+  password     String
+  description  String        @default("")
+  admin        Boolean?
+  reservations Reservation[]
+}
+
+type Interval {
+  start DateTime
+  end   DateTime
+}
+
+type WeeklySchedule {
+  sunday    Interval?
+  monday    Interval?
+  tuesday   Interval?
+  wednesday Interval?
+  thursday  Interval?
+  friday    Interval?
+  saturday  Interval?
+}
+
+type Slot {
+  id String
+  x  Int
+  y  Int
+}
+
+model Lab {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String         @unique
+  weeklySchedule WeeklySchedule
+  slots          Slot[]
+  reservations   Reservation[]
+}
+
+model Reservation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  labId     String   @db.ObjectId
+  anonymous Boolean?
+  schedule  Interval
+  slotIds   String[]
+  user      User     @relation(fields: [userId], references: [id])
+  lab       Lab      @relation(fields: [labId], references: [id])
+}
