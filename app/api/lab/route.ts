@@ -101,6 +101,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (new Set(body.slots.map(({ id }) => id)).size !== body.slots.length) {
+      postLogger.info("Duplicate slot IDs.");
+
+      return NextResponse.json(
+        { message: "Duplicate slot IDs." } as BadRequestResponse,
+        { status: 400 },
+      );
+    }
+
     if (labList.some(({ name }) => name === body.name)) {
       postLogger.info("Lab already exists.");
 

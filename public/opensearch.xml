@@ -4,6 +4,6 @@
     <ShortName>ArchersLab</ShortName>
     <Description>Search for labs in ArchersLab</Description>
     <InputEncoding>UTF-8</InputEncoding>
-    <Image type="image/png">https://localhost:3000/icon.png</Image>
-    <Url type="text/html" template="https://localhost:3000/?q={searchTerms}" />
+    <Image type="image/png">https://ccapdev-mco-pq20.onrender.com/icon.png</Image>
+    <Url type="text/html" template="https://ccapdev-mco-pq20.onrender.com/?q={searchTerms}" />
 </OpenSearchDescription>
