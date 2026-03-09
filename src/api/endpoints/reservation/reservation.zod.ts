@@ -11,7 +11,7 @@ import * as zod from 'zod';
 /**
  * @summary Create a reservation
  */
-export const createReservationBodyOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const createReservationBodyTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 
 
@@ -21,7 +21,7 @@ export const CreateReservationBody = zod.object({
   "start": zod.iso.datetime({}),
   "end": zod.iso.datetime({})
 }).describe('Time interval'),
-  "slotIds": zod.array(zod.string().regex(createReservationBodyOneSlotIdsItemRegExp).describe('ObjectID'))
+  "slotIds": zod.array(zod.string().min(1))
 }).and(zod.object({
   "labId": zod.string().regex(createReservationBodyTwoLabIdRegExp).describe('ObjectID')
 }))
@@ -36,7 +36,7 @@ export const UpdateReservationParams = zod.object({
   "id": zod.coerce.string().regex(updateReservationPathIdRegExp).describe('The unique identifier of the reservation')
 })
 
-export const updateReservationBodySlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 
 export const UpdateReservationBody = zod.object({
@@ -45,7 +45,7 @@ export const UpdateReservationBody = zod.object({
   "start": zod.iso.datetime({}),
   "end": zod.iso.datetime({})
 }).describe('Time interval'),
-  "slotIds": zod.array(zod.string().regex(updateReservationBodySlotIdsItemRegExp).describe('ObjectID'))
+  "slotIds": zod.array(zod.string().min(1))
 })
 
 /**
@@ -68,7 +68,7 @@ export const ReadReservationUserParams = zod.object({
   "id": zod.coerce.string().regex(readReservationUserPathIdRegExp).describe('The unique identifier of the user')
 })
 
-export const readReservationUserResponseOneOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const readReservationUserResponseOneTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 export const readReservationUserResponseTwoIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 export const readReservationUserResponseTwoUserIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
@@ -80,7 +80,7 @@ export const ReadReservationUserResponseItem = zod.object({
   "start": zod.iso.datetime({}),
   "end": zod.iso.datetime({})
 }).describe('Time interval'),
-  "slotIds": zod.array(zod.string().regex(readReservationUserResponseOneOneSlotIdsItemRegExp).describe('ObjectID'))
+  "slotIds": zod.array(zod.string().min(1))
 }).and(zod.object({
   "labId": zod.string().regex(readReservationUserResponseOneTwoLabIdRegExp).describe('ObjectID')
 })).and(zod.object({
@@ -100,7 +100,7 @@ export const ReadReservationLabParams = zod.object({
   "id": zod.coerce.string().regex(readReservationLabPathIdRegExp).describe('The unique identifier of the lab')
 })
 
-export const readReservationLabResponseOneOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const readReservationLabResponseOneTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 export const readReservationLabResponseTwoIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 export const readReservationLabResponseTwoUserIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
@@ -112,7 +112,7 @@ export const ReadReservationLabResponseItem = zod.object({
   "start": zod.iso.datetime({}),
   "end": zod.iso.datetime({})
 }).describe('Time interval'),
-  "slotIds": zod.array(zod.string().regex(readReservationLabResponseOneOneSlotIdsItemRegExp).describe('ObjectID'))
+  "slotIds": zod.array(zod.string().min(1))
 }).and(zod.object({
   "labId": zod.string().regex(readReservationLabResponseOneTwoLabIdRegExp).describe('ObjectID')
 })).and(zod.object({

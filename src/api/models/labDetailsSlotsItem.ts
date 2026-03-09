@@ -5,10 +5,10 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Id } from './id';
+import type { SlotId } from './slotId';
 
 export type LabDetailsSlotsItem = {
-  id: Id;
+  id: SlotId;
   /** @minimum 0 */
   x: number;
   /** @minimum 0 */

@@ -247,7 +247,7 @@ export default function Reservation({
           start: new Date(reservation.schedule.start),
           end: new Date(reservation.schedule.end),
         }
-      : { start: new Date(now), end: new Date(now) },
+      : { start: now, end: now },
   );
 
   const [selected, setSelected] = useState(reservation?.slotIds ?? []);

@@ -63,7 +63,7 @@ export default function TimeRangeInput({
               schedule &&
               setValue((value) => ({
                 ...value,
-                start: parse(event.target.value, "HH:mm", schedule.start),
+                start: parse(event.target.value, "HH:mm", value.start),
               }))
             }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
@@ -89,7 +89,7 @@ export default function TimeRangeInput({
               schedule &&
               setValue((value) => ({
                 ...value,
-                end: parse(event.target.value, "HH:mm", schedule.end),
+                end: parse(event.target.value, "HH:mm", value.end),
               }))
             }
             className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"

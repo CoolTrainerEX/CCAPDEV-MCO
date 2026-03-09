@@ -1,6 +1,8 @@
+import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
   CreateLabBody,
+  ReadLabResponse,
   ReadLabsQueryParams,
   ReadLabsResponse,
 } from "@/src/api/endpoints/lab/lab.zod";
@@ -11,7 +13,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { labs as labList, users } from "@/src/sample";
+import { Lab, Prisma } from "@/src/generated/prisma/client";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -22,23 +24,41 @@ const logger = pino();
 const getLogger = logger.child({ operation: "get labs" });
 const postLogger = logger.child({ operation: "create lab" });
 
+/**
+ * Converts lab weekly schedule.
+ * @param {Lab} lab Lab to convert schedule
+ * @returns {z.infer<typeof ReadLabResponse>} Lab with converted schedule
+ */
+export function weeklyScheduleDateToString(lab: Lab) {
+  return {
+    ...lab,
+    weeklySchedule: Object.fromEntries(
+      Object.entries(lab.weeklySchedule).map(([key, value]) => [
+        key,
+        value
+          ? {
+              start: value.start.toISOString(),
+              end: value.end.toISOString(),
+            }
+          : undefined,
+      ]),
+    ),
+  };
+}
+
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET(request: NextRequest) {
   try {
     const queryParams = ReadLabsQueryParams.parse(
       Object.fromEntries(request.nextUrl.searchParams.entries()),
     );
-    // Typescript cannot infer defined value
-    const lastIndex = queryParams.page * PAGE_LIMIT;
-    const q = queryParams.q;
-    const labs = q
-        ? labList.filter(({ name }) =>
-            name.toLowerCase().includes(q.toLowerCase()),
-          )
-        : labList,
-      page = labs.slice((queryParams.page - 1) * PAGE_LIMIT, lastIndex);
+    const labs = await prisma.lab.findMany({
+      where: { name: { contains: queryParams.q, mode: "insensitive" } },
+      skip: (queryParams.page - 1) * PAGE_LIMIT,
+      take: PAGE_LIMIT + 1,
+    });
 
-    if (!page.length) {
+    if (!labs.length) {
       getLogger.info("Labs not found.");
 
       return NextResponse.json(
@@ -46,19 +66,18 @@ export async function GET(request: NextRequest) {
         { status: 404 },
       );
     }
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-    const editable = users.find(({ id }) => id === sessionId)?.admin;
+    const editable = (await decrypt((await cookies()).get("session")?.value))
+      ?.admin;
 
     getLogger.info("Success");
 
     return NextResponse.json(
       ReadLabsResponse.parse({
-        data: page.map((value) => ({
+        data: labs.slice(0, PAGE_LIMIT).map((value) => ({
           editable,
-          ...value,
+          ...weeklyScheduleDateToString(value),
         })),
-        hasNextPage: lastIndex < labs.length,
+        hasNextPage: labs.length > PAGE_LIMIT,
       } as z.infer<typeof ReadLabsResponse>),
     );
   } catch (e) {
@@ -89,10 +108,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = CreateLabBody.parse(await request.json());
 
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-
-    if (!users.find(({ id }) => id === sessionId)?.admin) {
+    if (
+      !(
+        await prisma.user.findUnique({
+          where: {
+            id: (await decrypt((await cookies()).get("session")?.value))?.id,
+          },
+        })
+      )?.admin
+    ) {
       postLogger.info("Unauthorized.");
 
       return NextResponse.json(
@@ -110,7 +134,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (labList.some(({ name }) => name === body.name)) {
+    postLogger.info("Success");
+
+    return NextResponse.json((await prisma.lab.create({ data: body })).id, {
+      status: 201,
+    });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
       postLogger.info("Lab already exists.");
 
       return NextResponse.json(
@@ -119,13 +152,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const id = Math.max(...labList.map(({ id }) => id)) + 1;
-
-    labList.push({ id, ...body });
-    postLogger.info("Success");
-
-    return NextResponse.json(id, { status: 201 });
-  } catch (e) {
     if (e instanceof ZodError) {
       postLogger.info({ issues: e.issues });
 

@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
   DeleteReservationParams,
@@ -10,7 +11,6 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { labs, reservations, users } from "@/src/sample";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -28,7 +28,9 @@ export async function PUT(
   try {
     const params = UpdateReservationParams.parse(await context.params);
     const body = UpdateReservationBody.parse(await request.json());
-    const reservation = reservations.find(({ id }) => id === params.id);
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: params.id },
+    });
 
     const sessionId = (await decrypt((await cookies()).get("session")?.value))
       ?.id;
@@ -36,7 +38,7 @@ export async function PUT(
     if (
       !sessionId ||
       (sessionId !== reservation?.userId &&
-        !users.find(({ id }) => id === sessionId)?.admin)
+        !(await prisma.user.findUnique({ where: { id: sessionId } }))?.admin)
     ) {
       putLogger.info("Unauthorized.");
 
@@ -45,6 +47,7 @@ export async function PUT(
         { status: 401 },
       );
     }
+
     if (!reservation) {
       putLogger.info("Reservation not found.");
 
@@ -53,10 +56,31 @@ export async function PUT(
         { status: 404 },
       );
     }
-    const lab = labs.find(({ id }) => id === reservation.labId);
+
+    const lab = await prisma.lab.findUnique({
+      where: { id: reservation.labId },
+    });
+
+    if (!lab) {
+      putLogger.info("Lab not found.");
+
+      return NextResponse.json(
+        { message: "Lab not found." } as NotFoundResponse,
+        { status: 404 },
+      );
+    }
+
+    if (new Set(body.slotIds).size !== body.slotIds.length) {
+      putLogger.info("Duplicate slot IDs.");
+
+      return NextResponse.json(
+        { message: "Duplicate slot IDs." } as BadRequestResponse,
+        { status: 400 },
+      );
+    }
 
     for (const slotId of body.slotIds)
-      if (!lab?.slots.map(({ id }) => id).includes(slotId)) {
+      if (!lab.slots.map(({ id }) => id).includes(slotId)) {
         putLogger.info("Invalid slots.");
 
         return NextResponse.json(
@@ -65,7 +89,8 @@ export async function PUT(
         );
       }
 
-    Object.assign(reservation, body);
+    prisma.reservation.update({ data: body, where: { id: reservation.id } });
+
     putLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
@@ -97,7 +122,9 @@ export async function DELETE(
 ) {
   try {
     const params = DeleteReservationParams.parse(await context.params);
-    const reservation = reservations.find(({ id }) => id === params.id);
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: params.id },
+    });
 
     const sessionId = (await decrypt((await cookies()).get("session")?.value))
       ?.id;
@@ -105,7 +132,7 @@ export async function DELETE(
     if (
       !sessionId ||
       (sessionId !== reservation?.userId &&
-        !users.find(({ id }) => id === sessionId)?.admin)
+        !(await prisma.user.findUnique({ where: { id: sessionId } }))?.admin)
     ) {
       deleteLogger.info("Unauthorized.");
 
@@ -124,11 +151,7 @@ export async function DELETE(
       );
     }
 
-    reservations.splice(
-      reservations.findIndex(({ id }) => id === reservation.id),
-      1,
-    );
-
+    prisma.reservation.delete({ where: { id: reservation.id } });
     deleteLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });

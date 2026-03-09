@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { createSession, decrypt } from "@/lib/session";
 import {
   CreateUserBody,
@@ -10,7 +11,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { users } from "@/src/sample";
+import { Prisma } from "@/src/generated/prisma/client";
 import { hash } from "argon2";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -26,6 +27,8 @@ export async function GET() {
   try {
     const sessionId = (await decrypt((await cookies()).get("session")?.value))
       ?.id;
+    const user =
+      sessionId && (await prisma.user.findUnique({ where: { id: sessionId } }));
 
     if (!sessionId) {
       getLogger.info("Unauthorized.");
@@ -36,7 +39,7 @@ export async function GET() {
       );
     }
 
-    if (sessionId === null) {
+    if (!user) {
       getLogger.info("User not found.");
 
       return NextResponse.json(
@@ -65,7 +68,24 @@ export async function POST(request: NextRequest) {
   try {
     const body = CreateUserBody.parse(await request.json());
 
-    if (users.some(({ email }) => email === body.email)) {
+    const id = (
+      await prisma.user.create({
+        data: {
+          ...body,
+          password: await hash(body.password),
+        },
+      })
+    ).id;
+
+    await createSession(id, undefined);
+    postLogger.info("Success");
+
+    return NextResponse.json(id, { status: 201 });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
       postLogger.info("User already exists.");
 
       return NextResponse.json(
@@ -74,19 +94,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const id = Math.max(...users.map(({ id }) => id)) + 1;
-
-    users.push({
-      id,
-      description: "",
-      ...body,
-      password: await hash(body.password),
-    });
-    await createSession(id);
-    postLogger.info("Success");
-
-    return NextResponse.json(id, { status: 201 });
-  } catch (e) {
     if (e instanceof ZodError) {
       postLogger.info({ issues: e.issues });
 

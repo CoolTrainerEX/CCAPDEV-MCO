@@ -459,6 +459,9 @@ components:
           type: string
           format: date-time
           example: "1970-01-01T00:00:00.000Z"
+    SlotId:
+      type: string
+      minLength: 1
     UserId:
       description: The unique identifier of a user
       $ref: "#/components/schemas/Id"
@@ -549,7 +552,7 @@ components:
               - y
             properties:
               id:
-                $ref: "#/components/schemas/Id"
+                $ref: "#/components/schemas/SlotId"
               x:
                 type: integer
                 minimum: 0
@@ -557,7 +560,7 @@ components:
                 type: integer
                 minimum: 0
             example:
-              id: 1
+              id: "1"
               x: 0
               y: 0
     Lab:
@@ -584,7 +587,7 @@ components:
         slotIds:
           type: array
           items:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/SlotId"
     ReservationDetails:
       allOf:
         - $ref: "#/components/schemas/ReservationUpdate"

@@ -5,11 +5,11 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Id } from './id';
 import type { Interval } from './interval';
+import type { SlotId } from './slotId';
 
 export interface ReservationUpdate {
   anonymous?: boolean;
   schedule: Interval;
-  slotIds: Id[];
+  slotIds: SlotId[];
 }

@@ -174,7 +174,7 @@ export default function Lab() {
   });
 
   const now = new Date();
-  const [date, setDate] = useState(now);
+  const [date, setDate] = useState(startOfDay(now));
 
   const rawSchedule =
     lab &&
@@ -286,7 +286,20 @@ export default function Lab() {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={(date) => {
+                  setDate(date);
+
+                  const values: DateValues = {
+                    date: date.getDate(),
+                    month: date.getMonth(),
+                    year: date.getFullYear(),
+                  };
+
+                  setFormSchedule(({ start, end }) => ({
+                    start: set(start, values),
+                    end: set(end, values),
+                  }));
+                }}
                 className="p-0"
                 disabled={{
                   before: startOfDay(now),
@@ -304,21 +317,12 @@ export default function Lab() {
                   }
 
                   try {
-                    const dateValue: DateValues = {
-                      date: date.getDate(),
-                      month: date.getMonth(),
-                      year: date.getFullYear(),
-                    };
-
                     mutate({
                       data: CreateReservationBody.parse({
                         labId: lab.id,
                         schedule: {
-                          start: set(
-                            formSchedule.start,
-                            dateValue,
-                          ).toISOString(),
-                          end: set(formSchedule.end, dateValue).toISOString(),
+                          start: new Date(formSchedule.start).toISOString(),
+                          end: new Date(formSchedule.end).toISOString(),
                         },
                         slotIds: selected,
                         anonymous,

@@ -28,6 +28,7 @@ export * from './reservationId';
 export * from './reservationList';
 export * from './reservationListItem';
 export * from './reservationUpdate';
+export * from './slotId';
 export * from './unauthorizedResponse';
 export * from './unexpectedResponse';
 export * from './updateUserBody';

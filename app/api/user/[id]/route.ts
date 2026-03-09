@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
   DeleteUserParams,
@@ -12,7 +13,7 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { users } from "@/src/sample";
+import { Prisma } from "@/src/generated/prisma/client";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -30,7 +31,7 @@ export async function GET(
 ) {
   try {
     const params = ReadUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
+    const user = await prisma.user.findUnique({ where: { id: params.id } });
 
     if (!user) {
       getLogger.info("User not found.");
@@ -43,17 +44,14 @@ export async function GET(
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password, ...filtered } = user;
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-
+    const session = await decrypt((await cookies()).get("session")?.value);
     getLogger.info("Success");
 
     return NextResponse.json(
       ReadUserResponse.parse({
-        editable:
-          user.id === sessionId ||
-          users.find(({ id }) => id === sessionId)?.admin,
+        editable: user.id === session?.id || session?.admin,
         ...filtered,
+        admin: filtered.admin ?? undefined,
       } as z.infer<typeof ReadUserResponse>),
     );
   } catch (e) {
@@ -85,15 +83,14 @@ export async function PUT(
   try {
     const params = UpdateUserParams.parse(await context.params);
     const body = UpdateUserBody.parse(await request.json());
-    const user = users.find(({ id }) => id === params.id);
 
     const sessionId = (await decrypt((await cookies()).get("session")?.value))
       ?.id;
 
     if (
       !sessionId ||
-      (sessionId !== user?.id &&
-        !users.find(({ id }) => id === sessionId)?.admin)
+      (sessionId !== params.id &&
+        !(await prisma.user.findUnique({ where: { id: sessionId } }))?.admin)
     ) {
       putLogger.info("Unauthorized.");
 
@@ -102,7 +99,17 @@ export async function PUT(
         { status: 401 },
       );
     }
-    if (!user) {
+
+    prisma.user.update({ data: body, where: { id: params.id } });
+
+    putLogger.info("Success");
+
+    return new NextResponse(undefined, { status: 204 });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2025"
+    ) {
       putLogger.info("User not found.");
 
       return NextResponse.json(
@@ -111,11 +118,6 @@ export async function PUT(
       );
     }
 
-    Object.assign(user, body);
-    putLogger.info("Success");
-
-    return new NextResponse(undefined, { status: 204 });
-  } catch (e) {
     if (e instanceof ZodError) {
       putLogger.info({ issues: e.issues });
 
@@ -143,15 +145,14 @@ export async function DELETE(
 ) {
   try {
     const params = DeleteUserParams.parse(await context.params);
-    const user = users.find(({ id }) => id === params.id);
+    const cookieStore = await cookies();
+    const sessionId = (await decrypt(cookieStore.get("session")?.value))?.id;
 
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-
+    const isCurrentUser = sessionId === params.id;
     if (
       !sessionId ||
-      (sessionId !== user?.id &&
-        !users.find(({ id }) => id === sessionId)?.admin)
+      (!isCurrentUser &&
+        !(await prisma.user.findUnique({ where: { id: sessionId } })))
     ) {
       deleteLogger.info("Unauthorized.");
 
@@ -161,7 +162,18 @@ export async function DELETE(
       );
     }
 
-    if (!user) {
+    prisma.user.delete({ where: { id: params.id } });
+
+    if (isCurrentUser) cookieStore.delete("session");
+
+    deleteLogger.info("Success");
+
+    return new NextResponse(undefined, { status: 204 });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2025"
+    ) {
       deleteLogger.info("User not found.");
 
       return NextResponse.json(
@@ -170,15 +182,6 @@ export async function DELETE(
       );
     }
 
-    users.splice(
-      users.findIndex(({ id }) => id === user.id),
-      1,
-    );
-
-    deleteLogger.info("Success");
-
-    return new NextResponse(undefined, { status: 204 });
-  } catch (e) {
     if (e instanceof ZodError) {
       deleteLogger.info({ issues: e.issues });
 

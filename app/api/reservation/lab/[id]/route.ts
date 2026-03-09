@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
   ReadReservationLabParams,
@@ -9,8 +10,7 @@ import {
   NotFoundResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations as reservationList, users } from "@/src/sample";
-import { isAfter } from "date-fns";
+import { Reservation } from "@/src/generated/prisma/client";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -18,19 +18,34 @@ import z, { ZodError } from "zod";
 
 const getLogger = pino().child({ operation: "get reservations from lab" });
 
+/**
+ * Converts reservation schedule.
+ * @param {Reservation} reservation Reservation to convert schedule
+ * @returns {z.infer<typeof ReadReservationLabResponseItem>} Lab with converted schedule
+ */
+export function scheduleDateToString(reservation: Reservation) {
+  return {
+    ...reservation,
+    schedule: {
+      start: reservation.schedule.start.toISOString(),
+      end: reservation.schedule.end.toISOString(),
+    },
+  };
+}
+
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET(
   request: NextRequest,
   context: RouteContext<"/api/reservation/lab/[id]">,
 ) {
-  const now = new Date();
-
   try {
     const params = ReadReservationLabParams.parse(await context.params);
-    const reservations = reservationList.filter(
-      ({ labId, schedule: { end } }) =>
-        labId === params.id && isAfter(end, now),
-    );
+    const reservations = await prisma.reservation.findMany({
+      where: {
+        labId: params.id,
+        schedule: { is: { end: { gt: new Date() } } },
+      },
+    });
 
     if (!reservations.length) {
       getLogger.info("Reservations not found.");
@@ -41,9 +56,7 @@ export async function GET(
       );
     }
 
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-    const isAdmin = users.find(({ id }) => id === sessionId)?.admin;
+    const session = await decrypt((await cookies()).get("session")?.value);
 
     getLogger.info("Success");
 
@@ -52,9 +65,11 @@ export async function GET(
         reservations.map(
           (value) =>
             ({
-              editable: value.userId === sessionId || isAdmin,
-              ...value,
-              userId: value.anonymous && !isAdmin ? undefined : value.userId,
+              editable: value.userId === session?.id || session?.admin,
+              ...scheduleDateToString(value),
+              userId:
+                value.anonymous && !session?.admin ? undefined : value.userId,
+              anonymous: value.anonymous ?? undefined,
             }) as z.infer<typeof ReadReservationLabResponseItem>,
         ),
       ),

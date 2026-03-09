@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { createSession, decrypt } from "@/lib/session";
 import { LoginBody } from "@/src/api/endpoints/user/user.zod";
 import {
@@ -6,7 +7,6 @@ import {
   UnauthorizedResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { users } from "@/src/sample";
 import { verify } from "argon2";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,7 +21,7 @@ const deleteLogger = logger.child({ operation: "logout" });
 export async function POST(request: NextRequest) {
   try {
     const body = LoginBody.parse(await request.json());
-    const user = users.find(({ email }) => email === body.email);
+    const user = await prisma.user.findUnique({ where: { email: body.email } });
 
     if (!user || !(await verify(user.password, body.password))) {
       postLogger.info("User not found.");
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await createSession(user.id);
+    await createSession(user.id, user.admin ?? undefined);
     postLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
@@ -61,9 +61,8 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
-    const sessionId = (await decrypt(cookieStore.get("session")?.value))?.id;
 
-    if (!sessionId) {
+    if (!(await decrypt(cookieStore.get("session")?.value))?.id) {
       deleteLogger.info("Unauthorized.");
 
       return NextResponse.json(

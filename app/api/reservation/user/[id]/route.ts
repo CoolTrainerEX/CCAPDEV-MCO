@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
   ReadReservationUserParams,
@@ -9,12 +10,11 @@ import {
   NotFoundResponse,
   UnexpectedResponse,
 } from "@/src/api/models";
-import { reservations as reservationList, users } from "@/src/sample";
-import { isAfter } from "date-fns";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
 import z, { ZodError } from "zod";
+import { scheduleDateToString } from "../../lab/[id]/route";
 
 const getLogger = pino().child({ operation: "get reservations from user" });
 
@@ -23,15 +23,14 @@ export async function GET(
   request: NextRequest,
   context: RouteContext<"/api/reservation/user/[id]">,
 ) {
-  const now = new Date();
-
   try {
     const params = ReadReservationUserParams.parse(await context.params);
-    const reservations = reservationList.filter(
-      ({ userId, schedule: { end } }) =>
-        userId === params.id && isAfter(end, now),
-    );
-
+    const reservations = await prisma.reservation.findMany({
+      where: {
+        userId: params.id,
+        schedule: { is: { end: { gt: new Date() } } },
+      },
+    });
     if (!reservations.length) {
       getLogger.info("Reservations not found.");
 
@@ -41,9 +40,7 @@ export async function GET(
       );
     }
 
-    const sessionId = (await decrypt((await cookies()).get("session")?.value))
-      ?.id;
-    const isAdmin = users.find(({ id }) => id === sessionId)?.admin;
+    const session = await decrypt((await cookies()).get("session")?.value);
 
     getLogger.info("Success");
 
@@ -52,9 +49,11 @@ export async function GET(
         reservations.map(
           (value) =>
             ({
-              editable: value.userId === sessionId || isAdmin,
-              ...value,
-              userId: value.anonymous && !isAdmin ? undefined : value.userId,
+              editable: value.userId === session?.id || session?.admin,
+              ...scheduleDateToString(value),
+              userId:
+                value.anonymous && !session?.admin ? undefined : value.userId,
+              anonymous: value.anonymous ?? undefined,
             }) as z.infer<typeof ReadReservationUserResponseItem>,
         ),
       ),

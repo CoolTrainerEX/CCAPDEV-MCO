@@ -20,7 +20,7 @@ export const ReadLabsQueryParams = zod.object({
   "page": zod.coerce.number().min(1).default(readLabsQueryPageDefault).describe('Pagination query')
 })
 
-export const readLabsResponseDataItemOneSlotsItemIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const readLabsResponseDataItemOneSlotsItemXMin = 0;
 
 export const readLabsResponseDataItemOneSlotsItemYMin = 0;
@@ -62,7 +62,7 @@ export const ReadLabsResponse = zod.object({
 }).optional().describe('Time interval')
 }).describe('Weekly schedule of the lab'),
   "slots": zod.array(zod.object({
-  "id": zod.string().regex(readLabsResponseDataItemOneSlotsItemIdRegExp).describe('ObjectID'),
+  "id": zod.string().min(1),
   "x": zod.number().min(readLabsResponseDataItemOneSlotsItemXMin),
   "y": zod.number().min(readLabsResponseDataItemOneSlotsItemYMin)
 })).describe('Available slots in the lab')
@@ -76,7 +76,7 @@ export const ReadLabsResponse = zod.object({
 /**
  * @summary Create a lab
  */
-export const createLabBodySlotsItemIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const createLabBodySlotsItemXMin = 0;
 
 export const createLabBodySlotsItemYMin = 0;
@@ -116,7 +116,7 @@ export const CreateLabBody = zod.object({
 }).optional().describe('Time interval')
 }).describe('Weekly schedule of the lab'),
   "slots": zod.array(zod.object({
-  "id": zod.string().regex(createLabBodySlotsItemIdRegExp).describe('ObjectID'),
+  "id": zod.string().min(1),
   "x": zod.number().min(createLabBodySlotsItemXMin),
   "y": zod.number().min(createLabBodySlotsItemYMin)
 })).describe('Available slots in the lab')
@@ -132,7 +132,7 @@ export const ReadLabParams = zod.object({
   "id": zod.coerce.string().regex(readLabPathIdRegExp).describe('The unique identifier of the lab')
 })
 
-export const readLabResponseOneSlotsItemIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const readLabResponseOneSlotsItemXMin = 0;
 
 export const readLabResponseOneSlotsItemYMin = 0;
@@ -173,7 +173,7 @@ export const ReadLabResponse = zod.object({
 }).optional().describe('Time interval')
 }).describe('Weekly schedule of the lab'),
   "slots": zod.array(zod.object({
-  "id": zod.string().regex(readLabResponseOneSlotsItemIdRegExp).describe('ObjectID'),
+  "id": zod.string().min(1),
   "x": zod.number().min(readLabResponseOneSlotsItemXMin),
   "y": zod.number().min(readLabResponseOneSlotsItemYMin)
 })).describe('Available slots in the lab')
@@ -192,7 +192,7 @@ export const UpdateLabParams = zod.object({
   "id": zod.coerce.string().regex(updateLabPathIdRegExp).describe('The unique identifier of the lab')
 })
 
-export const updateLabBodySlotsItemIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 export const updateLabBodySlotsItemXMin = 0;
 
 export const updateLabBodySlotsItemYMin = 0;
@@ -232,7 +232,7 @@ export const UpdateLabBody = zod.object({
 }).optional().describe('Time interval')
 }).describe('Weekly schedule of the lab'),
   "slots": zod.array(zod.object({
-  "id": zod.string().regex(updateLabBodySlotsItemIdRegExp).describe('ObjectID'),
+  "id": zod.string().min(1),
   "x": zod.number().min(updateLabBodySlotsItemXMin),
   "y": zod.number().min(updateLabBodySlotsItemYMin)
 })).describe('Available slots in the lab')
