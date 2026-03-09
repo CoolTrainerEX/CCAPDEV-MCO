@@ -63,7 +63,7 @@ export default function User() {
   const params = ReadUserParams.safeParse(useParams()).data;
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data, isPending, isSuccess } = useReadUser(params?.id ?? Number.NaN);
+  const { data, isPending, isSuccess } = useReadUser(params?.id ?? "");
   let user: z.infer<typeof ReadUserResponse> | undefined;
 
   if (isSuccess)
@@ -93,7 +93,7 @@ export default function User() {
     }
 
   const reservationsQuery = useReadReservationUser(
-    ReadReservationUserParams.safeParse(user).data?.id ?? Number.NaN,
+    ReadReservationUserParams.safeParse(user).data?.id ?? "",
     {
       query: { enabled: isSuccess && data.status === 200 },
     },

@@ -5,7 +5,7 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { UserName } from "./userName";
+import type { UserName } from './userName';
 
 export interface UserDetails {
   name: UserName;

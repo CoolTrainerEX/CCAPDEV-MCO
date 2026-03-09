@@ -107,7 +107,7 @@ export default function LabForm({
           return;
         }
 
-        if (slotIds.has(Number.NaN)) {
+        if (slotIds.has("")) {
           toast.error("Empty slot ID not allowed.");
           return;
         }
@@ -138,7 +138,7 @@ export default function LabForm({
       <Slots
         className="max-h-96 min-h-50 flex-1"
         slots={Array.from({ length: length * width }, (_, k) => ({
-          id: k + 1,
+          id: (k + 1).toLocaleString(),
           x: k % length,
           y: Math.floor(k / length),
         }))}
@@ -173,7 +173,7 @@ export default function LabForm({
                 {selectedSlot ? (
                   <TooltipTrigger asChild>
                     <p className="scroll-m-20 text-xl font-semibold tracking-tight">
-                      {Number.isNaN(selectedSlot.id) ? "" : selectedSlot.id}
+                      {selectedSlot.id}
                     </p>
                   </TooltipTrigger>
                 ) : (
@@ -186,14 +186,13 @@ export default function LabForm({
                     <FieldLabel htmlFor="id">ID</FieldLabel>
                     <Input
                       id="id"
-                      type="number"
                       placeholder="1"
                       required
                       value={selectedSlot.id}
                       onChange={(event) =>
                         setSlots((slots) => [
                           {
-                            id: event.target.valueAsNumber,
+                            id: event.target.value,
                             x: selectedSlot.x,
                             y: selectedSlot.y,
                           },
@@ -217,7 +216,7 @@ export default function LabForm({
             <TabsList className="w-full">
               {days.map((value) => (
                 <TabsTrigger value={value} key={value}>
-                  {value[0].toUpperCase() + value.slice(1, 2)}
+                  {value[0].toLocaleUpperCase() + value.slice(1, 2)}
                 </TabsTrigger>
               ))}
             </TabsList>

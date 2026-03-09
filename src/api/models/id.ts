@@ -7,6 +7,7 @@
  */
 
 /**
- * @minimum 0
+ * ObjectID
+ * @pattern ^[0-9a-fA-F]{24}$
  */
-export type Id = number;
+export type Id = string;

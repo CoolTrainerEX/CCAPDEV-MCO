@@ -131,12 +131,12 @@ function getReservations(
 export default function Lab() {
   const queryClient = useQueryClient();
   const params = ReadLabParams.safeParse(useParams()).data;
-  const labQuery = useReadLab(params?.id ?? Number.NaN);
+  const labQuery = useReadLab(params?.id ?? "");
   const { data, isSuccess, isPending } = labQuery;
   const lab = getLab(labQuery);
 
   const reservationsQuery = useReadReservationLab(
-    ReadReservationLabParams.safeParse(lab).data?.id ?? Number.NaN,
+    ReadReservationLabParams.safeParse(lab).data?.id ?? "",
     {
       query: { enabled: isSuccess && data.status === 200 },
     },
@@ -208,7 +208,7 @@ export default function Lab() {
 
   if (schedule && isAfter(schedule.start, schedule.end)) schedule = undefined;
 
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [formSchedule, setFormSchedule] = useState<Interval>({
     start: new Date(schedule?.start ?? date),
     end: new Date(schedule?.end ?? date),

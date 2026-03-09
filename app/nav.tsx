@@ -23,7 +23,7 @@ import { Spinner } from "@/components/ui/spinner";
 export default function Nav() {
   const currentUserQuery = useReadCurrentUser();
 
-  let currentUser = Number.NaN;
+  let currentUser;
 
   if (currentUserQuery.isSuccess)
     switch (currentUserQuery.data.status) {
@@ -53,7 +53,7 @@ export default function Nav() {
     }
 
   const { data, isPending, isSuccess, isEnabled } = useReadUser(
-    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? Number.NaN,
+    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? "",
     {
       query: {
         enabled:

@@ -5,8 +5,8 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import type { Id } from "./id";
-import type { ReservationUpdate } from "./reservationUpdate";
+import type { Id } from './id';
+import type { ReservationUpdate } from './reservationUpdate';
 
 export type ReservationDetails = ReservationUpdate & {
   labId: Id;

@@ -2,7 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import pino from "pino";
-import { users } from "@/src/sample";
+import prisma from "./prisma";
 
 const encodedKey = new TextEncoder().encode(process.env.SESSION_SECRET);
 const logger = pino().child({ operation: "session" });
@@ -10,7 +10,7 @@ const logger = pino().child({ operation: "session" });
 /**
  * Decrypt JWT into payload object.
  * @param {string} session Session string
- * @returns {Promise<{id: number, admin: true | undefined} | null | undefined>} User ID (`null` if user not found; `undefined` if no session)
+ * @returns {Promise<{id: string, admin: true | undefined} | null | undefined>} User ID (`null` if user not found; `undefined` if no session)
  * @author Justin Ryan Uy
  */
 export async function decrypt(session: string = "") {
@@ -20,9 +20,10 @@ export async function decrypt(session: string = "") {
         await jwtVerify(session, encodedKey, {
           algorithms: ["HS256"],
         })
-      ).payload as { id: number }
+      ).payload as { id: string }
     ).id;
-    const user = users.find(({ id }) => id === sessionId);
+
+    const user = await prisma.user.findFirst({ where: { id: sessionId } });
 
     return (user && { id: user.id, admin: user.admin }) ?? null;
   } catch {
@@ -32,10 +33,10 @@ export async function decrypt(session: string = "") {
 
 /**
  * Creates a user session.
- * @param {number} id User ID
+ * @param {string} id User ID
  * @author Justin Ryan Uy
  */
-export async function createSession(id: number) {
+export async function createSession(id: string) {
   (await cookies()).set(
     "session",
     await new SignJWT({ id })

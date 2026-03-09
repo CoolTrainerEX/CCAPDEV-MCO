@@ -36,7 +36,7 @@ export default function EditLab() {
   const queryClient = useQueryClient();
   const params = UpdateLabParams.safeParse(useParams()).data;
 
-  const { data, isSuccess, isPending } = useReadLab(params?.id ?? Number.NaN);
+  const { data, isSuccess, isPending } = useReadLab(params?.id ?? "");
   let lab: z.infer<typeof ReadLabResponse> | undefined;
 
   if (isSuccess)

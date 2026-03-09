@@ -5,171 +5,120 @@
  * CCAPDEV MCO
  * OpenAPI spec version: 0.1.0
  */
-import * as zod from "zod";
+import * as zod from 'zod';
+
 
 /**
  * @summary Create a reservation
  */
-export const createReservationBodyOneSlotIdsItemMin = 0;
+export const createReservationBodyOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const createReservationBodyTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 
-export const createReservationBodyTwoLabIdMin = 0;
 
-export const CreateReservationBody = zod
-  .object({
-    anonymous: zod.boolean().optional(),
-    schedule: zod
-      .object({
-        start: zod.iso.datetime({}),
-        end: zod.iso.datetime({}),
-      })
-      .describe("Time interval"),
-    slotIds: zod.array(
-      zod.number().min(createReservationBodyOneSlotIdsItemMin),
-    ),
-  })
-  .and(
-    zod.object({
-      labId: zod.number().min(createReservationBodyTwoLabIdMin),
-    }),
-  );
+export const CreateReservationBody = zod.object({
+  "anonymous": zod.boolean().optional(),
+  "schedule": zod.object({
+  "start": zod.iso.datetime({}),
+  "end": zod.iso.datetime({})
+}).describe('Time interval'),
+  "slotIds": zod.array(zod.string().regex(createReservationBodyOneSlotIdsItemRegExp).describe('ObjectID'))
+}).and(zod.object({
+  "labId": zod.string().regex(createReservationBodyTwoLabIdRegExp).describe('ObjectID')
+}))
 
 /**
  * @summary Update a reservation
  */
-export const updateReservationPathIdMin = 0;
+export const updateReservationPathIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 export const UpdateReservationParams = zod.object({
-  id: zod.coerce
-    .number()
-    .min(updateReservationPathIdMin)
-    .describe("The unique identifier of the reservation"),
-});
+  "id": zod.coerce.string().regex(updateReservationPathIdRegExp).describe('The unique identifier of the reservation')
+})
 
-export const updateReservationBodySlotIdsItemMin = 0;
+export const updateReservationBodySlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 export const UpdateReservationBody = zod.object({
-  anonymous: zod.boolean().optional(),
-  schedule: zod
-    .object({
-      start: zod.iso.datetime({}),
-      end: zod.iso.datetime({}),
-    })
-    .describe("Time interval"),
-  slotIds: zod.array(zod.number().min(updateReservationBodySlotIdsItemMin)),
-});
+  "anonymous": zod.boolean().optional(),
+  "schedule": zod.object({
+  "start": zod.iso.datetime({}),
+  "end": zod.iso.datetime({})
+}).describe('Time interval'),
+  "slotIds": zod.array(zod.string().regex(updateReservationBodySlotIdsItemRegExp).describe('ObjectID'))
+})
 
 /**
  * @summary Delete a reservation
  */
-export const deleteReservationPathIdMin = 0;
+export const deleteReservationPathIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 export const DeleteReservationParams = zod.object({
-  id: zod.coerce
-    .number()
-    .min(deleteReservationPathIdMin)
-    .describe("The unique identifier of the reservation"),
-});
+  "id": zod.coerce.string().regex(deleteReservationPathIdRegExp).describe('The unique identifier of the reservation')
+})
 
 /**
  * @summary Read the reservations of the user
  */
-export const readReservationUserPathIdMin = 0;
+export const readReservationUserPathIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 export const ReadReservationUserParams = zod.object({
-  id: zod.coerce
-    .number()
-    .min(readReservationUserPathIdMin)
-    .describe("The unique identifier of the user"),
-});
+  "id": zod.coerce.string().regex(readReservationUserPathIdRegExp).describe('The unique identifier of the user')
+})
 
-export const readReservationUserResponseOneOneSlotIdsItemMin = 0;
+export const readReservationUserResponseOneOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationUserResponseOneTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationUserResponseTwoIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationUserResponseTwoUserIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 
-export const readReservationUserResponseOneTwoLabIdMin = 0;
 
-export const readReservationUserResponseTwoIdMin = 0;
-
-export const readReservationUserResponseTwoUserIdMin = 0;
-
-export const ReadReservationUserResponseItem = zod
-  .object({
-    anonymous: zod.boolean().optional(),
-    schedule: zod
-      .object({
-        start: zod.iso.datetime({}),
-        end: zod.iso.datetime({}),
-      })
-      .describe("Time interval"),
-    slotIds: zod.array(
-      zod.number().min(readReservationUserResponseOneOneSlotIdsItemMin),
-    ),
-  })
-  .and(
-    zod.object({
-      labId: zod.number().min(readReservationUserResponseOneTwoLabIdMin),
-    }),
-  )
-  .and(
-    zod.object({
-      id: zod.number().min(readReservationUserResponseTwoIdMin),
-      userId: zod
-        .number()
-        .min(readReservationUserResponseTwoUserIdMin)
-        .optional(),
-      editable: zod.boolean().optional(),
-    }),
-  );
-export const ReadReservationUserResponse = zod.array(
-  ReadReservationUserResponseItem,
-);
+export const ReadReservationUserResponseItem = zod.object({
+  "anonymous": zod.boolean().optional(),
+  "schedule": zod.object({
+  "start": zod.iso.datetime({}),
+  "end": zod.iso.datetime({})
+}).describe('Time interval'),
+  "slotIds": zod.array(zod.string().regex(readReservationUserResponseOneOneSlotIdsItemRegExp).describe('ObjectID'))
+}).and(zod.object({
+  "labId": zod.string().regex(readReservationUserResponseOneTwoLabIdRegExp).describe('ObjectID')
+})).and(zod.object({
+  "id": zod.string().regex(readReservationUserResponseTwoIdRegExp).describe('ObjectID'),
+  "userId": zod.string().regex(readReservationUserResponseTwoUserIdRegExp).optional().describe('ObjectID'),
+  "editable": zod.boolean().optional()
+}))
+export const ReadReservationUserResponse = zod.array(ReadReservationUserResponseItem)
 
 /**
  * @summary Read the reservations of the lab
  */
-export const readReservationLabPathIdMin = 0;
+export const readReservationLabPathIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+
 
 export const ReadReservationLabParams = zod.object({
-  id: zod.coerce
-    .number()
-    .min(readReservationLabPathIdMin)
-    .describe("The unique identifier of the lab"),
-});
+  "id": zod.coerce.string().regex(readReservationLabPathIdRegExp).describe('The unique identifier of the lab')
+})
 
-export const readReservationLabResponseOneOneSlotIdsItemMin = 0;
+export const readReservationLabResponseOneOneSlotIdsItemRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationLabResponseOneTwoLabIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationLabResponseTwoIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+export const readReservationLabResponseTwoUserIdRegExp = new RegExp('^[0-9a-fA-F]{24}$');
 
-export const readReservationLabResponseOneTwoLabIdMin = 0;
 
-export const readReservationLabResponseTwoIdMin = 0;
+export const ReadReservationLabResponseItem = zod.object({
+  "anonymous": zod.boolean().optional(),
+  "schedule": zod.object({
+  "start": zod.iso.datetime({}),
+  "end": zod.iso.datetime({})
+}).describe('Time interval'),
+  "slotIds": zod.array(zod.string().regex(readReservationLabResponseOneOneSlotIdsItemRegExp).describe('ObjectID'))
+}).and(zod.object({
+  "labId": zod.string().regex(readReservationLabResponseOneTwoLabIdRegExp).describe('ObjectID')
+})).and(zod.object({
+  "id": zod.string().regex(readReservationLabResponseTwoIdRegExp).describe('ObjectID'),
+  "userId": zod.string().regex(readReservationLabResponseTwoUserIdRegExp).optional().describe('ObjectID'),
+  "editable": zod.boolean().optional()
+}))
+export const ReadReservationLabResponse = zod.array(ReadReservationLabResponseItem)
 
-export const readReservationLabResponseTwoUserIdMin = 0;
-
-export const ReadReservationLabResponseItem = zod
-  .object({
-    anonymous: zod.boolean().optional(),
-    schedule: zod
-      .object({
-        start: zod.iso.datetime({}),
-        end: zod.iso.datetime({}),
-      })
-      .describe("Time interval"),
-    slotIds: zod.array(
-      zod.number().min(readReservationLabResponseOneOneSlotIdsItemMin),
-    ),
-  })
-  .and(
-    zod.object({
-      labId: zod.number().min(readReservationLabResponseOneTwoLabIdMin),
-    }),
-  )
-  .and(
-    zod.object({
-      id: zod.number().min(readReservationLabResponseTwoIdMin),
-      userId: zod
-        .number()
-        .min(readReservationLabResponseTwoUserIdMin)
-        .optional(),
-      editable: zod.boolean().optional(),
-    }),
-  );
-export const ReadReservationLabResponse = zod.array(
-  ReadReservationLabResponseItem,
-);

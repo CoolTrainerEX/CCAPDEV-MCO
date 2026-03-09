@@ -120,10 +120,10 @@ function getUser(user: ReturnType<typeof useReadUser<readUserResponse>>) {
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function Home() {
   const currentUserQuery = useReadCurrentUser();
-  const currentUser = getCurrentUser(currentUserQuery) ?? Number.NaN;
+  const currentUser = getCurrentUser(currentUserQuery) ?? "";
 
   const user = useReadUser(
-    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? Number.NaN,
+    ReadUserParams.safeParse({ id: currentUser }).data?.id ?? "",
     {
       query: {
         enabled:
@@ -191,7 +191,7 @@ export default function Home() {
   const reservationsQueries = useQueries({
     queries: labs.map(({ id }) =>
       getReadReservationLabQueryOptions(
-        ReadReservationLabParams.safeParse({ id }).data?.id ?? Number.NaN,
+        ReadReservationLabParams.safeParse({ id }).data?.id ?? "",
         { query: { enabled: isSuccess && status === 200 } },
       ),
     ),
@@ -201,10 +201,10 @@ export default function Home() {
 
   /**
    * Gets the reservation query of the specified lab.
-   * @param {number} id Lab ID
+   * @param {string} id Lab ID
    * @returns {ReturnType<typeof useReadReservationLab>} Reservation query
    */
-  function getReservationQuery(id: number) {
+  function getReservationQuery(id: string) {
     return reservationsQueries[labs.findIndex((value) => value.id === id)];
   }
 
@@ -284,7 +284,7 @@ export default function Home() {
               /**
                * Function to render slots.
                * @param {Parameters<Parameters<typeof Slots>[0]["children"]>[0]} param0 Slot
-               * @param {number} param0.id Slot ID
+               * @param {string} param0.id Slot ID
                */
               function slotFunc({
                 id,

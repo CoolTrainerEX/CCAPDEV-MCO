@@ -81,14 +81,14 @@ import { Spinner } from "@/components/ui/spinner";
 
 /**
  * Modify selected on toggle.
- * @param {Dispatch<SetStateAction<number[]>>} setSelected Selected state set
- * @param {number} slotId Slot ID
+ * @param {Dispatch<SetStateAction<string[]>>} setSelected Selected state set
+ * @param {string} slotId Slot ID
  * @returns {(pressed: boolean) => void} Function to run
  * @author Justin Ryan Uy
  */
 export function onPressedChange(
-  setSelected: Dispatch<SetStateAction<number[]>>,
-  slotId: number,
+  setSelected: Dispatch<SetStateAction<string[]>>,
+  slotId: string,
 ) {
   return (pressed: boolean) =>
     setSelected((value) =>
@@ -144,14 +144,14 @@ export default function Reservation({
   const queryClient = useQueryClient();
 
   const labQuery = useReadLab(
-    ReadLabParams.safeParse({ id: reservation?.labId }).data?.id ?? Number.NaN,
+    ReadLabParams.safeParse({ id: reservation?.labId }).data?.id ?? "",
     { query: { enabled: !!reservation } },
   );
 
   const lab = getLab(labQuery);
 
   const { data, isSuccess } = useReadReservationLab(
-    ReadReservationLabParams.safeParse(lab).data?.id ?? Number.NaN,
+    ReadReservationLabParams.safeParse(lab).data?.id ?? "",
     { query: { enabled: labQuery.isSuccess && labQuery.data.status === 200 } },
   );
 
@@ -433,7 +433,7 @@ export function ReservationContent({
   reservation: z.infer<typeof ReadReservationLabResponseItem>;
 }) {
   const userQuery = useReadUser(
-    ReadUserParams.safeParse({ id: reservation.userId }).data?.id ?? Number.NaN,
+    ReadUserParams.safeParse({ id: reservation.userId }).data?.id ?? "",
     { query: { enabled: !reservation.anonymous } },
   );
 
@@ -464,7 +464,7 @@ export function ReservationContent({
     }
 
   const labQuery = useReadLab(
-    ReadLabParams.safeParse({ id: reservation.labId }).data?.id ?? Number.NaN,
+    ReadLabParams.safeParse({ id: reservation.labId }).data?.id ?? "",
   );
 
   let lab: z.infer<typeof ReadLabResponse> | undefined;
