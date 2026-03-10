@@ -77,9 +77,11 @@ export async function POST(request: NextRequest) {
     if (checks) return checks;
 
     if (
-      (await prisma.reservation.findMany({})).some(({ schedule }) =>
-        areIntervalsOverlapping(schedule, body.schedule),
-      )
+      (
+        await prisma.reservation.findMany({
+          where: { slotIds: { hasSome: body.slotIds } },
+        })
+      ).some(({ schedule }) => areIntervalsOverlapping(schedule, body.schedule))
     ) {
       postLogger.info("Reservation overlaps.");
 

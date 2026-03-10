@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import Form from "next/form";
 import TimeRangeInput from "./time-range-input";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   getHours,
   getMinutes,
@@ -247,11 +247,23 @@ export default function Reservation({
           start: new Date(reservation.schedule.start),
           end: new Date(reservation.schedule.end),
         }
-      : { start: now, end: now },
+      : { start: startOfDay(now), end: startOfDay(now) },
   );
 
   const [selected, setSelected] = useState(reservation?.slotIds ?? []);
   const [anonymous, setAnonymous] = useState(reservation?.anonymous ?? false);
+
+  useEffect(() => {
+    if (reservation) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormSchedule({
+        start: new Date(reservation.schedule.start),
+        end: new Date(reservation.schedule.end),
+      });
+      setSelected(reservation.slotIds);
+      setAnonymous(reservation.anonymous ?? false);
+    }
+  }, [reservation]);
 
   if (!reservation) return children;
 
@@ -351,13 +363,15 @@ export default function Reservation({
                     schedule={schedule}
                     value={formSchedule}
                     setValue={setFormSchedule}
-                    valid={reservations
-                      .filter(({ slotIds }) =>
-                        slotIds.some((value) => selected.includes(value)),
-                      )
-                      .some(({ schedule }) =>
-                        areIntervalsOverlapping(schedule, formSchedule),
-                      )}
+                    valid={
+                      !reservations
+                        .filter(({ slotIds }) =>
+                          slotIds.some((value) => selected.includes(value)),
+                        )
+                        .some(({ schedule }) =>
+                          areIntervalsOverlapping(schedule, formSchedule),
+                        )
+                    }
                     submitValue="Reserve"
                   />
                   <Field orientation="horizontal">

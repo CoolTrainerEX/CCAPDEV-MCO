@@ -23,7 +23,8 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
-
+RUN bunx --bun orval
+RUN DATABASE_URL="mongodb+srv://root@cluster0.ab1cd.mongodb.net/mydb?retryWrites=true&w=majority" bunx --bun prisma generate
 RUN bun run build
 
 # Production image, copy all the files and run next
@@ -50,5 +51,4 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000
-
-CMD ["bun", "./server.js"]
+CMD [ "bun", "./server.js"]

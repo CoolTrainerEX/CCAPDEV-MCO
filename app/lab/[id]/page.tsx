@@ -216,7 +216,7 @@ export default function Lab() {
 
   const [anonymous, setAnonymous] = useState(false);
 
-  if (reservationsQuery.isSuccess && lab)
+  if (reservationsQuery.isSuccess && lab && reservations)
     return (
       <>
         <div className="container m-auto flex justify-center gap-6">
@@ -241,7 +241,7 @@ export default function Lab() {
           <Slots className="max-h-96 min-h-50 flex-1" slots={lab.slots}>
             {({ id }) => {
               const reservation = reservations
-                ?.filter((value) =>
+                .filter((value) =>
                   areIntervalsOverlapping(value.schedule, formSchedule),
                 )
                 .find(({ slotIds }) => slotIds.includes(id));
@@ -342,7 +342,7 @@ export default function Lab() {
                   setValue={setFormSchedule}
                   valid={
                     !reservations
-                      ?.filter(({ slotIds }) =>
+                      .filter(({ slotIds }) =>
                         slotIds.some((value) => selected.includes(value)),
                       )
                       .some(({ schedule }) =>
