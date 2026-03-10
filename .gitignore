@@ -50,3 +50,4 @@ node_modules/
 
 certificates
 /src/generated/prisma
+/src/api
