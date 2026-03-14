@@ -108,7 +108,7 @@ export async function PUT(
       );
     }
 
-    prisma.lab.update({ data: body, where: { id: params.id } });
+    await prisma.lab.update({ data: body, where: { id: params.id } });
     putLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });
@@ -170,7 +170,7 @@ export async function DELETE(
       );
     }
 
-    prisma.lab.delete({ where: { id: params.id } });
+    await prisma.lab.delete({ where: { id: params.id } });
     deleteLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });

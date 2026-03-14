@@ -465,15 +465,12 @@ components:
     UserId:
       description: The unique identifier of a user
       $ref: "#/components/schemas/Id"
-      example: 12412201
     LabId:
       description: The unique identifier of a lab
       $ref: "#/components/schemas/Id"
-      example: 1
     ReservationId:
       description: The unique identifier of a reservation
       $ref: "#/components/schemas/Id"
-      example: 1
     UserName:
       type: object
       required:

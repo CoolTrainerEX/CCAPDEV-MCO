@@ -32,7 +32,7 @@ export default function Login() {
       onSuccess(data) {
         switch (data.status) {
           case 204:
-            router.push("/");
+            router.refresh();
             toast.success("Logged in.");
             break;
 

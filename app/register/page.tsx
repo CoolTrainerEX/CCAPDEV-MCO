@@ -32,7 +32,7 @@ export default function Register() {
       onSuccess(data) {
         switch (data.status) {
           case 201:
-            router.push("/");
+            router.refresh();
             toast.success("Logged in.");
             break;
 

@@ -36,8 +36,10 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import {
+  readCurrentUserResponse,
   useDeleteUser,
   useLogout,
+  useReadCurrentUser,
   useReadUser,
   useUpdateUser,
 } from "@/src/api/endpoints/user/user";
@@ -46,6 +48,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import z from "zod";
 import {
   DeleteUserParams,
+  ReadCurrentUserResponse,
   ReadUserParams,
   ReadUserResponse,
   UpdateUserBody,
@@ -58,12 +61,49 @@ import {
 } from "@/src/api/endpoints/reservation/reservation.zod";
 import { Spinner } from "@/components/ui/spinner";
 
+/**
+ * Parses the current user ID from the query.
+ * @param {ReturnType<typeof useReadCurrentUser>} currentUserQuery Current user query
+ * @returns {z.infer<typeof ReadCurrentUserResponse> | undefined} Parsed current user ID
+ */
+function getCurrentUser(
+  currentUserQuery: ReturnType<
+    typeof useReadCurrentUser<readCurrentUserResponse>
+  >,
+) {
+  if (currentUserQuery.isSuccess)
+    switch (currentUserQuery.data.status) {
+      case 200:
+        try {
+          return ReadCurrentUserResponse.parse(currentUserQuery.data.data);
+        } catch {
+          toast.warning("Bad response.");
+        }
+        break;
+
+      case 401:
+        break;
+      case 404:
+        toast.error(currentUserQuery.data.data.message);
+        break;
+
+      case 500:
+        toast.warning(currentUserQuery.data.data.message);
+        break;
+
+      default:
+        toast.warning("Unexpected error.");
+        break;
+    }
+}
+
 // eslint-disable-next-line jsdoc/require-jsdoc
 export default function User() {
   const params = ReadUserParams.safeParse(useParams()).data;
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data, isPending, isSuccess } = useReadUser(params?.id ?? "");
+
   let user: z.infer<typeof ReadUserResponse> | undefined;
 
   if (isSuccess)
@@ -91,6 +131,10 @@ export default function User() {
         toast.warning("Unexpected error.");
         break;
     }
+
+  const currentUserQuery = useReadCurrentUser();
+
+  const currentUser = getCurrentUser(currentUserQuery);
 
   const reservationsQuery = useReadReservationUser(
     ReadReservationUserParams.safeParse(user).data?.id ?? "",
@@ -215,7 +259,7 @@ export default function User() {
   return (
     <>
       {(() => {
-        if (isSuccess && user)
+        if (isSuccess && currentUserQuery.isSuccess && user && currentUser)
           return (
             <>
               <div className="container m-auto flex items-center justify-center gap-6">
@@ -233,178 +277,169 @@ export default function User() {
                   <p className="text-muted-foreground text-sm">{user.id}</p>
                 </div>
                 {user.editable && (
-                  <>
-                    <Drawer>
-                      <DrawerTrigger asChild>
-                        <Button variant="outline">
-                          <Pencil />
-                        </Button>
-                      </DrawerTrigger>
-                      <DrawerContent>
-                        <div className="mx-auto w-full max-w-sm overflow-y-auto">
-                          <DrawerHeader>
-                            <DrawerTitle>Edit Profile</DrawerTitle>
-                          </DrawerHeader>
-                          <Form
-                            action={(formData) => {
-                              const data = Object.fromEntries(
-                                formData.entries(),
-                              );
+                  <Drawer>
+                    <DrawerTrigger asChild>
+                      <Button variant="outline">
+                        <Pencil />
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <div className="mx-auto w-full max-w-sm overflow-y-auto">
+                        <DrawerHeader>
+                          <DrawerTitle>Edit Profile</DrawerTitle>
+                        </DrawerHeader>
+                        <Form
+                          action={(formData) => {
+                            const data = Object.fromEntries(formData.entries());
 
-                              if (
-                                data["password"] !== data["confirm-password"]
-                              ) {
-                                toast.error("Passwords do not match.");
-                                return;
-                              }
+                            if (data["password"] !== data["confirm-password"]) {
+                              toast.error("Passwords do not match.");
+                              return;
+                            }
 
-                              try {
-                                mutateUpdateUser({
-                                  ...UpdateUserParams.parse(user),
-                                  data: UpdateUserBody.parse({
-                                    name: {
-                                      first: data["firstname"],
-                                      last: data["lastname"],
-                                    },
-                                    ...data,
-                                    password: data["password"] || undefined,
-                                  } as z.infer<typeof UpdateUserBody>),
-                                });
-                              } catch {
-                                toast.error("Invalid fields.");
-                              }
-                            }}
-                          >
-                            <div className="p-4 pb-0">
-                              <div className="flex items-center justify-center space-x-2">
-                                <FieldGroup>
-                                  <Field>
-                                    <FieldLabel htmlFor="firstname">
-                                      First Name
-                                    </FieldLabel>
-                                    <Input
-                                      id="firstname"
-                                      name="firstname"
-                                      type="text"
-                                      placeholder="Juan"
-                                      defaultValue={user.name.first}
-                                      required
-                                    />
-                                  </Field>
-                                  <Field>
-                                    <FieldLabel htmlFor="lastname">
-                                      Last Name
-                                    </FieldLabel>
-                                    <Input
-                                      id="lastname"
-                                      name="lastname"
-                                      type="text"
-                                      placeholder="Dela Cruz"
-                                      defaultValue={user.name.last}
-                                      required
-                                    />
-                                  </Field>
-                                  <Field>
-                                    <FieldLabel htmlFor="description">
-                                      Description
-                                    </FieldLabel>
-                                    <Textarea
-                                      id="description"
-                                      name="description"
-                                      placeholder="Type your description here."
-                                      defaultValue={user.description}
-                                    />
-                                  </Field>
-                                  <Field>
-                                    <FieldLabel htmlFor="password">
-                                      Password
-                                    </FieldLabel>
-                                    <Input
-                                      id="password"
-                                      name="password"
-                                      type="password"
-                                      minLength={8}
-                                    />
-                                    <FieldDescription>
-                                      Must be at least 8 characters long.
-                                    </FieldDescription>
-                                  </Field>
-                                  <Field>
-                                    <FieldLabel htmlFor="confirm-password">
-                                      Confirm Password
-                                    </FieldLabel>
-                                    <Input
-                                      id="confirm-password"
-                                      name="confirm-password"
-                                      type="password"
-                                    />
-                                    <FieldDescription>
-                                      Please confirm your password.
-                                    </FieldDescription>
-                                  </Field>
-                                </FieldGroup>
-                              </div>
+                            try {
+                              mutateUpdateUser({
+                                ...UpdateUserParams.parse(user),
+                                data: UpdateUserBody.parse({
+                                  name: {
+                                    first: data["firstname"],
+                                    last: data["lastname"],
+                                  },
+                                  ...data,
+                                  password: data["password"] || undefined,
+                                } as z.infer<typeof UpdateUserBody>),
+                              });
+                            } catch {
+                              toast.error("Invalid fields.");
+                            }
+                          }}
+                        >
+                          <div className="p-4 pb-0">
+                            <div className="flex items-center justify-center space-x-2">
+                              <FieldGroup>
+                                <Field>
+                                  <FieldLabel htmlFor="firstname">
+                                    First Name
+                                  </FieldLabel>
+                                  <Input
+                                    id="firstname"
+                                    name="firstname"
+                                    type="text"
+                                    placeholder="Juan"
+                                    defaultValue={user.name.first}
+                                    required
+                                  />
+                                </Field>
+                                <Field>
+                                  <FieldLabel htmlFor="lastname">
+                                    Last Name
+                                  </FieldLabel>
+                                  <Input
+                                    id="lastname"
+                                    name="lastname"
+                                    type="text"
+                                    placeholder="Dela Cruz"
+                                    defaultValue={user.name.last}
+                                    required
+                                  />
+                                </Field>
+                                <Field>
+                                  <FieldLabel htmlFor="description">
+                                    Description
+                                  </FieldLabel>
+                                  <Textarea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Type your description here."
+                                    defaultValue={user.description}
+                                  />
+                                </Field>
+                                <Field>
+                                  <FieldLabel htmlFor="password">
+                                    Password
+                                  </FieldLabel>
+                                  <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    minLength={8}
+                                  />
+                                  <FieldDescription>
+                                    Must be at least 8 characters long.
+                                  </FieldDescription>
+                                </Field>
+                                <Field>
+                                  <FieldLabel htmlFor="confirm-password">
+                                    Confirm Password
+                                  </FieldLabel>
+                                  <Input
+                                    id="confirm-password"
+                                    name="confirm-password"
+                                    type="password"
+                                  />
+                                  <FieldDescription>
+                                    Please confirm your password.
+                                  </FieldDescription>
+                                </Field>
+                              </FieldGroup>
                             </div>
-                            <DrawerFooter>
-                              <Button type="submit">Update</Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="destructive">Delete</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will
-                                      permanently delete your account from our
-                                      servers.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                      Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => {
-                                        try {
-                                          mutateDeleteUser(
-                                            DeleteUserParams.parse(user),
-                                          );
-                                        } catch {
-                                          toast.error("Invalid request.");
-                                        }
-                                      }}
-                                    >
-                                      Continue
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                              <DrawerClose asChild>
-                                <Button variant="outline" type="reset">
-                                  Cancel
-                                </Button>
-                              </DrawerClose>
-                            </DrawerFooter>
-                          </Form>
-                        </div>
-                      </DrawerContent>
-                    </Drawer>
-                    <Button
-                      variant="destructive"
-                      onClick={() => mutateLogout()}
-                    >
-                      Logout
-                    </Button>
-                  </>
+                          </div>
+                          <DrawerFooter>
+                            <Button type="submit">Update</Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive">Delete</Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete your account from our
+                                    servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      try {
+                                        mutateDeleteUser(
+                                          DeleteUserParams.parse(user),
+                                        );
+                                      } catch {
+                                        toast.error("Invalid request.");
+                                      }
+                                    }}
+                                  >
+                                    Continue
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                            <DrawerClose asChild>
+                              <Button variant="outline" type="reset">
+                                Cancel
+                              </Button>
+                            </DrawerClose>
+                          </DrawerFooter>
+                        </Form>
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                )}
+                {user.id === currentUser && (
+                  <Button variant="destructive" onClick={() => mutateLogout()}>
+                    Logout
+                  </Button>
                 )}
               </div>
               <p className="mx-auto mt-6 w-fit italic">{user.description}</p>
             </>
           );
-        else if (isPending)
+        else if (isPending || currentUserQuery.isPending)
           return (
             <div className="container m-auto flex items-center justify-center gap-6">
               <Spinner className="size-8" />

@@ -17,8 +17,8 @@ import pino from "pino";
 import { ZodError } from "zod";
 
 const logger = pino();
-const putLogger = logger.child({ operation: "update user" });
-const deleteLogger = logger.child({ operation: "delete user" });
+const putLogger = logger.child({ operation: "update reservation" });
+const deleteLogger = logger.child({ operation: "delete reservation" });
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function PUT(
@@ -89,7 +89,10 @@ export async function PUT(
         );
       }
 
-    prisma.reservation.update({ data: body, where: { id: reservation.id } });
+    await prisma.reservation.update({
+      data: body,
+      where: { id: reservation.id },
+    });
 
     putLogger.info("Success");
 
@@ -151,7 +154,7 @@ export async function DELETE(
       );
     }
 
-    prisma.reservation.delete({ where: { id: reservation.id } });
+    await prisma.reservation.delete({ where: { id: reservation.id } });
     deleteLogger.info("Success");
 
     return new NextResponse(undefined, { status: 204 });

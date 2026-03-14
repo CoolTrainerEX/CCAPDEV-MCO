@@ -23,7 +23,7 @@ import { Spinner } from "@/components/ui/spinner";
 export default function Nav() {
   const currentUserQuery = useReadCurrentUser();
 
-  let currentUser;
+  let currentUser: z.infer<typeof ReadCurrentUserResponse> | undefined;
 
   if (currentUserQuery.isSuccess)
     switch (currentUserQuery.data.status) {

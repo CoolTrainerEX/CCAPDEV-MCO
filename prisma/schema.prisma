@@ -65,6 +65,6 @@ model Reservation {
   anonymous Boolean?
   schedule  Interval
   slotIds   String[]
-  user      User     @relation(fields: [userId], references: [id])
-  lab       Lab      @relation(fields: [labId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lab       Lab      @relation(fields: [labId], references: [id], onDelete: Cascade)
 }

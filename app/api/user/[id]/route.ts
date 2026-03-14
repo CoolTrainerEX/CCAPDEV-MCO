@@ -100,7 +100,7 @@ export async function PUT(
       );
     }
 
-    prisma.user.update({ data: body, where: { id: params.id } });
+    await prisma.user.update({ data: body, where: { id: params.id } });
 
     putLogger.info("Success");
 
@@ -162,7 +162,7 @@ export async function DELETE(
       );
     }
 
-    prisma.user.delete({ where: { id: params.id } });
+    await prisma.user.delete({ where: { id: params.id } });
 
     if (isCurrentUser) cookieStore.delete("session");
 

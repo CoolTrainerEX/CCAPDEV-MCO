@@ -142,7 +142,7 @@ export default function Lab() {
     },
   );
 
-  const reservations = getReservations(reservationsQuery);
+  const reservations = getReservations(reservationsQuery) ?? [];
 
   const { mutate } = useCreateReservation({
     mutation: {
@@ -216,7 +216,11 @@ export default function Lab() {
 
   const [anonymous, setAnonymous] = useState(false);
 
-  if (reservationsQuery.isSuccess && lab && reservations)
+  if (
+    isSuccess &&
+    (!reservationsQuery.isEnabled || reservationsQuery.isSuccess) &&
+    lab
+  )
     return (
       <>
         <div className="container m-auto flex justify-center gap-6">
