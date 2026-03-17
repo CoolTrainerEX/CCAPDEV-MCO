@@ -14,6 +14,7 @@ import {
   UnexpectedResponse,
 } from "@/src/api/models";
 import { Prisma } from "@/src/generated/prisma/client";
+import { hash } from "argon2";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
@@ -100,7 +101,10 @@ export async function PUT(
       );
     }
 
-    await prisma.user.update({ data: body, where: { id: params.id } });
+    await prisma.user.update({
+      data: { ...body, password: body.password && (await hash(body.password)) },
+      where: { id: params.id },
+    });
 
     putLogger.info("Success");
 
