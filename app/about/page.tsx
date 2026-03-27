@@ -149,6 +149,17 @@ export default function About() {
         </dl>
         <Separator />
         <dl className="flex items-center justify-between">
+          <dt>sharp</dt>
+          <dd className="text-muted-foreground">
+            <Button variant="link" asChild>
+              <Link href="https://sharp.pixelplumbing.com/" target="_blank">
+                <Globe />
+              </Link>
+            </Button>
+          </dd>
+        </dl>
+        <Separator />
+        <dl className="flex items-center justify-between">
           <dt>Tailwind CSS</dt>
           <dd className="text-muted-foreground">
             <Button variant="link" asChild>

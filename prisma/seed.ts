@@ -14,6 +14,9 @@ const userData: Prisma.UserCreateInput[] = [
     },
     password: await hash("12345678"),
     description: "Student of DLSU",
+    image: new Uint8Array(
+      await (await fetch("https://picsum.photos/64.webp")).arrayBuffer(),
+    ),
   },
   {
     email: "joe_dela_cruz@dlsu.edu.ph",
@@ -24,6 +27,9 @@ const userData: Prisma.UserCreateInput[] = [
     password: await hash("password"),
     description: "IT Employee",
     admin: true,
+    image: new Uint8Array(
+      await (await fetch("https://picsum.photos/64.webp")).arrayBuffer(),
+    ),
   },
   {
     email: "paityn_orr@dlsu.edu.ph",
@@ -33,6 +39,9 @@ const userData: Prisma.UserCreateInput[] = [
     },
     password: await hash("123456789"),
     description: "Proud CCS Student",
+    image: new Uint8Array(
+      await (await fetch("https://picsum.photos/64.webp")).arrayBuffer(),
+    ),
   },
   {
     email: "benicio_mclean@dlsu.edu.ph",
@@ -43,6 +52,9 @@ const userData: Prisma.UserCreateInput[] = [
     password: await hash("00000000"),
     description: "ADSO Officer",
     admin: true,
+    image: new Uint8Array(
+      await (await fetch("https://picsum.photos/64.webp")).arrayBuffer(),
+    ),
   },
   {
     email: "amirah_colon@dlsu.edu.ph",
@@ -52,6 +64,9 @@ const userData: Prisma.UserCreateInput[] = [
     },
     password: await hash("87654321"),
     description: "Epic gamer",
+    image: new Uint8Array(
+      await (await fetch("https://picsum.photos/64.webp")).arrayBuffer(),
+    ),
   },
 ];
 

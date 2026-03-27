@@ -1,11 +1,9 @@
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/session";
 import {
-  DeleteUserParams,
-  ReadUserParams,
-  ReadUserResponse,
-  UpdateUserBody,
-  UpdateUserParams,
+  DeleteUserImageParams,
+  ReadUserImageParams,
+  UpdateUserImageParams,
 } from "@/src/api/endpoints/user/user.zod";
 import {
   BadRequestResponse,
@@ -14,48 +12,45 @@ import {
   UnexpectedResponse,
 } from "@/src/api/models";
 import { Prisma } from "@/src/generated/prisma/client";
-import { hash } from "argon2";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import pino from "pino";
-import z, { ZodError } from "zod";
+import sharp from "sharp";
+import { ZodError } from "zod";
 
 const logger = pino();
-const getLogger = logger.child({ operation: "get user" });
-const putLogger = logger.child({ operation: "update user" });
-const deleteLogger = logger.child({ operation: "delete user" });
+const getLogger = logger.child({ operation: "get user image" });
+const putLogger = logger.child({ operation: "update user image" });
+const deleteLogger = logger.child({ operation: "delete user image" });
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function GET(
   _: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/user/[id]/image">,
 ) {
   try {
-    const params = ReadUserParams.parse(await context.params);
-    const user = await prisma.user.findUnique({
-      select: { id: true, description: true, admin: true, name: true },
-      where: { id: params.id },
-    });
+    const params = ReadUserImageParams.parse(await context.params);
+    const image = (
+      await prisma.user.findUnique({
+        select: { image: true },
+        where: { id: params.id },
+      })
+    )?.image;
 
-    if (!user) {
-      getLogger.info("User not found.");
+    if (!image) {
+      getLogger.info("Image not found.");
 
       return NextResponse.json(
-        { message: "User not found." } as NotFoundResponse,
+        { message: "Image not found." } as NotFoundResponse,
         { status: 404 },
       );
     }
 
-    const session = await decrypt((await cookies()).get("session")?.value);
     getLogger.info("Success");
 
-    return NextResponse.json(
-      ReadUserResponse.parse({
-        editable: user.id === session?.id || session?.admin,
-        ...user,
-        admin: user.admin ?? undefined,
-      } as z.infer<typeof ReadUserResponse>),
-    );
+    return new NextResponse(image, {
+      headers: { "Content-Type": "image/webp" },
+    });
   } catch (e) {
     if (e instanceof ZodError) {
       getLogger.info({ issues: e.issues });
@@ -80,11 +75,14 @@ export async function GET(
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function PUT(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/user/[id]/image">,
 ) {
   try {
-    const params = UpdateUserParams.parse(await context.params);
-    const body = UpdateUserBody.parse(await request.json());
+    const params = UpdateUserImageParams.parse(await context.params);
+    const body = await sharp(await request.arrayBuffer())
+      .resize(64, 64)
+      .webp()
+      .toBuffer();
 
     const sessionId = (await decrypt((await cookies()).get("session")?.value))
       ?.id;
@@ -103,7 +101,7 @@ export async function PUT(
     }
 
     await prisma.user.update({
-      data: { ...body, password: body.password && (await hash(body.password)) },
+      data: { image: new Uint8Array(body) },
       where: { id: params.id },
     });
 
@@ -146,17 +144,16 @@ export async function PUT(
 // eslint-disable-next-line jsdoc/require-jsdoc
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext<"/api/user/[id]">,
+  context: RouteContext<"/api/user/[id]/image">,
 ) {
   try {
-    const params = DeleteUserParams.parse(await context.params);
-    const cookieStore = await cookies();
-    const sessionId = (await decrypt(cookieStore.get("session")?.value))?.id;
+    const params = DeleteUserImageParams.parse(await context.params);
+    const sessionId = (await decrypt((await cookies()).get("session")?.value))
+      ?.id;
 
-    const isCurrentUser = sessionId === params.id;
     if (
       !sessionId ||
-      (!isCurrentUser &&
+      (sessionId !== params.id &&
         !(await prisma.user.findUnique({ where: { id: sessionId } })))
     ) {
       deleteLogger.info("Unauthorized.");
@@ -167,9 +164,10 @@ export async function DELETE(
       );
     }
 
-    await prisma.user.delete({ where: { id: params.id } });
-
-    if (isCurrentUser) cookieStore.delete("session");
+    await prisma.user.update({
+      data: { image: null },
+      where: { id: params.id },
+    });
 
     deleteLogger.info("Success");
 

@@ -26,6 +26,7 @@ model User {
   password     String
   description  String        @default("")
   admin        Boolean?
+  image        Bytes?
   reservations Reservation[]
 }
 

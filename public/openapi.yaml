@@ -177,6 +177,68 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/Unexpected"
+  /user/{id}/image:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+    get:
+      summary: Read a user image
+      operationId: readUserImage
+      tags:
+        - user
+      responses:
+        "200":
+          description: The user image corresponding to the provided `id`
+          content:
+            image/webp:
+              schema:
+                $ref: "#/components/schemas/Image"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+    put:
+      summary: Update a user image
+      operationId: updateUserImage
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Update the user image corresponding to the provided `id`
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+      requestBody:
+        content:
+          image/*:
+            schema:
+              $ref: "#/components/schemas/Image"
+    delete:
+      summary: Delete a user image
+      operationId: deleteUserImage
+      tags:
+        - user
+      security:
+        - Jwt: []
+      responses:
+        "204":
+          description: Delete the user image corresponding to the provided `id`
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/Unexpected"
   /lab:
     get:
       summary: Read all labs
@@ -459,6 +521,9 @@ components:
           type: string
           format: date-time
           example: "1970-01-01T00:00:00.000Z"
+    Image:
+      type: string
+      format: binary
     SlotId:
       type: string
       minLength: 1
