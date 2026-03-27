@@ -6,6 +6,8 @@ import Providers from "./providers";
 import Nav from "./nav";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +59,13 @@ export default function RootLayout({
             <TooltipProvider>
               <Nav />
               <main className="p-4">{children}</main>
+              <footer className="bg-muted p-6">
+                <Button className="my-6 block" variant="link" asChild>
+                  <Link href="/about">About</Link>
+                </Button>
+                Copyright &copy; 2026 by Rear-end Developers. All rights
+                reserved.
+              </footer>
             </TooltipProvider>
             <Toaster />
           </ThemeProvider>
