@@ -9,7 +9,11 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import icon from "./icon0.svg";
-import { useReadCurrentUser, useReadUser } from "@/src/api/endpoints/user/user";
+import {
+  useReadCurrentUser,
+  useReadUser,
+  useReadUserImage,
+} from "@/src/api/endpoints/user/user";
 import {
   ReadCurrentUserResponse,
   ReadUserParams,
@@ -116,7 +120,10 @@ export default function Nav() {
                       Hello, {user.name.first}!
                     </p>
                     <Avatar>
-                      <AvatarImage src="" />
+                      <AvatarImage
+                        src={`/api/user/${user.id}/image`}
+                        alt="Profile image"
+                      ></AvatarImage>
                       <AvatarFallback>{user.name.first[0]}</AvatarFallback>
                     </Avatar>
                   </Link>

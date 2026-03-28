@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import Reservation, { ReservationContent } from "@/app/reservation";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { ImagePlus, Pencil } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -38,6 +38,7 @@ import {
 import {
   readCurrentUserResponse,
   useDeleteUser,
+  useDeleteUserImage,
   useLogout,
   useReadCurrentUser,
   useReadUser,
@@ -47,11 +48,13 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import z from "zod";
 import {
+  DeleteUserImageParams,
   DeleteUserParams,
   ReadCurrentUserResponse,
   ReadUserParams,
   ReadUserResponse,
   UpdateUserBody,
+  UpdateUserImageParams,
   UpdateUserParams,
 } from "@/src/api/endpoints/user/user.zod";
 import { useReadReservationUser } from "@/src/api/endpoints/reservation/reservation";
@@ -60,6 +63,18 @@ import {
   ReadReservationUserResponse,
 } from "@/src/api/endpoints/reservation/reservation.zod";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
 
 /**
  * Parses the current user ID from the query.
@@ -256,6 +271,32 @@ export default function User() {
     },
   });
 
+  const { mutate: mutateDeleteUserImage } = useDeleteUserImage({
+    mutation: {
+      onSuccess(data) {
+        switch (data.status) {
+          case 204:
+            toast.success("Deleted user image.");
+            break;
+
+          case 400:
+          case 401:
+          case 404:
+            toast.error(data.data.message);
+            break;
+
+          case 500:
+            toast.warning(data.data.message);
+            break;
+
+          default:
+            toast.warning("Unexpected error.");
+            break;
+        }
+      },
+    },
+  });
+
   return (
     <>
       {(() => {
@@ -264,7 +305,10 @@ export default function User() {
             <>
               <div className="container m-auto flex items-center justify-center gap-6">
                 <Avatar size="lg">
-                  <AvatarImage src="" />
+                  <AvatarImage
+                    src={`/api/user/${user.id}/image`}
+                    alt="Profile image"
+                  />
                   <AvatarFallback>{user.name.first[0]}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -277,115 +321,60 @@ export default function User() {
                   <p className="text-muted-foreground text-sm">{user.id}</p>
                 </div>
                 {user.editable && (
-                  <Drawer>
-                    <DrawerTrigger asChild>
-                      <Button variant="outline">
-                        <Pencil />
-                      </Button>
-                    </DrawerTrigger>
-                    <DrawerContent>
-                      <div className="mx-auto w-full max-w-sm overflow-y-auto">
-                        <DrawerHeader>
-                          <DrawerTitle>Edit Profile</DrawerTitle>
-                        </DrawerHeader>
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline">
+                          <ImagePlus />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-sm">
                         <Form
-                          action={(formData) => {
-                            const data = Object.fromEntries(formData.entries());
+                          action={async (formData) => {
+                            const query = await fetch(
+                              `${baseUrl}/api/user/${user.id}/image`,
+                              { method: "PUT", body: formData.get("image") },
+                            );
 
-                            if (data["password"] !== data["confirm-password"]) {
-                              toast.error("Passwords do not match.");
-                              return;
-                            }
+                            switch (query.status) {
+                              case 204:
+                                toast.success("Updated user image.");
+                                break;
 
-                            try {
-                              mutateUpdateUser({
-                                ...UpdateUserParams.parse(user),
-                                data: UpdateUserBody.parse({
-                                  name: {
-                                    first: data["firstname"],
-                                    last: data["lastname"],
-                                  },
-                                  ...data,
-                                  password: data["password"] || undefined,
-                                } as z.infer<typeof UpdateUserBody>),
-                              });
-                            } catch {
-                              toast.error("Invalid fields.");
+                              case 400:
+                              case 401:
+                              case 404:
+                                toast.error((await query.json()).message);
+                                break;
+
+                              case 500:
+                                toast.warning((await query.json()).message);
+                                break;
+
+                              default:
+                                toast.warning("Unexpected error.");
+                                break;
                             }
                           }}
                         >
-                          <div className="p-4 pb-0">
-                            <div className="flex items-center justify-center space-x-2">
-                              <FieldGroup>
-                                <Field>
-                                  <FieldLabel htmlFor="firstname">
-                                    First Name
-                                  </FieldLabel>
-                                  <Input
-                                    id="firstname"
-                                    name="firstname"
-                                    type="text"
-                                    placeholder="Juan"
-                                    defaultValue={user.name.first}
-                                    required
-                                  />
-                                </Field>
-                                <Field>
-                                  <FieldLabel htmlFor="lastname">
-                                    Last Name
-                                  </FieldLabel>
-                                  <Input
-                                    id="lastname"
-                                    name="lastname"
-                                    type="text"
-                                    placeholder="Dela Cruz"
-                                    defaultValue={user.name.last}
-                                    required
-                                  />
-                                </Field>
-                                <Field>
-                                  <FieldLabel htmlFor="description">
-                                    Description
-                                  </FieldLabel>
-                                  <Textarea
-                                    id="description"
-                                    name="description"
-                                    placeholder="Type your description here."
-                                    defaultValue={user.description}
-                                  />
-                                </Field>
-                                <Field>
-                                  <FieldLabel htmlFor="password">
-                                    Password
-                                  </FieldLabel>
-                                  <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    minLength={8}
-                                  />
-                                  <FieldDescription>
-                                    Must be at least 8 characters long.
-                                  </FieldDescription>
-                                </Field>
-                                <Field>
-                                  <FieldLabel htmlFor="confirm-password">
-                                    Confirm Password
-                                  </FieldLabel>
-                                  <Input
-                                    id="confirm-password"
-                                    name="confirm-password"
-                                    type="password"
-                                  />
-                                  <FieldDescription>
-                                    Please confirm your password.
-                                  </FieldDescription>
-                                </Field>
-                              </FieldGroup>
-                            </div>
-                          </div>
-                          <DrawerFooter>
-                            <Button type="submit">Update</Button>
+                          <DialogHeader>
+                            <DialogTitle>Change profile image</DialogTitle>
+                            <DialogDescription>
+                              Make changes to your profile image here.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <Field>
+                            <Input name="image" type="file" required />
+                            <FieldDescription>
+                              Select an image to upload.
+                            </FieldDescription>
+                          </Field>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button variant="outline" type="reset">
+                                Cancel
+                              </Button>
+                            </DialogClose>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="destructive">Delete</Button>
@@ -397,8 +386,8 @@ export default function User() {
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
                                     This action cannot be undone. This will
-                                    permanently delete your account from our
-                                    servers.
+                                    permanently delete your profile image from
+                                    our servers.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -406,8 +395,8 @@ export default function User() {
                                   <AlertDialogAction
                                     onClick={() => {
                                       try {
-                                        mutateDeleteUser(
-                                          DeleteUserParams.parse(user),
+                                        mutateDeleteUserImage(
+                                          DeleteUserImageParams.parse(user),
                                         );
                                       } catch {
                                         toast.error("Invalid request.");
@@ -419,16 +408,170 @@ export default function User() {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                            <DrawerClose asChild>
-                              <Button variant="outline" type="reset">
-                                Cancel
-                              </Button>
-                            </DrawerClose>
-                          </DrawerFooter>
+                            <Button type="submit">Update</Button>
+                          </DialogFooter>
                         </Form>
-                      </div>
-                    </DrawerContent>
-                  </Drawer>
+                      </DialogContent>
+                    </Dialog>
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <Button variant="outline">
+                          <Pencil />
+                        </Button>
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="mx-auto w-full max-w-sm overflow-y-auto">
+                          <DrawerHeader>
+                            <DrawerTitle>Edit Profile</DrawerTitle>
+                          </DrawerHeader>
+                          <Form
+                            action={(formData) => {
+                              const data = Object.fromEntries(
+                                formData.entries(),
+                              );
+
+                              if (
+                                data["password"] !== data["confirm-password"]
+                              ) {
+                                toast.error("Passwords do not match.");
+                                return;
+                              }
+
+                              try {
+                                mutateUpdateUser({
+                                  ...UpdateUserParams.parse(user),
+                                  data: UpdateUserBody.parse({
+                                    name: {
+                                      first: data["firstname"],
+                                      last: data["lastname"],
+                                    },
+                                    ...data,
+                                    password: data["password"] || undefined,
+                                  } as z.infer<typeof UpdateUserBody>),
+                                });
+                              } catch {
+                                toast.error("Invalid fields.");
+                              }
+                            }}
+                          >
+                            <div className="p-4 pb-0">
+                              <div className="flex items-center justify-center space-x-2">
+                                <FieldGroup>
+                                  <Field>
+                                    <FieldLabel htmlFor="firstname">
+                                      First Name
+                                    </FieldLabel>
+                                    <Input
+                                      id="firstname"
+                                      name="firstname"
+                                      type="text"
+                                      placeholder="Juan"
+                                      defaultValue={user.name.first}
+                                      required
+                                    />
+                                  </Field>
+                                  <Field>
+                                    <FieldLabel htmlFor="lastname">
+                                      Last Name
+                                    </FieldLabel>
+                                    <Input
+                                      id="lastname"
+                                      name="lastname"
+                                      type="text"
+                                      placeholder="Dela Cruz"
+                                      defaultValue={user.name.last}
+                                      required
+                                    />
+                                  </Field>
+                                  <Field>
+                                    <FieldLabel htmlFor="description">
+                                      Description
+                                    </FieldLabel>
+                                    <Textarea
+                                      id="description"
+                                      name="description"
+                                      placeholder="Type your description here."
+                                      defaultValue={user.description}
+                                    />
+                                  </Field>
+                                  <Field>
+                                    <FieldLabel htmlFor="password">
+                                      Password
+                                    </FieldLabel>
+                                    <Input
+                                      id="password"
+                                      name="password"
+                                      type="password"
+                                      minLength={8}
+                                    />
+                                    <FieldDescription>
+                                      Must be at least 8 characters long.
+                                    </FieldDescription>
+                                  </Field>
+                                  <Field>
+                                    <FieldLabel htmlFor="confirm-password">
+                                      Confirm Password
+                                    </FieldLabel>
+                                    <Input
+                                      id="confirm-password"
+                                      name="confirm-password"
+                                      type="password"
+                                    />
+                                    <FieldDescription>
+                                      Please confirm your password.
+                                    </FieldDescription>
+                                  </Field>
+                                </FieldGroup>
+                              </div>
+                            </div>
+                            <DrawerFooter>
+                              <Button type="submit">Update</Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive">Delete</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will
+                                      permanently delete your account from our
+                                      servers.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => {
+                                        try {
+                                          mutateDeleteUser(
+                                            DeleteUserParams.parse(user),
+                                          );
+                                        } catch {
+                                          toast.error("Invalid request.");
+                                        }
+                                      }}
+                                    >
+                                      Continue
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                              <DrawerClose asChild>
+                                <Button variant="outline" type="reset">
+                                  Cancel
+                                </Button>
+                              </DrawerClose>
+                            </DrawerFooter>
+                          </Form>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
+                  </>
                 )}
                 {user.id === currentUser && (
                   <Button variant="destructive" onClick={() => mutateLogout()}>
